@@ -4,6 +4,7 @@ package com.example.iread.apicaller;
 import com.example.iread.Model.Account;
 import com.example.iread.Model.Book;
 import com.example.iread.Model.BookChapter;
+import com.example.iread.Model.BookViewModel;
 import com.example.iread.Model.Category;
 import com.example.iread.Model.CommentModel;
 import com.example.iread.basemodel.ReponderModel;
@@ -54,5 +55,14 @@ public interface IAppApiCaller {
     @POST("Book/UpdateComment")
     Call<ReponderModel<Object>>commentBook(
             @Body CommentModel commentModel
+    );
+    @POST("Book/CreateViewBook")
+    Call<ReponderModel<String>>createBookView(
+            @Body BookViewModel bookViewModel
+    );
+    @GET("Book/GetViewNo")
+    Call<ReponderModel<Integer>> totalViewBook(
+            @Query("bookId") int bookId,
+            @Query("bookTypeStatus") int statusType
     );
 }

@@ -60,6 +60,8 @@ public class ChapterFragment extends Fragment {
 
 
         totalChapters = view.findViewById(R.id.totalChapters);
+
+        //Sort view list chapter
         sortOrderView = view.findViewById(R.id.sortOlderView);
         sortOrderView.setOnClickListener(v -> {
             if (chapterList != null && chapterList.size() > 1) {
@@ -105,8 +107,6 @@ public class ChapterFragment extends Fragment {
                     }, getContext(), chapterList);
                     recyclerView.setAdapter(chapterAdapter);
 
-
-                    Log.d("ChapterFragment", "Số chương nhận được từ API: " + chapterList.size());
                     // Log để kiểm tra dữ liệu
                     for (BookChapter chapter : chapterList) {
                         Log.d("BookChapter", "Chapter name: " + chapter.getChapterName());

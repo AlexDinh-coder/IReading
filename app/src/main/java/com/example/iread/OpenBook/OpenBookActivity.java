@@ -26,6 +26,7 @@ import com.example.iread.Comment.ReviewActivity;
 import com.example.iread.CommentActivity;
 import com.example.iread.Interface.ParameterInterface;
 import com.example.iread.Model.Book;
+import com.example.iread.Model.BookViewModel;
 import com.example.iread.Model.Category;
 import com.example.iread.Model.CommentModel;
 import com.example.iread.R;
@@ -50,9 +51,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     private ReviewAdapter reviewAdapter;
     TabLayout tabLayout;
 
-    TextView totalRating, btnTotalReview, btnTextReview;
-
-    private SwipeRefreshLayout swipeRefreshLayout;
+    TextView totalRating, btnTotalReview, btnTextReview, totalReadView;
 
     private ActivityResultLauncher<Intent> commentLauncher;
 
@@ -67,6 +66,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         btnTotalReview = findViewById(R.id.btn_see_all_reviews);
         totalRating =findViewById(R.id.totalRating);
         btnTextReview = findViewById(R.id.btnReview);
+        totalReadView = findViewById(R.id.totalView);
 
         AtomicInteger bookId = new AtomicInteger(getIntent().getIntExtra("bookId", -1));
 
@@ -95,11 +95,11 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
 
         // xử lí hiện list tổng review
         if (bookId.get() != -1){
-            getBookReview(bookId.get());
             btnTotalReview.setOnClickListener(v -> {
                 Intent intent = new Intent(OpenBookActivity.this, ReviewActivity.class);
                 intent.putExtra("bookId", bookId.get());
                 startActivity(intent);
+
             });
         }
 
@@ -183,9 +183,33 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             });
         }
 
+        getBookReview(bookId.get());
+        getBookTotalReview(bookId.get());
 
 
     }
+    //Total review của sách
+    private void getBookTotalReview(int bookId) {
+        iAppApiCaller.totalViewBook(bookId, 0).enqueue(new Callback<ReponderModel<Integer>>() {
+            @Override
+            public void onResponse(Call<ReponderModel<Integer>> call, Response<ReponderModel<Integer>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    int viewCount = response.body().getData();
+                    Log.d("APIView", "Tổng lượt đọc: " + viewCount);
+                    totalReadView.setText(viewCount + "");
+
+                }else {
+                    Log.d("APIView", "Khong co du lieu");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ReponderModel<Integer>> call, Throwable t) {
+                Log.e("APIView", "Lỗi API GetViewNo: " + t.getMessage());
+            }
+        });
+    }
+
     // Lấy phần list revie của sách ở bên ngoài chi tiết sách
     private void getBookReview(int bookId) {
         iAppApiCaller.listCommentBook(bookId).enqueue(new Callback<ReponderModel<CommentModel>>() {
@@ -320,18 +344,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     }
 
 
-
-    private TextView createTextView(String text, int sizeSp, boolean bold) {
-        TextView tv = new TextView(this);
-        tv.setText(text);
-        tv.setTextSize(sizeSp);
-        tv.setTextColor(Color.WHITE);
-        tv.setPadding(16, 8, 16, 8);
-        if (bold) tv.setTypeface(null, android.graphics.Typeface.BOLD);
-        return tv;
-    }
-
-
     private void makeStatusBarTransparent() {
         Window window = getWindow();
 
@@ -365,6 +377,25 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     @Override
     public void onSuccess(Integer data) {
 
+    }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        int bookId = getIntent().getIntExtra("bookId", -1);
+        if (bookId != -1) {
+            getBookTotalReview(bookId);  // reload khi quay lại
+        }
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        int bookId = getIntent().getIntExtra("bookId", -1);
+        if (bookId != -1) {
+            getBookTotalReview(bookId);  // Gọi lại mỗi lần quay về
+        }
     }
 }

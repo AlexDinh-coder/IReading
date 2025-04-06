@@ -40,7 +40,7 @@ public class SplashActivity extends AppCompatActivity {
 //                }
 //                finish();
                 // Luôn chạy LoginActivity (không check user)
-                Intent intent = new Intent(SplashActivity.this, LoginOpenActivity.class);
+                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             });

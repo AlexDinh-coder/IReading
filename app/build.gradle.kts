@@ -70,6 +70,8 @@ dependencies {
     implementation("com.airbnb.android:lottie:6.4.1")
     //Material Icons
     implementation ("com.google.android.material:material:1.11.0")
+     //secutiry
+    implementation ("androidx.security:security-crypto:1.1.0-alpha03")
 
 
 
