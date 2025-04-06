@@ -64,6 +64,12 @@ dependencies {
     implementation ("com.google.android.material:material:1.10.0")
     //FlexBoxLayout
     implementation ("com.google.android.flexbox:flexbox:3.0.0")
+    // PaperDB
+    implementation ("io.github.pilgr:paperdb:2.7.2")
+    // Lottie
+    implementation("com.airbnb.android:lottie:6.4.1")
+    //Material Icons
+    implementation ("com.google.android.material:material:1.11.0")
 
 
 

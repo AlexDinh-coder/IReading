@@ -1,5 +1,7 @@
 package com.example.iread.Book;
 
+
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,15 +10,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.iread.Model.BookChapter;
 import com.example.iread.R;
 
 import java.util.List;
 
 public class PageAdapter extends RecyclerView.Adapter<PageAdapter.PageViewHolder> {
 
-    private List<String> pageList;
+    private List<BookChapter> pageList;
 
-    public PageAdapter(List<String> pageList) {
+    public PageAdapter(List<BookChapter> pageList) {
         this.pageList = pageList;
     }
 
@@ -29,7 +32,12 @@ public class PageAdapter extends RecyclerView.Adapter<PageAdapter.PageViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull PageViewHolder holder, int position) {
-        holder.textPage.setText(pageList.get(position));
+        BookChapter bookChapter = pageList.get(position);
+        if (bookChapter.getContent() != null)
+            holder.textPage.setText(Html.fromHtml(bookChapter.getContent(), Html.FROM_HTML_MODE_LEGACY));
+        else {
+            holder.textPage.setText("Nội dung đang cập nhật...");
+        }
     }
 
     @Override

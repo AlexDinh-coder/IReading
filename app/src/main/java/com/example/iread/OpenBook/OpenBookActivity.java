@@ -1,10 +1,9 @@
 package com.example.iread.OpenBook;
 
-import static android.content.Intent.getIntent;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -12,9 +11,10 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,10 +22,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
+import com.example.iread.Comment.ReviewActivity;
+import com.example.iread.CommentActivity;
 import com.example.iread.Interface.ParameterInterface;
 import com.example.iread.Model.Book;
 import com.example.iread.Model.Category;
-import com.example.iread.Model.Review;
+import com.example.iread.Model.CommentModel;
 import com.example.iread.R;
 import com.example.iread.apicaller.IAppApiCaller;
 import com.example.iread.apicaller.RetrofitClient;
@@ -36,6 +38,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,7 +50,11 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     private ReviewAdapter reviewAdapter;
     TabLayout tabLayout;
 
+    TextView totalRating, btnTotalReview, btnTextReview;
+
     private SwipeRefreshLayout swipeRefreshLayout;
+
+    private ActivityResultLauncher<Intent> commentLauncher;
 
     ImageView btnBack;
     FrameLayout contentFrame;
@@ -56,43 +63,45 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_open_book);
 
-        int bookId = getIntent().getIntExtra("bookId", -1);
+        iAppApiCaller = RetrofitClient.getInstance(Utils.BASE_URL, this).create(IAppApiCaller.class);
+        btnTotalReview = findViewById(R.id.btn_see_all_reviews);
+        totalRating =findViewById(R.id.totalRating);
+        btnTextReview = findViewById(R.id.btnReview);
+
+        AtomicInteger bookId = new AtomicInteger(getIntent().getIntExtra("bookId", -1));
 
         makeStatusBarTransparent(); // làm trong suốt status bar
         applyTopPadding();          // tránh đè nội dung lên status bar nếu cần
 
         rcv= findViewById(R.id.rcv_review_in_open_book);
         rcv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        reviewAdapter = new ReviewAdapter(new ArrayList<>());
+        rcv.setAdapter(reviewAdapter);
 
+        //Xử lí nut back quay lại
         btnBack = findViewById(R.id.imageView2);
         btnBack.setOnClickListener(v -> {
             finish(); // Quay lại màn trước đó
         });
 
+        commentLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && bookId.get() != -1) {
+                        getBookReview(bookId.get());
+                    }
+                }
+        );
 
-
-
-
-
-
-        List<Review> reviewList = new ArrayList<>();
-
-        // Tạo 5 đối tượng Review
-        Review review1 = new Review("Linh", "Truyện rất hay, cốt truyện hấp dẫn!");
-        Review review2 = new Review("Minh", "Tác giả xây dựng nhân vật rất tốt.");
-        Review review3 = new Review("Trang", "Mình đọc một mạch không dừng lại được.");
-        Review review4 = new Review("Huy", "Nội dung ổn nhưng đoạn kết hơi vội.");
-        Review review5 = new Review("Lan", "Tình tiết nhẹ nhàng, rất phù hợp để thư giãn.");
-
-        // Thêm vào danh sách
-        reviewList.add(review1);
-        reviewList.add(review2);
-        reviewList.add(review3);
-        reviewList.add(review4);
-        reviewList.add(review5);
-
-        reviewAdapter = new ReviewAdapter(reviewList);
-        rcv.setAdapter(reviewAdapter);
+        // xử lí hiện list tổng review
+        if (bookId.get() != -1){
+            getBookReview(bookId.get());
+            btnTotalReview.setOnClickListener(v -> {
+                Intent intent = new Intent(OpenBookActivity.this, ReviewActivity.class);
+                intent.putExtra("bookId", bookId.get());
+                startActivity(intent);
+            });
+        }
 
         // =========================================
         tabLayout = findViewById(R.id.tabLayout);
@@ -105,31 +114,32 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         // Load tab đầu tiên mặc định
         ChapterFragment chapterFragment = new ChapterFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt("bookId", bookId);
+        bundle.putInt("bookId", bookId.get());
         chapterFragment.setArguments(bundle);
         loadFragment(chapterFragment);
 
 
 
-        // Lắng nghe sự kiện chọn tab
+        // Lắng nghe sự kiện chọn tab giữa chương sách và có thể bạn thích
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition() == 0) {
                     ChapterFragment chapterFragment = new ChapterFragment();
                     Bundle bundle = new Bundle();
-                    bundle.putInt("bookId", bookId);
+                    bundle.putInt("bookId", bookId.get());
                     chapterFragment.setArguments(bundle);
                     loadFragment(chapterFragment);
                 } else if (tab.getPosition() == 1) {
                     MinghtLikeFragment minghtLikeFragment = new MinghtLikeFragment();
                     Bundle bundle = new Bundle();
-                    bundle.putInt("bookId", bookId);
+                    bundle.putInt("bookId", bookId.get());
                     minghtLikeFragment.setArguments(bundle);
                     loadFragment(minghtLikeFragment);
 
                 }
             }
+
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {}
@@ -138,16 +148,27 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         });
 
         Log.d("OpenBookActivity", "Received bookId: " + bookId);
-        if (bookId != -1) {
+
+        //Xử lí phần hien click đánh giá của sách đó
+        if (bookId.get() != -1) {
             iAppApiCaller = RetrofitClient.getInstance(Utils.BASE_URL, this).create(IAppApiCaller.class);
 
-            iAppApiCaller.getBookById(bookId).enqueue(new Callback<ReponderModel<Book>>() {
+            iAppApiCaller.getBookById(bookId.get()).enqueue(new Callback<ReponderModel<Book>>() {
                 @Override
                 public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         Book book = response.body().getData();  // đây mới đúng
                         if (book != null) {
                             showBookDetailUI(book);
+                            btnTextReview.setOnClickListener(v -> {
+                                Intent intent = new Intent(OpenBookActivity.this, CommentActivity.class);
+                                intent.putExtra("bookId", book.getId());
+                                intent.putExtra("bookTitle", book.getName());
+                                intent.putExtra("bookAuthor", book.getCreateBy());
+                                intent.putExtra("bookImage", book.getPoster());
+                                commentLauncher.launch(intent);
+
+                            });
                         } else {
                             Log.e("OpenBookActivity", "Book is null trong data");
                         }
@@ -162,8 +183,39 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             });
         }
 
+
+
     }
-    
+    // Lấy phần list revie của sách ở bên ngoài chi tiết sách
+    private void getBookReview(int bookId) {
+        iAppApiCaller.listCommentBook(bookId).enqueue(new Callback<ReponderModel<CommentModel>>() {
+            @Override
+            public void onResponse(Call<ReponderModel<CommentModel>> call, Response<ReponderModel<CommentModel>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getDataList() != null) {
+                    List<CommentModel> commentModel = response.body().getDataList();
+                    Log.d("ReviewAPI", "Số lượng review nhận được: " + commentModel.size());
+
+                    totalRating.setText(commentModel.size() + " đánh giá");
+                    reviewAdapter.updateData(commentModel);
+
+                    float totalStar = 0f;
+                    for (CommentModel comment : commentModel){
+                        totalStar += comment.getRating();
+                    }
+                    float averageRating = commentModel.size() >0 ? totalStar / commentModel.size() : 0f;
+                } else {
+                    Log.w("ReviewAPI", "Không có review hoặc response không hợp lệ");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ReponderModel<CommentModel>> call, Throwable t) {
+                Log.e("ReviewAPI", "Lỗi khi lấy đánh giá: " + t.getMessage(), t);
+            }
+        });
+    }
+
+
 
     private void loadFragment(Fragment fragment) {
         getSupportFragmentManager()
@@ -173,6 +225,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     }
 
 
+    // Hiện chi tiết thông tin của sách
     private void showBookDetailUI(Book book) {
         // 1. Hiển thị ảnh bìa sách
         ImageView imgBook = findViewById(R.id.image_characters_in_detail);

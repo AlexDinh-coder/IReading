@@ -1,5 +1,6 @@
 package com.example.iread.Home;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -171,6 +172,7 @@ public class HomeFragment extends Fragment {
         apiCaller.getCategories().enqueue(new Callback<ReponderModel<Category>>() {
             @Override
             public void onResponse(Call<ReponderModel<Category>> call, Response<ReponderModel<Category>> response) {
+                if (!isAdded()) return; // 🛡️ check fragment còn tồn tại
                 if (response.isSuccessful() && response.body() != null) {
                     List<Category> categories = response.body().getDataList();
                     //sap xep category theo id
@@ -178,6 +180,7 @@ public class HomeFragment extends Fragment {
 
 
                     for (Category category : categories) {
+                        if (isAdded()) // Ngăn crash
                         addCategorySelection(category);
                     }
                 }
@@ -192,6 +195,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void addCategorySelection(Category category) {
+        if (!isAdded()) return; // check fragment tồn tại
 
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         View sectionView = inflater.inflate(R.layout.item_category_section_xml, contentScrollLayout, false);
@@ -208,6 +212,7 @@ public class HomeFragment extends Fragment {
                 .enqueue(new Callback<ReponderModel<Book>>() {
                     @Override
                     public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
+                        if (!isAdded()) return; // Ngăn crash, check fragment còn tồn tại không
                         if (response.isSuccessful() && response.body() != null) {
                             List<Book> books = response.body().getDataList();
 
@@ -290,22 +295,26 @@ public class HomeFragment extends Fragment {
     private void updateBackgroundColor(int imageResId) {
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), imageResId);
         Palette.from(bitmap).generate(palette -> {
-            if (palette != null) {
-                int defaultColor = ContextCompat.getColor(requireContext(), android.R.color.black);
-                int dominantColor = palette.getDominantColor(defaultColor);
+            if (!isAdded() || palette == null) return; // ✅ Chống crash
 
-                int startColor = addAlpha(dominantColor, 200);
-                int endColor = Color.parseColor("#101318");
+            Context context = getContext();
+            if (context == null) return; // ✅ context an toàn
 
-                GradientDrawable gradientDrawable = new GradientDrawable(
-                        GradientDrawable.Orientation.TOP_BOTTOM,
-                        new int[]{startColor, endColor}
-                );
-                gradientDrawable.setCornerRadius(0f);
-                backgroundView.setBackground(gradientDrawable);
-            }
+            int defaultColor = ContextCompat.getColor(context, android.R.color.black);
+            int dominantColor = palette.getDominantColor(defaultColor);
+
+            int startColor = addAlpha(dominantColor, 200);
+            int endColor = Color.parseColor("#101318");
+
+            GradientDrawable gradientDrawable = new GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{startColor, endColor}
+            );
+            gradientDrawable.setCornerRadius(0f);
+            backgroundView.setBackground(gradientDrawable);
         });
     }
+
 
     private int addAlpha(int color, int alpha) {
         return (alpha << 24) | (color & 0x00FFFFFF);

@@ -1,6 +1,8 @@
 package com.example.iread.Model;
 
-public class BookChapter {
+import java.io.Serializable;
+
+public class BookChapter implements Serializable {
     private String id;
     private String chapterName;
     private int chaperId;

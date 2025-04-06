@@ -2,6 +2,7 @@ package com.example.iread.OpenBook;
 
 import static android.content.Intent.getIntent;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.iread.Book.ActivityBook;
 import com.example.iread.Model.BookChapter;
 import com.example.iread.R;
 import com.example.iread.apicaller.IAppApiCaller;
@@ -80,6 +82,8 @@ public class ChapterFragment extends Fragment {
     }
 
     private void getBookChaper(int bookId) {
+        if (!isAdded()) return; // đảm bảo Fragment đã được attach
+        requireContext();
         iAppApiCaller = RetrofitClient.getInstance(Utils.BASE_URL, requireContext()).create(IAppApiCaller.class);
         iAppApiCaller.getListByBookId(bookId).enqueue(new Callback<ReponderModel<BookChapter>>() {
             @Override
@@ -93,8 +97,14 @@ public class ChapterFragment extends Fragment {
                     totalChapters.setText(chapterList.size() + " chương");
 
                     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                    chapterAdapter = new ChapterAdapter(getContext(), chapterList);
+                    chapterAdapter = new ChapterAdapter((int position) -> {
+                        Intent intent = new Intent(getContext(), ActivityBook.class);
+                        intent.putExtra("selectedIndex", position);
+                        intent.putExtra("chapterList", new ArrayList<>(chapterList)); // truyền danh sách chương
+                        startActivity(intent);
+                    }, getContext(), chapterList);
                     recyclerView.setAdapter(chapterAdapter);
+
 
                     Log.d("ChapterFragment", "Số chương nhận được từ API: " + chapterList.size());
                     // Log để kiểm tra dữ liệu

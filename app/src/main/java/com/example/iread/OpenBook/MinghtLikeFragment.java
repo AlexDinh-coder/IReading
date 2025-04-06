@@ -48,8 +48,6 @@ public class MinghtLikeFragment extends Fragment {
 
 
 
-
-
         Bundle bundle = getArguments();
         if (bundle != null) {
             int bookId = bundle.getInt("bookId", -1);
@@ -89,34 +87,36 @@ public class MinghtLikeFragment extends Fragment {
         //Set adapter mot lần
         bookDetailAdapter = new BookDetailAdapter(requireContext(), recommendedBook);
         rcvBookDetail.setAdapter(bookDetailAdapter);
+        String categoryName = "";
         for (Category category : categoryNames) {
-            String categoryName = category.getName();
-            iAppApiCaller.getBookByCategory(categoryName).enqueue(new Callback<ReponderModel<Book>>() {
-                @Override
-                public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        List<Book> booksFromCategory = response.body().getDataList();
-
-                        for (Book book : booksFromCategory) {
-                            int id = book.getId();
-                            // Không trùng sách hiện tại và không trùng trong danh sách
-                            if (id != bookId && !addBookIds.contains(id)) {
-                                addBookIds.add(id);
-                                recommendedBook.add(book);
-                            }
-                        }
-                        // Cập nhật lại adapter
-                        bookDetailAdapter.notifyDataSetChanged();
-
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ReponderModel<Book>> call, Throwable t) {
-                    Log.e("MinghtLikeFragment", "Lỗi gọi API getBookByCategory: " + t.getMessage());
-                }
-            });
+            categoryName += category.getName() + ",";
         }
+        iAppApiCaller.getBookByCategory(categoryName).enqueue(new Callback<ReponderModel<Book>>() {
+            @Override
+            public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Book> booksFromCategory = response.body().getDataList();
+
+                    for (Book book : booksFromCategory) {
+                        int id = book.getId();
+                        // Không trùng sách hiện tại và không trùng trong danh sách
+                        if (id != bookId && !addBookIds.contains(id)) {
+                            addBookIds.add(id);
+                            recommendedBook.add(book);
+                        }
+                    }
+                    // Cập nhật lại adapter
+                    bookDetailAdapter.notifyDataSetChanged();
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ReponderModel<Book>> call, Throwable t) {
+                Log.e("MinghtLikeFragment", "Lỗi gọi API getBookByCategory: " + t.getMessage());
+            }
+        });
+
     }
 
 }
