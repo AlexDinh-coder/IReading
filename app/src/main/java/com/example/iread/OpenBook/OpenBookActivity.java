@@ -1,8 +1,8 @@
 package com.example.iread.OpenBook;
 
-
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,18 +15,17 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.iread.Comment.ReviewActivity;
 import com.example.iread.CommentActivity;
 import com.example.iread.Interface.ParameterInterface;
 import com.example.iread.Model.Book;
-import com.example.iread.Model.BookViewModel;
 import com.example.iread.Model.Category;
 import com.example.iread.Model.CommentModel;
 import com.example.iread.R;
@@ -39,196 +38,172 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class OpenBookActivity extends AppCompatActivity implements ParameterInterface<Integer> {
+
     private RecyclerView rcv;
-    IAppApiCaller iAppApiCaller;
+    private IAppApiCaller apiCaller;
     private ReviewAdapter reviewAdapter;
-    TabLayout tabLayout;
+    private TabLayout tabLayout;
+    private TextView totalRating, btnTotalReview, btnTextReview, totalReadView;
 
-    TextView totalRating, btnTotalReview, btnTextReview, totalReadView;
+    private TextView ratingTextStarTop, ratingTextStarBottom;
 
+    ImageView[] ratingStarBottom = new ImageView[5];
     private ActivityResultLauncher<Intent> commentLauncher;
+    private ImageView btnBack;
+    private FrameLayout contentFrame;
+    private int bookId;
 
-    ImageView btnBack;
-    FrameLayout contentFrame;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_open_book);
+        // Khởi tạo dữ liệu
+        initViews();
+        setupApiCaller();
+        //Cấu hình giao diện
+        setupUI();
+        setupRecyclerView();
+        setupTabs();
+        setupCommentLauncher();
+        //Load lại chi tiết sách và dữ liệu
+        loadBookDetails();
+    }
 
-        iAppApiCaller = RetrofitClient.getInstance(Utils.BASE_URL, this).create(IAppApiCaller.class);
+    //Hàm ánh xạ tới các view từ layout xml
+    private void initViews() {
         btnTotalReview = findViewById(R.id.btn_see_all_reviews);
-        totalRating =findViewById(R.id.totalRating);
+        totalRating = findViewById(R.id.totalRating);
         btnTextReview = findViewById(R.id.btnReview);
         totalReadView = findViewById(R.id.totalView);
+        btnBack = findViewById(R.id.imageView2);
+        tabLayout = findViewById(R.id.tabLayout);
+        contentFrame = findViewById(R.id.contentFrame);
+        rcv = findViewById(R.id.rcv_review_in_open_book);
+        bookId = getIntent().getIntExtra("bookId", -1);
+        ratingTextStarTop = findViewById(R.id.textViewTop);
+        ratingTextStarBottom =findViewById(R.id.textViewBottom);
 
-        AtomicInteger bookId = new AtomicInteger(getIntent().getIntExtra("bookId", -1));
+        ratingStarBottom[0] = findViewById(R.id.star1);
+        ratingStarBottom[1] = findViewById(R.id.star2);
+        ratingStarBottom[2] = findViewById(R.id.star3);
+        ratingStarBottom[3] = findViewById(R.id.star4);
+        ratingStarBottom[4] = findViewById(R.id.star5);
 
-        makeStatusBarTransparent(); // làm trong suốt status bar
-        applyTopPadding();          // tránh đè nội dung lên status bar nếu cần
 
-        rcv= findViewById(R.id.rcv_review_in_open_book);
+    }
+    //Khởi tạo retrofit API thực hiện các request tới server
+    private void setupApiCaller() {
+        apiCaller = RetrofitClient.getInstance(Utils.BASE_URL, this).create(IAppApiCaller.class);
+    }
+    //
+    private void setupUI() {
+        makeStatusBarTransparent();
+        applyTopPadding();
+        //Xử lí nút back
+        btnBack.setOnClickListener(v -> finish());
+        //Xem tổng đánh giá
+        if (bookId != -1) {
+            btnTotalReview.setOnClickListener(v -> {
+                Intent intent = new Intent(OpenBookActivity.this, ReviewActivity.class);
+                intent.putExtra("bookId", bookId);
+                startActivity(intent);
+            });
+        }
+    }
+
+    private void setupRecyclerView() {
         rcv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         reviewAdapter = new ReviewAdapter(new ArrayList<>());
         rcv.setAdapter(reviewAdapter);
-
-        //Xử lí nut back quay lại
-        btnBack = findViewById(R.id.imageView2);
-        btnBack.setOnClickListener(v -> {
-            finish(); // Quay lại màn trước đó
-        });
-
-        commentLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == RESULT_OK && bookId.get() != -1) {
-                        getBookReview(bookId.get());
-                    }
-                }
-        );
-
-        // xử lí hiện list tổng review
-        if (bookId.get() != -1){
-            btnTotalReview.setOnClickListener(v -> {
-                Intent intent = new Intent(OpenBookActivity.this, ReviewActivity.class);
-                intent.putExtra("bookId", bookId.get());
-                startActivity(intent);
-
-            });
-        }
-
-        // =========================================
-        tabLayout = findViewById(R.id.tabLayout);
-        contentFrame = findViewById(R.id.contentFrame);
-
-        // Thêm 2 tab
+    }
+    //Hàm để khởi tạo các tab ấn click vô mục chương, có thể bạn thích
+    private void setupTabs() {
         tabLayout.addTab(tabLayout.newTab().setText("Chương"));
         tabLayout.addTab(tabLayout.newTab().setText("Có thể bạn thích"));
 
-        // Load tab đầu tiên mặc định
-        ChapterFragment chapterFragment = new ChapterFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt("bookId", bookId.get());
-        chapterFragment.setArguments(bundle);
-        loadFragment(chapterFragment);
+        loadFragmentWithBookId(new ChapterFragment());
 
-
-
-        // Lắng nghe sự kiện chọn tab giữa chương sách và có thể bạn thích
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition() == 0) {
-                    ChapterFragment chapterFragment = new ChapterFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("bookId", bookId.get());
-                    chapterFragment.setArguments(bundle);
-                    loadFragment(chapterFragment);
-                } else if (tab.getPosition() == 1) {
-                    MinghtLikeFragment minghtLikeFragment = new MinghtLikeFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("bookId", bookId.get());
-                    minghtLikeFragment.setArguments(bundle);
-                    loadFragment(minghtLikeFragment);
-
-                }
+                Fragment fragment = tab.getPosition() == 0 ? new ChapterFragment() : new MinghtLikeFragment();
+                loadFragmentWithBookId(fragment);
             }
-
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {}
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
-
-        Log.d("OpenBookActivity", "Received bookId: " + bookId);
-
-        //Xử lí phần hien click đánh giá của sách đó
-        if (bookId.get() != -1) {
-            iAppApiCaller = RetrofitClient.getInstance(Utils.BASE_URL, this).create(IAppApiCaller.class);
-
-            iAppApiCaller.getBookById(bookId.get()).enqueue(new Callback<ReponderModel<Book>>() {
-                @Override
-                public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        Book book = response.body().getData();  // đây mới đúng
-                        if (book != null) {
-                            showBookDetailUI(book);
-                            btnTextReview.setOnClickListener(v -> {
-                                Intent intent = new Intent(OpenBookActivity.this, CommentActivity.class);
-                                intent.putExtra("bookId", book.getId());
-                                intent.putExtra("bookTitle", book.getName());
-                                intent.putExtra("bookAuthor", book.getCreateBy());
-                                intent.putExtra("bookImage", book.getPoster());
-                                commentLauncher.launch(intent);
-
-                            });
-                        } else {
-                            Log.e("OpenBookActivity", "Book is null trong data");
-                        }
-                    }
-
-                }
-
-                @Override
-                public void onFailure(Call<ReponderModel<Book>> call, Throwable t) {
-                    Log.e("BookAPI", "Lỗi gọi API GetBookById: " + t.getMessage());
-                }
-            });
-        }
-
-        getBookReview(bookId.get());
-        getBookTotalReview(bookId.get());
-
-
     }
-    //Total review của sách
-    private void getBookTotalReview(int bookId) {
-        iAppApiCaller.totalViewBook(bookId, 0).enqueue(new Callback<ReponderModel<Integer>>() {
-            @Override
-            public void onResponse(Call<ReponderModel<Integer>> call, Response<ReponderModel<Integer>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    int viewCount = response.body().getData();
-                    Log.d("APIView", "Tổng lượt đọc: " + viewCount);
-                    totalReadView.setText(viewCount + "");
 
-                }else {
-                    Log.d("APIView", "Khong co du lieu");
+    private void setupCommentLauncher() {
+        commentLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && bookId != -1) {
+                        getBookReview(bookId);
+                    }
+                });
+    }
+    //Hàm để xử lí load các thông tin sách
+    private void loadBookDetails() {
+        if (bookId == -1) return;
+
+        apiCaller.getBookById(bookId).enqueue(new Callback<ReponderModel<Book>>() {
+            @Override
+            public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Book book = response.body().getData();
+                    if (book != null) {
+                        showBookDetailUI(book);
+                        btnTextReview.setOnClickListener(v -> {
+                            Intent intent = new Intent(OpenBookActivity.this, CommentActivity.class);
+                            intent.putExtra("bookId", book.getId());
+                            intent.putExtra("bookTitle", book.getName());
+                            intent.putExtra("bookAuthor", book.getCreateBy());
+                            intent.putExtra("bookImage", book.getPoster());
+                            commentLauncher.launch(intent);
+                        });
+                    }
                 }
             }
 
             @Override
-            public void onFailure(Call<ReponderModel<Integer>> call, Throwable t) {
-                Log.e("APIView", "Lỗi API GetViewNo: " + t.getMessage());
+            public void onFailure(Call<ReponderModel<Book>> call, Throwable t) {
+                Log.e("BookAPI", "Lỗi gọi API GetBookById: " + t.getMessage());
             }
         });
-    }
 
-    // Lấy phần list revie của sách ở bên ngoài chi tiết sách
+        getBookReview(bookId);
+        getBookTotalReview(bookId);
+    }
+    //Hàm để lấy list review của users
     private void getBookReview(int bookId) {
-        iAppApiCaller.listCommentBook(bookId).enqueue(new Callback<ReponderModel<CommentModel>>() {
+        apiCaller.listCommentBook(bookId).enqueue(new Callback<ReponderModel<CommentModel>>() {
             @Override
             public void onResponse(Call<ReponderModel<CommentModel>> call, Response<ReponderModel<CommentModel>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getDataList() != null) {
-                    List<CommentModel> commentModel = response.body().getDataList();
-                    Log.d("ReviewAPI", "Số lượng review nhận được: " + commentModel.size());
-
-                    totalRating.setText(commentModel.size() + " đánh giá");
-                    reviewAdapter.updateData(commentModel);
+                    List<CommentModel> comments = response.body().getDataList();
+                    totalRating.setText(comments.size() + " đánh giá");
+                    reviewAdapter.updateData(comments);
 
                     float totalStar = 0f;
-                    for (CommentModel comment : commentModel){
+                    for (CommentModel comment : comments) {
                         totalStar += comment.getRating();
                     }
-                    float averageRating = commentModel.size() >0 ? totalStar / commentModel.size() : 0f;
-                } else {
-                    Log.w("ReviewAPI", "Không có review hoặc response không hợp lệ");
+                    float averageRating = comments.size() > 0 ? totalStar / comments.size() : 0f;
+                    String ratingStar = String.format("%.1f", averageRating);
+                    ratingTextStarTop.setText(ratingStar + "/5");
+                    ratingTextStarBottom.setText(ratingStar);
+
+                    updateStarIcon(averageRating);
                 }
             }
 
@@ -239,27 +214,44 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         });
     }
 
+    private void updateStarIcon(float averageRating) {
+        int fullStar = (int) averageRating;
+        boolean halfStar = (averageRating - fullStar) >= 0.5;
 
-
-    private void loadFragment(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.contentFrame, fragment)
-                .commit();
+        for (int i = 0; i < ratingStarBottom.length; i++) {
+           if (i < fullStar) {
+               ratingStarBottom[i].setImageResource(R.drawable.ic_star);
+           } else if (i == fullStar && halfStar) {
+               ratingStarBottom[i].setImageResource(R.drawable.ic_star_half);
+           } else {
+               ratingStarBottom[i].setImageResource(R.drawable.ic_star_border);
+           }
+        }
     }
 
+    //Hàm để hiện thị tổng số lượt người đọc
+    private void getBookTotalReview(int bookId) {
+        apiCaller.totalViewBook(bookId, 0).enqueue(new Callback<ReponderModel<Integer>>() {
+            @Override
+            public void onResponse(@NonNull Call<ReponderModel<Integer>> call, @NonNull Response<ReponderModel<Integer>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    totalReadView.setText(String.valueOf(response.body().getData()));
+                }
+            }
 
-    // Hiện chi tiết thông tin của sách
+            @Override
+            public void onFailure(Call<ReponderModel<Integer>> call, Throwable t) {
+                Log.e("APIView", "Lỗi API GetViewNo: " + t.getMessage());
+            }
+        });
+    }
+    // Hiển thị toàn bộ thông tin chi tiết của sách như ảnh bìa, tên, tác giả, mô tả, thể loại.
     private void showBookDetailUI(Book book) {
-        // 1. Hiển thị ảnh bìa sách
         ImageView imgBook = findViewById(R.id.image_characters_in_detail);
-        Glide.with(this)
-                .load(book.getPoster())
+        Glide.with(this).load(book.getPoster())
                 .placeholder(R.drawable.loading_placeholder)
-                .error(R.drawable.error_image)
-                .into(imgBook);
+                .error(R.drawable.error_image).into(imgBook);
 
-        // 2. Hiển thị tên sách
         TextView tvName = findViewById(R.id.book_title_in_detail);
         if (tvName != null) {
             tvName.setText(book.getName());
@@ -268,51 +260,49 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             tvName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         }
 
-        // 3. Hiển thị tên tác giả (đã thêm id vào XML là author_name)
         TextView authorName = findViewById(R.id.author_name);
         if (authorName != null) {
             authorName.setText(book.getCreateBy());
         }
 
-        // 4. Hiển thị mô tả sách
+        setupBookSummary(book);
+        setupBookCategories(book);
+    }
+    //Hàm này hiện thị phần xem thêm hoặc thu gọn ở phần giới thiệu sách
+    private void setupBookSummary(Book book) {
         TextView tvSummary = findViewById(R.id.descriptionTextView);
         TextView tvToggle = findViewById(R.id.tvToggleSummary);
 
-        //Kiểm tra 2 textview trên có tồn tại không
-        if (tvSummary != null && tvToggle != null) {
-            //Gắn cho summary của sách
-            tvSummary.setText(book.getSummary());
-            //Giới hạn hiện thị 2 dòng, phần còn lại sẽ hiện ...
-            tvSummary.setMaxLines(2);
-            tvSummary.setEllipsize(TextUtils.TruncateAt.END);
+        if (tvSummary == null || tvToggle == null) return;
 
-            tvToggle.setText("Xem thêm");
-            //Xử lí phần click hiện nút "xem thêm" và "rút gọn"
-            tvToggle.setOnClickListener(new View.OnClickListener() {
-                boolean isExpanded = false; //false: thu gọn, true = mở rộng
+        tvSummary.setText(book.getSummary());
+        tvSummary.setMaxLines(2);
+        tvSummary.setEllipsize(TextUtils.TruncateAt.END);
 
-                @Override
-                public void onClick(View v) {
-                    if (isExpanded) {
-                        //kiểm tra xem nếu đầy đủ => thu gọn
-                        tvSummary.setMaxLines(2);
-                        tvSummary.setEllipsize(TextUtils.TruncateAt.END);
-                        tvToggle.setText("Xem thêm");
-                    } else {
-                        //nếu thu gọn => hiện đầy đủ
-                        tvSummary.setMaxLines(Integer.MAX_VALUE);
-                        tvSummary.setEllipsize(null);
-                        tvToggle.setText("Thu gọn");
-                    }
-                    //Đổi trạng thái khi mỗi lần click
-                    isExpanded = !isExpanded;
+        tvToggle.setText("Xem thêm");
+
+        tvToggle.setOnClickListener(new View.OnClickListener() {
+            boolean isExpanded = false;
+
+            @Override
+            public void onClick(View v) {
+                if (isExpanded) {
+                    tvSummary.setMaxLines(2);
+                    tvSummary.setEllipsize(TextUtils.TruncateAt.END);
+                    tvToggle.setText("Xem thêm");
+                } else {
+                    tvSummary.setMaxLines(Integer.MAX_VALUE);
+                    tvSummary.setEllipsize(null);
+                    tvToggle.setText("Thu gọn");
                 }
-            });
-        }
-
-        // 5. Hiển thị thể loại đầu tiên của sách
+                isExpanded = !isExpanded;
+            }
+        });
+    }
+    //Hiển thị các thể loại của sách dưới dạng tag trong FlexboxLayout
+    private void setupBookCategories(Book book) {
         FlexboxLayout tagContainer = findViewById(R.id.tagContainer);
-        tagContainer.removeAllViews(); // Xóa tag cũ (nếu có)
+        tagContainer.removeAllViews();
 
         for (Category category : book.getListCategories()) {
             TextView tagView = new TextView(this);
@@ -322,48 +312,44 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             tagView.setBackgroundResource(R.drawable.button_rounded_border_in_open_book);
             tagView.setPadding(24, 12, 24, 12);
 
-            // Thiết lập layout params cho từng tag trong FlexboxLayout
             FlexboxLayout.LayoutParams params = new FlexboxLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,// Chiều rộng theo nội dung
-                    LinearLayout.LayoutParams.WRAP_CONTENT // Chiều cao theo nội dung
-            );
-            // Thêm khoảng cách giữa các tag (margin)
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
             params.setMargins(10, 10, 10, 10);
             tagView.setLayoutParams(params);
 
-            tagView.setMaxWidth(500); // Giới hạn chiều rộng để không bị wrap đứng
-            tagView.setSingleLine(true); // Không xuống dòng
-//            tagView.setEllipsize(TextUtils.TruncateAt.END); // Nếu dài thì hiển thị "..."
+            tagView.setMaxWidth(500);
+            tagView.setSingleLine(true);
 
             tagContainer.addView(tagView);
         }
-
-
-
-
     }
 
+    private void loadFragmentWithBookId(Fragment fragment) {
+        Bundle bundle = new Bundle();
+        bundle.putInt("bookId", bookId);
+        fragment.setArguments(bundle);
+        loadFragment(fragment);
+    }
+
+    private void loadFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.contentFrame, fragment).commit();
+    }
 
     private void makeStatusBarTransparent() {
         Window window = getWindow();
-
         window.getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        );
-
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         window.setStatusBarColor(Color.TRANSPARENT);
     }
 
-
     private void applyTopPadding() {
         View contentContainer = findViewById(R.id.box_open_book_activity);
-
         if (contentContainer != null) {
             int statusBarHeight = getStatusBarHeight();
             contentContainer.setPadding(0, statusBarHeight, 0, 0);
         }
     }
-
 
     private int getStatusBarHeight() {
         int result = 0;
@@ -375,27 +361,17 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     }
 
     @Override
-    public void onSuccess(Integer data) {
+    public void onSuccess(Integer data) {}
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (bookId != -1) getBookTotalReview(bookId);
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        int bookId = getIntent().getIntExtra("bookId", -1);
-        if (bookId != -1) {
-            getBookTotalReview(bookId);  // reload khi quay lại
-        }
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        int bookId = getIntent().getIntExtra("bookId", -1);
-        if (bookId != -1) {
-            getBookTotalReview(bookId);  // Gọi lại mỗi lần quay về
-        }
+        if (bookId != -1) getBookTotalReview(bookId);
     }
 }
