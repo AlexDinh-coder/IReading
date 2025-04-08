@@ -10,7 +10,9 @@ public class BookViewModel {
     private int bookTypeStatus;
     private String createBy;
     private String userId;
-    private String modifyDate;
+
+
+
 
     public int getId() {
         return id;
@@ -68,11 +70,5 @@ public class BookViewModel {
         this.userId = userId;
     }
 
-    public String getModifyDate() {
-        return modifyDate;
-    }
 
-    public void setModifyDate(String modifyDate) {
-        this.modifyDate = modifyDate;
-    }
 }

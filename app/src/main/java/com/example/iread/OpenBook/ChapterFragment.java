@@ -69,10 +69,10 @@ public class ChapterFragment extends Fragment {
 
                 if (isAscending) {
                     sortOrderView.setText("Cũ nhất");
-                    Collections.sort(chapterList, Comparator.comparing(BookChapter::getChapterId));
+                    Collections.sort(chapterList, Comparator.comparing(BookChapter::getChaperId));
                 } else {
                     sortOrderView.setText("Mới nhất");
-                    Collections.sort(chapterList, (c1, c2) -> c2.getChapterId() - c1.getChapterId());
+                    Collections.sort(chapterList, (c1, c2) -> c2.getChaperId() - c1.getChaperId());
                 }
 
                 chapterAdapter.updateData(chapterList); // Cập nhật lại adapter
@@ -94,7 +94,7 @@ public class ChapterFragment extends Fragment {
 
                     chapterList = response.body().getDataList(); // dùng biến toàn cục
 
-                    Collections.sort(chapterList, Comparator.comparing(BookChapter::getChapterId));
+                    Collections.sort(chapterList, Comparator.comparing(BookChapter::getChaperId));
 
                     totalChapters.setText(chapterList.size() + " chương");
 
@@ -104,7 +104,10 @@ public class ChapterFragment extends Fragment {
                         intent.putExtra("selectedIndex", position);
                         intent.putExtra("chapterList", new ArrayList<>(chapterList)); // truyền danh sách chương
                         startActivity(intent);
-                    }, getContext(), chapterList);
+
+
+
+                    }, getContext(), chapterList, 0);
                     recyclerView.setAdapter(chapterAdapter);
 
                     // Log để kiểm tra dữ liệu
@@ -123,4 +126,7 @@ public class ChapterFragment extends Fragment {
             }
         });
     }
+
+
+
 }

@@ -17,6 +17,24 @@ public class BookChapter implements Serializable {
     private String userId;
     private String bookId;
 
+    private int viewNo;
+
+    public int getChaperId() {
+        return chaperId;
+    }
+
+    public void setChaperId(int chaperId) {
+        this.chaperId = chaperId;
+    }
+
+    public int getViewNo() {
+        return viewNo;
+    }
+
+    public void setViewNo(int viewNo) {
+        this.viewNo = viewNo;
+    }
+
     public String getId() {
         return id;
     }
@@ -33,13 +51,7 @@ public class BookChapter implements Serializable {
         this.chapterName = chapterName;
     }
 
-    public int getChapterId() {
-        return chaperId;
-    }
 
-    public void setChapterId(int chapterId) {
-        this.chaperId = chapterId;
-    }
 
     public String getAudioUrl() {
         return audioUrl;

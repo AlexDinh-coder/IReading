@@ -17,15 +17,18 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.iread.Book.ActivityBook;
 import com.example.iread.Comment.ReviewActivity;
 import com.example.iread.CommentActivity;
 import com.example.iread.Interface.ParameterInterface;
 import com.example.iread.Model.Book;
+import com.example.iread.Model.BookChapter;
 import com.example.iread.Model.Category;
 import com.example.iread.Model.CommentModel;
 import com.example.iread.R;
@@ -34,9 +37,12 @@ import com.example.iread.apicaller.RetrofitClient;
 import com.example.iread.basemodel.ReponderModel;
 import com.example.iread.helper.Utils;
 import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -52,6 +58,12 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     private TextView totalRating, btnTotalReview, btnTextReview, totalReadView;
 
     private TextView ratingTextStarTop, ratingTextStarBottom;
+
+    MaterialButton btnBookRead, btnBookListen;
+
+    ImageView iconShow;
+
+    AppCompatButton btnActionBook, btnUpgrade;
 
     ImageView[] ratingStarBottom = new ImageView[5];
     private ActivityResultLauncher<Intent> commentLauncher;
@@ -73,6 +85,8 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         setupCommentLauncher();
         //Load lại chi tiết sách và dữ liệu
         loadBookDetails();
+
+        applyBookReadMode();
     }
 
     //Hàm ánh xạ tới các view từ layout xml
@@ -88,6 +102,13 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         bookId = getIntent().getIntExtra("bookId", -1);
         ratingTextStarTop = findViewById(R.id.textViewTop);
         ratingTextStarBottom =findViewById(R.id.textViewBottom);
+        btnBookRead = findViewById(R.id.btnBookRead);
+        btnBookListen = findViewById(R.id.btnBookListen);
+        iconShow = findViewById(R.id.iconShow);
+        btnActionBook = findViewById(R.id.btnActionBook);
+        btnUpgrade = findViewById(R.id.btnUpgrade);
+        btnBookRead.setOnClickListener(v -> applyBookReadMode());
+        btnBookListen.setOnClickListener(v -> applyBookListenMode());
 
         ratingStarBottom[0] = findViewById(R.id.star1);
         ratingStarBottom[1] = findViewById(R.id.star2);
@@ -95,8 +116,61 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         ratingStarBottom[3] = findViewById(R.id.star4);
         ratingStarBottom[4] = findViewById(R.id.star5);
 
+        btnActionBook.setOnClickListener(v -> {
+            if (btnActionBook.getText().toString().equals("ĐỌC SÁCH")){
+                openFirstChapter(); // gọi API lấy chương đầu tiên
+            }
+        });
 
     }
+    //Xử lí phần khi click đọs sach nhảy sang nội dung của chương
+    private void openFirstChapter() {
+        apiCaller.getListByBookId(bookId).enqueue(new Callback<ReponderModel<BookChapter>>() {
+            @Override
+            public void onResponse(Call<ReponderModel<BookChapter>> call, Response<ReponderModel<BookChapter>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<BookChapter> chapters = response.body().getDataList();
+                    if (chapters != null && !chapters.isEmpty()) {
+                        // Lấy nội dung của chương sách đầu tiên
+                        Collections.sort(chapters, Comparator.comparing(BookChapter::getChaperId));
+
+                        Intent intent = new Intent(OpenBookActivity.this, ActivityBook.class);
+                        intent.putExtra("selectedIndex", 0);
+                        intent.putExtra("chapterList", new ArrayList<>(chapters));
+                        startActivity(intent);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ReponderModel<BookChapter>> call, Throwable t) {
+                Log.e("API", "Lỗi lấy chương đầu: " + t.getMessage());
+            }
+        });
+    }
+
+    //Xử lí phần sách nghe
+    private void applyBookListenMode() {
+        iconShow.setImageResource(R.drawable.ic_headphone);
+        btnBookListen.setTextColor(Color.WHITE);
+        btnBookRead.setTextColor(Color.GRAY);
+        btnBookListen.setBackgroundTintList(getColorStateList(android.R.color.transparent));
+        btnBookRead.setBackgroundTintList(getColorStateList(R.color.dark_gray));
+        btnActionBook.setText("NGHE THỬ");
+        btnUpgrade.setVisibility(View.VISIBLE);
+    }
+
+    ////Xử lí phần sách nghe
+    private void applyBookReadMode() {
+        iconShow.setImageResource(R.drawable.ic_show);
+        btnBookRead.setTextColor(Color.WHITE);
+        btnBookListen.setTextColor(Color.GRAY);
+        btnBookRead.setBackgroundTintList(getColorStateList(android.R.color.transparent));
+        btnBookListen.setBackgroundTintList(getColorStateList(R.color.dark_gray));
+        btnActionBook.setText("ĐỌC SÁCH");
+        btnUpgrade.setVisibility(View.GONE);
+    }
+
     //Khởi tạo retrofit API thực hiện các request tới server
     private void setupApiCaller() {
         apiCaller = RetrofitClient.getInstance(Utils.BASE_URL, this).create(IAppApiCaller.class);
@@ -219,13 +293,13 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         boolean halfStar = (averageRating - fullStar) >= 0.5;
 
         for (int i = 0; i < ratingStarBottom.length; i++) {
-           if (i < fullStar) {
-               ratingStarBottom[i].setImageResource(R.drawable.ic_star);
-           } else if (i == fullStar && halfStar) {
-               ratingStarBottom[i].setImageResource(R.drawable.ic_star_half);
-           } else {
-               ratingStarBottom[i].setImageResource(R.drawable.ic_star_border);
-           }
+            if (i < fullStar) {
+                ratingStarBottom[i].setImageResource(R.drawable.ic_star);
+            } else if (i == fullStar && halfStar) {
+                ratingStarBottom[i].setImageResource(R.drawable.ic_star_half);
+            } else {
+                ratingStarBottom[i].setImageResource(R.drawable.ic_star_border);
+            }
         }
     }
 
@@ -235,7 +309,9 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             @Override
             public void onResponse(@NonNull Call<ReponderModel<Integer>> call, @NonNull Response<ReponderModel<Integer>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    totalReadView.setText(String.valueOf(response.body().getData()));
+                    Integer totalView = response.body().getData();
+                    Log.d("API_VIEW", "Tổng lượt xem: " + totalView);
+                    totalReadView.setText(String.valueOf(totalView));
                 }
             }
 

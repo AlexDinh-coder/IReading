@@ -16,54 +16,44 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.iread.Account.LoginActivity;
 import com.example.iread.Account.LoginOpenActivity;
 
-
-import java.util.ArrayList;
-
 public class UserFragment extends Fragment {
-    Button logOut1, login;
-    TextView username;
 
+    private TextView btnLogOut;
+    private TextView username;
 
-    @SuppressLint("MissingInflatedId")
+    @SuppressLint({"MissingInflatedId", "WrongViewCast"})
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user, container, false);
-        username = view.findViewById(R.id.logout);
+
+        btnLogOut = view.findViewById(R.id.btnLogout);
+        username = view.findViewById(R.id.username);
 
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        String username1 = sharedPreferences.getString("username", "");
-        username.setText(username1);
-        login = view.findViewById(R.id.btnlogin);
-        logOut1 = view.findViewById(R.id.btnLogout);
-        logOut1.setOnClickListener(category -> {
-          //  SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
-            sharedPreferences.edit()
-                    .putString("username", "")
-                    .putString("userId", "")
-                    .putString("token", "")
-                    .apply();
-            Intent intent = new Intent(getContext(), MainActivity.class);
-            startActivity(intent);
+        String usernameValue = sharedPreferences.getString("username", "");
+        String token = sharedPreferences.getString("token", "");
 
-
-
-        });
-        login.setOnClickListener(category -> {
+        //  Nếu chưa đăng nhập, chuyển sang LoginOpenActivity
+        if (token.isEmpty()) {
             Intent intent = new Intent(getContext(), LoginOpenActivity.class);
             startActivity(intent);
-
-
-
-        });
-        if(!username1.isEmpty()){
-            logOut1.setVisibility(VISIBLE);
-            login.setVisibility(GONE);
-        } else {
-            logOut1.setVisibility(GONE);
-            login.setVisibility(VISIBLE);
+           requireActivity().finish(); // tránh quay lại màn cũ bằng back
+            return view;
         }
+
+        // Nếu đã đăng nhập
+        username.setText(usernameValue);
+        btnLogOut.setVisibility(VISIBLE);
+
+        // Đăng xuất
+        btnLogOut.setOnClickListener(v -> {
+            sharedPreferences.edit().clear().apply(); // Xóa toàn bộ dữ liệu
+            Intent intent = new Intent(getContext(), MainActivity.class);
+            startActivity(intent);
+        });
+
         return view;
     }
 }

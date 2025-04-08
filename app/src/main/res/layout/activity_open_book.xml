@@ -18,7 +18,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/box_open_book_activity"
         app:layout_constraintTop_toTopOf="parent" />
-     <ImageView
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/bg_image_fade" />
@@ -186,6 +186,7 @@
                     android:paddingBottom="8dp">
 
                     <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnActionBook"
                         style="@style/Widget.AppCompat.Button"
                         android:layout_width="150dp"
                         android:layout_height="40dp"
@@ -198,6 +199,7 @@
                         android:textStyle="bold" />
 
                     <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnUpgrade"
                         style="@style/Widget.AppCompat.Button"
                         android:layout_width="150dp"
                         android:layout_height="40dp"
@@ -260,10 +262,11 @@
                         card_view:layout_constraintVertical_bias="0.0">
 
                         <ImageView
+                            android:id="@+id/iconShow"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_gravity="center"
-                            android:src="@drawable/ic_headphone" />
+                            android:src="@drawable/ic_show" />
 
                         <TextView
                             android:id="@+id/totalView"
@@ -307,6 +310,50 @@
                             android:src="@drawable/ic_menu_in_open_book" />
                     </LinearLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
+                <LinearLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    >
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBookRead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="55dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="Sách điện tử\nMiễn phí"
+                        android:textColor="#FFFFFF"
+                        android:textSize="10sp"
+                        android:gravity="center"
+                        android:paddingHorizontal="16dp"
+                        app:cornerRadius="8dp"
+                        app:iconGravity="textStart"
+                        app:strokeColor="#00FFAA"
+                        app:strokeWidth="1dp"
+                        android:layout_weight="1"
+                        app:backgroundTint="@android:color/transparent"/>
+
+                    <!-- Nút Sách nói - Hội viên -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBookListen"
+                        android:layout_width="wrap_content"
+                        android:layout_height="55dp"
+                        android:text="Sách nói\nHội viên"
+                        android:textColor="#B0B0B0"
+                        android:textSize="10sp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:paddingHorizontal="16dp"
+                        app:cornerRadius="8dp"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:backgroundTint="@android:color/transparent"
+                        app:strokeColor="#00FFAA"
+                        app:strokeWidth="1dp"/>
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/descriptionTextView"
@@ -354,6 +401,54 @@
                         android:textColor="#FFFFFF"
                         android:textSize="14sp" />
                 </com.google.android.flexbox.FlexboxLayout>
+                <LinearLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:background="#1C1C1E"
+                    android:gravity="center_vertical"
+                    android:layout_margin="8dp"
+                    android:clipToPadding="false"
+                    android:elevation="2dp"
+                    android:backgroundTint="#1C1C1E">
+
+                    <!-- Khối văn bản -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:text="Phần mới nhất"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="Phần 68 | 06/04/2025"
+                            android:textColor="#AAAAAA"
+                            android:textSize="14sp"
+                            android:layout_marginTop="4dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <!-- Nút ĐỌC -->
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:layout_width="64dp"
+                        android:layout_height="32dp"
+                        android:text="ĐỌC"
+                        android:textSize="14sp"
+                        android:textColor="#00FFC3"
+                        android:background="@drawable/bg_read_button"
+                        android:layout_marginStart="8dp"
+                        android:fontFamily="sans-serif-medium"/>
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -517,31 +612,31 @@
 
                 </androidx.recyclerview.widget.RecyclerView>
 
-           <LinearLayout
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:gravity="center"
-               android:layout_marginTop="20dp"
-               >
-               <LinearLayout
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:orientation="horizontal"
-                   android:paddingLeft="25dp"
-                   android:paddingRight="25dp"
-                   android:paddingTop="5dp"
-                   android:paddingBottom="5dp"
-                   android:background="@drawable/button_rounded_border_in_open_book"
-                   >
-                   <TextView
-                       android:id="@+id/btn_see_all_reviews"
-                       android:layout_width="wrap_content"
-                       android:layout_height="match_parent"
-                       android:text="Xem Tất Đánh giá"
-                       android:textColor="@color/white"
-                       android:textSize="15sp"/>
-               </LinearLayout>
-           </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginTop="20dp"
+                    >
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingLeft="25dp"
+                        android:paddingRight="25dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        android:background="@drawable/button_rounded_border_in_open_book"
+                        >
+                        <TextView
+                            android:id="@+id/btn_see_all_reviews"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="Xem Tất Đánh giá"
+                            android:textColor="@color/white"
+                            android:textSize="15sp"/>
+                    </LinearLayout>
+                </LinearLayout>
 
                 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -574,7 +669,7 @@
 
             </LinearLayout>
 
-         </ScrollView>
+        </ScrollView>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

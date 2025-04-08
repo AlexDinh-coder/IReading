@@ -1,6 +1,7 @@
 package com.example.iread.Book;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,11 +39,21 @@ public class ActivityBook extends AppCompatActivity {
     private PageAdapter pageAdapter;
     private List<BookChapter> chapterList = new ArrayList<>();
 
+    private Integer viewId = 0;
+
+    private String username, userId;
+
+    private boolean clickView = false;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book);
+        SharedPreferences sharedPreferences = this.getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        username = sharedPreferences.getString("username", "");
+        userId = sharedPreferences.getString("userId", "");
+        clickView = getIntent().getBooleanExtra("isView", false);
 
         setupUI();
         setupApiCaller();
@@ -56,7 +67,8 @@ public class ActivityBook extends AppCompatActivity {
     public void onBackPressed() {
         int currentPosition = viewPagerBook.getCurrentItem();
         BookChapter currentChapter = chapterList.get(currentPosition);
-        sendViewStatus(currentChapter, 1); // Đánh dấu chương đã đóng
+
+        sendViewStatus(currentChapter, 1,viewId); // Đánh dấu chương đã đóng
         super.onBackPressed();
     }
 
@@ -91,13 +103,22 @@ public class ActivityBook extends AppCompatActivity {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 BookChapter selectedChapter = chapterList.get(position);
-                sendViewStatus(selectedChapter, 0);
+                sendViewStatus(selectedChapter,0,viewId);
+
+                //BookChapter selectedChapter = chapterList.get(position);
+//                if (oldPosition == null ){
+//                    sendViewStatus(selectedChapter, 0,0);
+//                } else if (oldPosition != position){
+//                    sendViewStatus(selectedChapter, 1,viewId);
+//
+//                }
+//                oldPosition = position;
             }
         });
     }
 
     // Gửi trạng thái đọc chương (mở hoặc đóng)
-    private void sendViewStatus(BookChapter chapter, int status) {
+    private void sendViewStatus(BookChapter chapter, int status, int id) {
         if (chapter == null || chapter.getBookId() == null || chapter.getBookId().trim().isEmpty()) return;
 
         int bookId;
@@ -109,20 +130,26 @@ public class ActivityBook extends AppCompatActivity {
         }
 
         BookViewModel model = new BookViewModel();
+        model.setId(id);
         model.setBookId(bookId);
-        model.setChapterId(String.valueOf(chapter.getChapterId()));
+        model.setChapterId(chapter.getId());
         model.setBookTypeStatus(0);
+        model.setCreateBy(username);
         model.setStatus(status);
-        model.setUserId(chapter.getUserId());
+        model.setUserId(userId);
 
-        apiCaller.createBookView(model).enqueue(new Callback<ReponderModel<String>>() {
+        apiCaller.createBookView(model).enqueue(new Callback<ReponderModel<Integer>>() {
             @Override
-            public void onResponse(Call<ReponderModel<String>> call, Response<ReponderModel<String>> response) {
-                Log.d("BookTracking", "Đã gửi trạng thái " + status + " cho chương " + chapter.getChapterId());
+            public void onResponse(Call<ReponderModel<Integer>> call, Response<ReponderModel<Integer>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                     viewId = response.body().getData();
+
+                }
+                Log.d("BookTracking", "Đã gửi trạng thái " + status + " cho chương " + chapter.getChaperId());
             }
 
             @Override
-            public void onFailure(Call<ReponderModel<String>> call, Throwable t) {
+            public void onFailure(Call<ReponderModel<Integer>> call, Throwable t) {
                 Log.e("BookTracking", "Lỗi gửi trạng thái: " + t.getMessage());
             }
         });
@@ -132,6 +159,9 @@ public class ActivityBook extends AppCompatActivity {
     private void setupBackButton() {
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> {
+            int currentPosition = viewPagerBook.getCurrentItem();
+            BookChapter currentChapter = chapterList.get(currentPosition);
+            sendViewStatus(currentChapter, 1,viewId); // Đánh dấu chương đã đóng
             finish();
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         });
@@ -155,7 +185,7 @@ public class ActivityBook extends AppCompatActivity {
                 position -> {
                     viewPagerBook.setCurrentItem(position);
                     dialog.dismiss();
-                }, this, chapterList
+                }, this, chapterList, viewId
         );
 
         recyclerView.setAdapter(menuAdapter);

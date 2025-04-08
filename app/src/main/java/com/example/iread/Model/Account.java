@@ -16,7 +16,21 @@ public class Account {
     private boolean accountActive;
     private  int grantPerMission;
 
-    private int Register;
+    private int register;
+
+    private int registerType; // 0: user, 1: author
+
+    private String avatar;
+
+
+
+    public int getRegisterType() {
+        return registerType;
+    }
+
+    public void setRegisterType(int registerType) {
+        this.registerType = registerType;
+    }
 
     public String getUsername() {
         return username;
@@ -115,10 +129,18 @@ public class Account {
     }
 
     public int getRegister() {
-        return Register;
+        return register;
     }
 
     public void setRegister(int register) {
-        Register = register;
+        this.register = register;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

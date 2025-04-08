@@ -72,6 +72,8 @@ dependencies {
     implementation ("com.google.android.material:material:1.11.0")
      //secutiry
     implementation ("androidx.security:security-crypto:1.1.0-alpha03")
+    //MPAndroidChart
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
 
 

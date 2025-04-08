@@ -57,12 +57,18 @@ public interface IAppApiCaller {
             @Body CommentModel commentModel
     );
     @POST("Book/CreateViewBook")
-    Call<ReponderModel<String>>createBookView(
+    Call<ReponderModel<Integer>>createBookView(
             @Body BookViewModel bookViewModel
     );
     @GET("Book/GetViewNo")
     Call<ReponderModel<Integer>> totalViewBook(
             @Query("bookId") int bookId,
             @Query("bookTypeStatus") int statusType
+    );
+
+    @GET("/Book/AddFavouriteBook")
+    Call<ReponderModel<String>> addFavoriteBook(
+            @Query("") int bookId
+
     );
 }
