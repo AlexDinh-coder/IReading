@@ -72,4 +72,14 @@ public interface IAppApiCaller {
              @Query("username") String username
 
     );
+
+     @GET("Book/GetAllBookByCategory")
+    Call<ReponderModel<Book>> getBookByCategory(
+            @Query("category") String categoryName
+    );
+
+    @GET("Book/GetListBookChapter")
+    Call<ReponderModel<BookChapter>> getListByBookId(
+            @Query("bookId") int listBookId
+    );
 }
