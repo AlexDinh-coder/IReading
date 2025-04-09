@@ -66,9 +66,10 @@ public interface IAppApiCaller {
             @Query("bookTypeStatus") int statusType
     );
 
-    @GET("/Book/AddFavouriteBook")
+    @GET("Book/AddFavouriteBook")
     Call<ReponderModel<String>> addFavoriteBook(
-            @Query("") int bookId
+            @Query("bookId") int bookId,
+             @Query("username") String username
 
     );
 }

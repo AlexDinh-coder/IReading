@@ -70,7 +70,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/imageView4"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="1.0"
-                app:srcCompat="@drawable/ic_cart" />
+                app:srcCompat="@drawable/ic_notification" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -288,17 +288,20 @@
                         card_view:layout_constraintTop_toTopOf="parent">
 
                         <ImageView
+                            android:id="@+id/iconLove"
                             android:layout_width="23dp"
                             android:layout_height="23dp"
                             android:layout_gravity="center"
-                            android:src="@drawable/ic_love" />
+                            android:src="@drawable/ic_love"
+                            android:clickable="true"
+                            android:focusable="true"/>
 
                         <ImageView
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:layout_gravity="center"
                             android:layout_marginLeft="10dp"
-                            android:src="@drawable/ic_download" />
+                            android:src="@drawable/ic_bookmark" />
 
                         <ImageView
                             android:id="@+id/imageView6"

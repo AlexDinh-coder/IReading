@@ -50,7 +50,7 @@
                 android:id="@+id/imageView5"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                app:srcCompat="@drawable/ic_cart"
+                app:srcCompat="@drawable/ic_notification"
                 app:layout_constraintEnd_toStartOf="@+id/imageView4"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />

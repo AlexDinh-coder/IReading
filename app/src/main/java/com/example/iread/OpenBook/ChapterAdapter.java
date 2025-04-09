@@ -78,7 +78,9 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
 
         holder.itemView.setOnClickListener(v -> {
             if (onChapterClickListener != null) {
-                //sendViewStatus(bookChapter,0,viewId);
+                if (position != 0) {
+                    sendViewStatus(bookChapter,0,viewId);
+                }
                 onChapterClickListener.onChapterClick(position);
             }
         });
