@@ -6,6 +6,15 @@
     android:background="#121212"
     android:padding="16dp">
 
+    <ImageView
+        android:id="@+id/btnClose"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_close"
+        android:layout_gravity="end"
+        android:contentDescription="Đóng"
+        android:padding="4dp"/>
+
     <!-- Tiêu đề -->
     <TextView
         android:layout_marginTop="10dp"

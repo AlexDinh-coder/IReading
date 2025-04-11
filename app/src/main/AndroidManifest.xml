@@ -21,15 +21,34 @@
         </activity>
 
         <activity
-            android:name=".Home.SplashActivity"
+            android:name=".UpgradeActivity"
             android:exported="true" >
+        </activity>
 
+        <activity
+            android:name=".SubscriptionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MenuBarInHome.SearchActivity"
+            android:exported="true" >
 
         </activity>
 
         <activity
-            android:name=".Audio.AudioActivity"
-            android:exported="true">
+            android:name=".Payment.PaymentChooseActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".Payment.PaymentActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".MenuBarInHome.CategoryActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".Home.SplashActivity"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -39,9 +58,14 @@
         </activity>
 
         <activity
+            android:name=".Audio.AudioActivity"
+            android:exported="true">
+
+        </activity>
+
+        <activity
             android:name=".Account.LoginOpenActivity"
             android:exported="true" >
-
 
 
         </activity>
@@ -50,25 +74,22 @@
             android:name=".Account.LoginActivity"
             android:exported="true" >
 
-
         </activity>
         <activity
             android:name=".DetailActivity"
             android:exported="true" >
+
 
         </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true">
 
-
-
         </activity>
 
         <activity
             android:name=".OpenBook.OpenBookActivity"
             android:exported="true">
-
 
 
         </activity>

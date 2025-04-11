@@ -3,7 +3,6 @@ package com.example.iread.OpenBook;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -28,6 +27,7 @@ import com.bumptech.glide.Glide;
 import com.example.iread.Book.ActivityBook;
 import com.example.iread.Comment.ReviewActivity;
 import com.example.iread.CommentActivity;
+import com.example.iread.DetailActivity;
 import com.example.iread.Interface.ParameterInterface;
 import com.example.iread.Model.Book;
 import com.example.iread.Model.BookChapter;
@@ -91,7 +91,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         setupCommentLauncher();
         //Load lại chi tiết sách và dữ liệu
         loadBookDetails();
-
         applyBookReadMode();
     }
 
@@ -113,12 +112,13 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         iconShow = findViewById(R.id.iconShow);
         btnActionBook = findViewById(R.id.btnActionBook);
         btnUpgrade = findViewById(R.id.btnUpgrade);
-        btnBookRead.setOnClickListener(v -> applyBookReadMode());
-        btnBookListen.setOnClickListener(v -> applyBookListenMode());
         iconLove = findViewById(R.id.iconLove);
 
+        //Load dữ liệu user info
         SharedPreferences sharedPreferences = this.getSharedPreferences("MyPrefs", MODE_PRIVATE);
         username = sharedPreferences.getString("username", "");
+
+        //Load favorite book
         String key = username + "_book_" + bookId;
         SharedPreferences prefs = getSharedPreferences("FavoritePrefs", MODE_PRIVATE);
         isFavorite = prefs.getBoolean(key, false); // Load trạng thái yêu thích
@@ -144,17 +144,60 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                 openFirstChapter(); // gọi API lấy chương đầu tiên
             }
         });
+        btnBookRead.setOnClickListener(v -> applyBookReadMode());
+        btnBookListen.setOnClickListener(v -> applyBookListenMode());
+    }
 
+    //Khởi tạo retrofit API thực hiện các request tới server
+    private void setupApiCaller() {
+        apiCaller = RetrofitClient.getInstance(Utils.BASE_URL, this).create(IAppApiCaller.class);
+    }
+    //Hàm để xử lí load các thông tin sách
+    private void loadBookDetails() {
+        if (bookId == -1) return;
 
+        apiCaller.getBookById(bookId).enqueue(new Callback<ReponderModel<Book>>() {
+            @Override
+            public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Book book = response.body().getData();
+                    if (book != null) {
+                        showBookDetailUI(book);
+                        btnTextReview.setOnClickListener(v -> {
+                            Intent intent = new Intent(OpenBookActivity.this, CommentActivity.class);
+                            intent.putExtra("bookId", book.getId());
+                            intent.putExtra("bookTitle", book.getName());
+                            intent.putExtra("bookAuthor", book.getCreateBy());
+                            intent.putExtra("bookImage", book.getPoster());
+                            commentLauncher.launch(intent);
+                        });
+                    }
+                }
+            }
 
+            @Override
+            public void onFailure(Call<ReponderModel<Book>> call, Throwable t) {
+                Log.e("BookAPI", "Lỗi gọi API GetBookById: " + t.getMessage());
+            }
+        });
 
+        getBookReview(bookId);
+        getBookTotalReview(bookId);
     }
 
     private void removeFromFavorite(int bookId, String username) {
         isFavorite = false;
         iconLove.setImageResource(R.drawable.ic_love);
         saveFavoriteStatus(false);
+        removeBookFromPref(bookId);
         Toast.makeText(this, "Đã xóa khỏi danh sách yêu thích", Toast.LENGTH_SHORT).show();
+    }
+
+    private void removeBookFromPref(int bookId) {
+        SharedPreferences prefs = getSharedPreferences("FavoriteBooks", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(String.valueOf(bookId));
+        editor.apply();
     }
 
     private void addBookToFavorite(int bookId, String username) {
@@ -167,10 +210,12 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             @Override
             public void onResponse(Call<ReponderModel<String>> call, Response<ReponderModel<String>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSussess()) {
-                    isFavorite = true;
-                    iconLove.setImageResource(R.drawable.ic_heart_filled);
-                    saveFavoriteStatus(true);
-                    Toast.makeText(OpenBookActivity.this, "Đã thêm vào danh sách yêu thích", Toast.LENGTH_SHORT).show();
+                        isFavorite = true;
+                        iconLove.setImageResource(R.drawable.ic_heart_filled);
+                        saveFavoriteStatus(true);
+                        Toast.makeText(OpenBookActivity.this, "Đã thêm vào danh sách yêu thích", Toast.LENGTH_SHORT).show();
+                        // Lưu sách yêu thích vào SharedPreferences
+                        saveBookInfo(bookId);
                 } else {
                     Toast.makeText(OpenBookActivity.this, "Thêm vào yêu thích thất bại", Toast.LENGTH_SHORT).show();
                 }
@@ -183,16 +228,39 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         });
     }
 
+    private void saveBookInfo(int bookId) {
+        apiCaller.getBookById(bookId).enqueue(new Callback<ReponderModel<Book>>() {
+            @Override
+            public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Book book = response.body().getData();
+                    if (book != null) {
+                        saveFavoriteBookToPrefs(book);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ReponderModel<Book>> call, Throwable t) {
+                Log.e("API", "Lỗi lấy thông tin sách để lưu local: " + t.getMessage());
+            }
+        });
+    }
+
+    private void saveFavoriteBookToPrefs(Book book) {
+        SharedPreferences prefs = getSharedPreferences("FavoriteBooks", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        String bookData = book.getName() + "|" + book.getCreateBy() + "|" + book.getPoster();
+        editor.putString(String.valueOf(book.getId()), bookData);
+        editor.apply();
+    }
+
     private void saveFavoriteStatus(boolean status) {
             SharedPreferences.Editor editor = getSharedPreferences("FavoritePrefs", MODE_PRIVATE).edit();
             String key = username + "_book_" + bookId;
             editor.putBoolean(key, status);
             editor.apply();
-    }
-
-    //Khởi tạo retrofit API thực hiện các request tới server
-    private void setupApiCaller() {
-        apiCaller = RetrofitClient.getInstance(Utils.BASE_URL, this).create(IAppApiCaller.class);
     }
 
 
@@ -296,38 +364,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                     }
                 });
     }
-    //Hàm để xử lí load các thông tin sách
-    private void loadBookDetails() {
-        if (bookId == -1) return;
 
-        apiCaller.getBookById(bookId).enqueue(new Callback<ReponderModel<Book>>() {
-            @Override
-            public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Book book = response.body().getData();
-                    if (book != null) {
-                        showBookDetailUI(book);
-                        btnTextReview.setOnClickListener(v -> {
-                            Intent intent = new Intent(OpenBookActivity.this, CommentActivity.class);
-                            intent.putExtra("bookId", book.getId());
-                            intent.putExtra("bookTitle", book.getName());
-                            intent.putExtra("bookAuthor", book.getCreateBy());
-                            intent.putExtra("bookImage", book.getPoster());
-                            commentLauncher.launch(intent);
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ReponderModel<Book>> call, Throwable t) {
-                Log.e("BookAPI", "Lỗi gọi API GetBookById: " + t.getMessage());
-            }
-        });
-
-        getBookReview(bookId);
-        getBookTotalReview(bookId);
-    }
     //Hàm để lấy list review của users
     private void getBookReview(int bookId) {
         apiCaller.listCommentBook(bookId).enqueue(new Callback<ReponderModel<CommentModel>>() {
@@ -455,6 +492,13 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             tagView.setText(category.getName());
             tagView.setTextColor(Color.WHITE);
             tagView.setTextSize(14);
+
+            tagView.setOnClickListener(v -> {
+                Intent intent = new Intent(OpenBookActivity.this, DetailActivity.class);
+                intent.putExtra("selectedCategory", category.getName()); // Truyền tên thể loại sang DetailActivity
+                startActivity(intent);
+            });
+
             tagView.setBackgroundResource(R.drawable.button_rounded_border_in_open_book);
             tagView.setPadding(24, 12, 24, 12);
 

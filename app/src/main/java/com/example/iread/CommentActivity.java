@@ -37,7 +37,7 @@ public class CommentActivity extends AppCompatActivity {
 
     private ImageView[] ratingStar = new ImageView[5];
 
-    ImageView imageView;
+    ImageView imageView, btnClose;
     TextView bookTitle, bookAuthor;
 
     private int rating = 5;
@@ -68,9 +68,13 @@ public class CommentActivity extends AppCompatActivity {
                 .into(imageView);
 
 
+        btnClose = findViewById(R.id.btnClose);
+        btnClose.setOnClickListener(v ->finish());
 
         editText = findViewById(R.id.editTextReview);
         btnSend = findViewById(R.id.btnSend);
+
+        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
 
 
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
