@@ -1,4 +1,5 @@
 package com.example.iread.MenuBarInHome;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.example.iread.Model.Book;
 import com.example.iread.Model.BookSearch;
 import com.example.iread.R;
 
@@ -15,10 +18,13 @@ import java.util.List;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> {
 
-    private List<BookSearch> bookList;
+    private List<Book> bookList;
 
-    public BookAdapter(List<BookSearch> bookList) {
+    Context context;
+
+    public BookAdapter(List<Book> bookList, Context context) {
         this.bookList = bookList;
+        this.context = context;
     }
 
     @NonNull
@@ -31,10 +37,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
-        BookSearch book = bookList.get(position);
-        holder.tvBookTitle.setText(book.getTitle());
-        holder.tvBookInfo.setText(book.getInfo());
-        holder.imgBookCover.setImageResource(book.getImageResId());
+        Book book = bookList.get(position);
+        holder.tvBookTitle.setText(book.getName());
+        holder.tvBookInfo.setText(book.getCreateBy());
+        Glide.with(holder.imgBookCover.getContext())
+                .load(bookList.get(position).getPoster())
+                .placeholder(R.drawable.loading_placeholder)
+                .error(R.drawable.error_image)
+                .into(holder.imgBookCover);
     }
 
     @Override

@@ -119,15 +119,9 @@ public class ActivityBook extends AppCompatActivity {
 
     // Gửi trạng thái đọc chương (mở hoặc đóng)
     private void sendViewStatus(BookChapter chapter, int status, int id) {
-        if (chapter == null || chapter.getBookId() == null || chapter.getBookId().trim().isEmpty()) return;
+        if (chapter == null) return;
 
-        int bookId;
-        try {
-            bookId = Integer.parseInt(chapter.getBookId());
-        } catch (NumberFormatException e) {
-            Log.e("BookTracking", "bookId không hợp lệ: " + chapter.getBookId());
-            return;
-        }
+        int bookId = chapter.getBookId();
 
         BookViewModel model = new BookViewModel();
         model.setId(id);

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">IRead</string>
+    <string name="default_web_client_id">817855725596-d22h02ikei1lls3ghn9q414r6j9gfja5.apps.googleusercontent.com</string>
+
 </resources>

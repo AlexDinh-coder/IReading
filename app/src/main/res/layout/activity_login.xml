@@ -236,8 +236,6 @@
                     android:layout_height="1dp"
                     android:background="#444444"/>
             </LinearLayout>
-
-            <!-- 2 nút Facebook và Google -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -245,13 +243,13 @@
                 android:gravity="center">
 
                 <ImageButton
-                    android:id="@+id/facebookLogin"
+                    android:id="@+id/gmailLogin"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:background="@drawable/social_button_background"
                     android:src="@drawable/ic_google"
                     android:layout_gravity="center"
-                    android:contentDescription="Login with Facebook"
+                    android:contentDescription="Login with Gmail"
                     android:scaleType="centerInside"/>
             </LinearLayout>
         </LinearLayout>

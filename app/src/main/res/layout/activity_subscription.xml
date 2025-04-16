@@ -14,6 +14,20 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:id="@+id/btnClose"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="12dp"
+            android:src="@drawable/ic_close"
+            android:contentDescription="Close"
+            android:clickable="true"
+            android:focusable="true"
+            app:tint="@android:color/black" />
+
+
+
+        <ImageView
             android:id="@+id/headerImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -32,7 +46,7 @@
             android:shadowDx="0"
             android:shadowDy="2"
             android:shadowRadius="4"
-            android:text="NGHE VÀ ĐỌC 20.000 NỘI DUNG\nTHUỘC KHO SÁCH HỘI VIÊN"
+            android:text="NGHE VÀ ĐỌC NGHÌN NỘI DUNG\nTHUỘC KHO SÁCH HỘI VIÊN"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -69,6 +83,7 @@
             android:padding="16dp">
 
             <RelativeLayout
+                android:id="@+id/buy_12m"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
@@ -79,33 +94,28 @@
                     android:id="@+id/title_12m"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="WAKA 12 THÁNG"
+                    android:text="IREADING 12 THÁNG"
                     android:textColor="#000000"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/hot_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:background="@drawable/rounded_hot"
-                    android:padding="4dp"
-                    android:text="HOT"
-                    android:textColor="#FFFFFF"
-                    android:textSize="10sp" />
 
                 <TextView
+                    android:id="@+id/textDescription1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/title_12m"
                     android:layout_marginTop="4dp"
-                    android:text="365 ngày đọc/nghe sách"
                     android:textColor="#777777"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    android:inputType="textMultiLine"
+                    android:singleLine="false"
+                    android:ellipsize="none"
+                    android:maxLines="5"
+                    android:lineSpacingExtra="2dp"/>
 
                 <TextView
+                    android:id="@+id/textPrice1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -114,9 +124,11 @@
                     android:textColor="#009688"
                     android:textSize="18sp"
                     android:textStyle="bold" />
+
             </RelativeLayout>
 
             <RelativeLayout
+                android:id="@+id/buy_6m"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
@@ -127,21 +139,26 @@
                     android:id="@+id/title_6m"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="WAKA 6 THÁNG"
+                    android:text="IREADING 6 THÁNG"
                     android:textColor="#000000"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/textDescription2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/title_6m"
                     android:layout_marginTop="4dp"
-                    android:text="183 ngày đọc/nghe sách"
                     android:textColor="#777777"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    android:maxLines="3"
+                    android:ellipsize="none"
+                    android:inputType="textMultiLine"
+                    android:singleLine="false"/>
 
                 <TextView
+                    android:id="@+id/textPrice2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -154,6 +171,7 @@
 
             <!-- Gói 3 tháng -->
             <RelativeLayout
+                android:id="@+id/buy_3m"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_white"
@@ -163,21 +181,26 @@
                     android:id="@+id/title_3m"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="WAKA 3 THÁNG"
+                    android:text="IREADING 3 THÁNG"
                     android:textColor="#000000"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/textDescription3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/title_3m"
                     android:layout_marginTop="4dp"
-                    android:text="90 ngày đọc/nghe sách"
                     android:textColor="#777777"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    android:maxLines="3"
+                    android:ellipsize="none"
+                    android:inputType="textMultiLine"
+                    android:singleLine="false"/>
 
                 <TextView
+                    android:id="@+id/textPrice3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -189,36 +212,13 @@
             </RelativeLayout>
         </LinearLayout>
 
-        <!-- Checkbox tự động gia hạn -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="16dp">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginEnd="8dp"
-                android:src="@android:drawable/checkbox_on_background"
-                android:tint="#4CAF50" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tự động gia hạn"
-                android:textColor="#4CAF50"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <!-- Ghi chú cuối trang -->
         <TextView
+            android:id="@+id/tvNotice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lineSpacingExtra="4dp"
             android:padding="16dp"
-            android:text="Lưu ý: Thanh toán trực tiếp khi chưa Đăng nhập..."
+            android:text="Lưu ý: Bạn cần đăng nhập mới có thể thanh toán."
             android:textColor="#666666"
             android:textSize="12sp" />
     </LinearLayout>

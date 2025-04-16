@@ -1,7 +1,5 @@
 package com.example.iread.OpenBook;
 
-import static android.content.Intent.getIntent;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,97 +20,73 @@ import com.example.iread.apicaller.RetrofitClient;
 import com.example.iread.basemodel.ReponderModel;
 import com.example.iread.helper.Utils;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ChapterFragment extends Fragment {
-    RecyclerView recyclerView;
+
+    private RecyclerView recyclerView;
     private ChapterAdapter chapterAdapter;
+    private TextView totalChapters, sortOrderView;
 
-    TextView totalChapters, sortOrderView;
-    boolean isAscending = true;
-
+    private boolean isAscending = true;
     private List<BookChapter> chapterList = new ArrayList<>();
 
-
-    IAppApiCaller iAppApiCaller;
+    private IAppApiCaller iAppApiCaller;
+    private int bookTypeStatus = 0; // 0 - đọc, 1 - nghe
+    private int bookId = -1;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chapter, container, false);
 
-        Bundle args = getArguments();
-        int bookId = -1;
-        if (args != null) {
-            bookId = args.getInt("bookId", -1);
-        }
-
-        // Gán dữ liệu vào RecyclerView
-        recyclerView = view.findViewById(R.id.rcv_chapter_in_open_book);
-        getBookChaper(bookId);
-
-
-        totalChapters = view.findViewById(R.id.totalChapters);
-
-        //Sort view list chapter
-        sortOrderView = view.findViewById(R.id.sortOlderView);
-        sortOrderView.setOnClickListener(v -> {
-            if (chapterList != null && chapterList.size() > 1) {
-                isAscending = !isAscending; // Đảo hướng sắp xếp
-
-                if (isAscending) {
-                    sortOrderView.setText("Cũ nhất");
-                    Collections.sort(chapterList, Comparator.comparing(BookChapter::getChaperId));
-                } else {
-                    sortOrderView.setText("Mới nhất");
-                    Collections.sort(chapterList, (c1, c2) -> c2.getChaperId() - c1.getChaperId());
-                }
-
-                chapterAdapter.updateData(chapterList); // Cập nhật lại adapter
-            }
-        });
-
+        initArguments();
+        initViews(view);
+        initApi();
+        fetchChapters();
 
         return view;
     }
 
-    private void getBookChaper(int bookId) {
-        if (!isAdded()) return; // đảm bảo Fragment đã được attach
-        requireContext();
+    private void initArguments() {
+        Bundle args = getArguments();
+        if (args != null) {
+            bookId = args.getInt("bookId", -1);
+            bookTypeStatus = args.getInt("bookTypeStatus", 0);
+        }
+    }
+
+    private void initViews(View view) {
+        recyclerView = view.findViewById(R.id.rcv_chapter_in_open_book);
+        totalChapters = view.findViewById(R.id.totalChapters);
+        sortOrderView = view.findViewById(R.id.sortOlderView);
+
+        sortOrderView.setOnClickListener(v -> {
+            toggleSortOrder();
+        });
+    }
+
+    private void initApi() {
         iAppApiCaller = RetrofitClient.getInstance(Utils.BASE_URL, requireContext()).create(IAppApiCaller.class);
+    }
+
+    private void fetchChapters() {
+        if (bookId == -1) return;
+
         iAppApiCaller.getListByBookId(bookId).enqueue(new Callback<ReponderModel<BookChapter>>() {
             @Override
             public void onResponse(Call<ReponderModel<BookChapter>> call, Response<ReponderModel<BookChapter>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().getDataList() != null) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<BookChapter> allChapters = response.body().getDataList();
 
-                    chapterList = response.body().getDataList(); // dùng biến toàn cục
-
-                    Collections.sort(chapterList, Comparator.comparing(BookChapter::getChaperId));
-
-                    totalChapters.setText(chapterList.size() + " chương");
-
-                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                    chapterAdapter = new ChapterAdapter((int position) -> {
-                        Intent intent = new Intent(getContext(), ActivityBook.class);
-                        intent.putExtra("selectedIndex", position);
-                        intent.putExtra("chapterList", new ArrayList<>(chapterList)); // truyền danh sách chương
-                        startActivity(intent);
-
-
-
-                    }, getContext(), chapterList, 0);
-                    recyclerView.setAdapter(chapterAdapter);
-
-                    // Log để kiểm tra dữ liệu
-                    for (BookChapter chapter : chapterList) {
-                        Log.d("BookChapter", "Chapter name: " + chapter.getChapterName());
+                    if (allChapters != null) {
+                        filterAndShowChapters(allChapters);
                     }
 
                 } else {
@@ -127,6 +101,60 @@ public class ChapterFragment extends Fragment {
         });
     }
 
+    private void filterAndShowChapters(List<BookChapter> allChapters) {
+        Log.d("CHAPTER_CHECK", "bookTypeStatus = " + bookTypeStatus);
+        chapterList.clear();
+
+        for (BookChapter chapter : allChapters) {
+            Log.d("CHAPTER_CHECK", "Chapter: " + chapter.getChapterName() + ", BookType = " + chapter.getBookType() + ", FileName = " + chapter.getFileName());
+            if (chapter.getBookType() == 0) {
+                chapterList.add(chapter);
+            }
+//            if (bookTypeStatus == 0) {
+//                // Chế độ đọc: chỉ lấy chương có BookType = 0
+//                if (chapter.getBookType() == 0) {
+//                    chapterList.add(chapter);
+//                }
+//            } else if (bookTypeStatus == 1) {
+//                // Chế độ nghe: chỉ lấy chương có audio (FileName không rỗng)
+//                if (chapter.getBookType() == 0 && chapter.getFileName() != null && !chapter.getFileName().isEmpty()) {
+//                    chapterList.add(chapter);
+//                }
+//            }
+        }
+
+        sortChapterList();
+        totalChapters.setText(chapterList.size() + " chương");
+        setupRecyclerView();
+    }
 
 
+
+    private void sortChapterList() {
+        if (isAscending) {
+            Collections.sort(chapterList, Comparator.comparing(BookChapter::getChaperId));
+            sortOrderView.setText("Cũ nhất");
+        } else {
+            Collections.sort(chapterList, (c1, c2) -> c2.getChaperId() - c1.getChaperId());
+            sortOrderView.setText("Mới nhất");
+        }
+    }
+
+    private void toggleSortOrder() {
+        isAscending = !isAscending;
+        sortChapterList();
+        chapterAdapter.updateData(chapterList);
+    }
+
+    private void setupRecyclerView() {
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        chapterAdapter = new ChapterAdapter(position -> {
+            Intent intent = new Intent(getContext(), ActivityBook.class);
+            intent.putExtra("selectedIndex", position);
+            intent.putExtra("chapterList", new ArrayList<>(chapterList));
+            intent.putExtra("bookTypeStatus", bookTypeStatus); // truyền để phân biệt khi mở chương
+            startActivity(intent);
+        }, getContext(), chapterList, bookTypeStatus);
+        recyclerView.setAdapter(chapterAdapter);
+    }
 }

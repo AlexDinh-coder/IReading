@@ -35,6 +35,7 @@ import com.example.iread.Home.Banner.ImageSliderAdapter;
 import com.example.iread.MenuBarInHome.CategoryActivity;
 import com.example.iread.Model.Book;
 import com.example.iread.Model.Category;
+import com.example.iread.SubscriptionActivity;
 import com.example.iread.apicaller.IAppApiCaller;
 import com.example.iread.apicaller.RetrofitClient;
 import com.example.iread.basemodel.ReponderModel;
@@ -53,6 +54,8 @@ public class HomeFragment extends Fragment {
     private CategoryAdapter categoryAdapter;
     private final List<Category> dataList = new ArrayList<>();
     private final Map<Integer, View> categorySectionMap = new LinkedHashMap<>();
+
+    private TextView btnPay;
 
     private ImageView imgBar;
 
@@ -89,6 +92,13 @@ public class HomeFragment extends Fragment {
         scrollView = view.findViewById(R.id.scrollView2);
         contentScrollLayout = view.findViewById(R.id.content_scroll);
         backgroundView = view.findViewById(R.id.background_view);
+        btnPay = view.findViewById(R.id.btnPlan);
+        btnPay.setOnClickListener(v -> {
+            if (getContext() != null) {
+                Intent intent = new Intent(getContext(), SubscriptionActivity.class);
+                startActivity(intent);
+            }
+        });
         // bar
         imgBar = view.findViewById(R.id.imgBarInHome);
         imgBar.setOnClickListener(v->{

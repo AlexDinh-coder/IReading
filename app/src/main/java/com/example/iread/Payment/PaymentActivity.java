@@ -6,14 +6,18 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.iread.MainActivity;
 import com.example.iread.R;
+import com.example.iread.UserFragment;
 
 public class PaymentActivity extends AppCompatActivity {
     private LinearLayout btnPay;
+    private ImageView btnClose;
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +25,14 @@ public class PaymentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_payment);
         makeStatusBarTransparent();
         applyTopPadding();
+
+        btnClose = findViewById(R.id.btnClose);
+        btnClose.setOnClickListener(v->{
+            Intent intent = new Intent(PaymentActivity.this , MainActivity.class);
+            intent.putExtra("UserFragment", true);
+            startActivity(intent);
+            finish();
+        });
 
         btnPay = findViewById(R.id.paymentBox1);
         btnPay.setOnClickListener(v->{

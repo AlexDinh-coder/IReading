@@ -67,6 +67,7 @@
                 app:srcCompat="@drawable/ic_book_svg" />
 
             <ImageView
+                android:id="@+id/btnBook"
                 android:layout_width="27dp"
                 android:layout_height="27dp"
                 android:layout_marginEnd="24dp"
@@ -129,8 +130,9 @@
                     android:id="@+id/txtAudioTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ở một góc nhân gian"
+                    android:text=""
                     android:textColor="@color/white" />
+
             </LinearLayout>
 
             <RelativeLayout

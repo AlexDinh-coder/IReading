@@ -38,6 +38,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
+                    android:id="@+id/avatar"
                     android:layout_width="60dp"
                     android:layout_height="match_parent"
                     android:src="@drawable/facebook" />
@@ -86,6 +87,7 @@
                     android:textSize="16sp" />
 
                 <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/upgradeAccount"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
                     android:background="@drawable/bg_button_upgrade"
@@ -439,11 +441,12 @@
                     <!--                        android:tint="#00FFAA" />-->
 
                     <TextView
+                        android:id="@+id/btnPayment"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_weight="1"
-                        android:text="Cài đặt"
+                        android:text="Nạp xu"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp" />
 

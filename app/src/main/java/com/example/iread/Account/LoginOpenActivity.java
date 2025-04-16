@@ -1,18 +1,23 @@
 package com.example.iread.Account;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.iread.MainActivity;
 import com.example.iread.R;
 
 public class LoginOpenActivity extends AppCompatActivity {
     private Button btnLoginOpen;
+    private TextView btnClose;
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +30,15 @@ public class LoginOpenActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(LoginOpenActivity.this, LoginActivity.class);
                 startActivity(intent);
+            }
+        });
+        btnClose = findViewById(R.id.btnClose);
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginOpenActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
 

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.iread.Audio.AudioActivity;
 import com.example.iread.Book.ActivityBook;
 import com.example.iread.Interface.OnChapterClickListener;
 import com.example.iread.Model.BookChapter;
@@ -24,6 +25,7 @@ import com.example.iread.apicaller.RetrofitClient;
 import com.example.iread.basemodel.ReponderModel;
 import com.example.iread.helper.Utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,11 +57,6 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
         userId = sharedPreferences.getString("userId", "");
     }
 
-    // Constructor đơn giản, không xử lý click (dùng cho ChapterFragment)
-//    public ChapterAdapter(Context context, List<BookChapter> chapterList) {
-//        this.context = context;
-//        this.chapterList = chapterList;
-//    }
 
     @NonNull
     @Override
@@ -73,17 +70,44 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
     public void onBindViewHolder(@NonNull ChapterViewHolder holder, int position) {
         BookChapter bookChapter= chapterList.get(position);
         holder.chapterTitle.setText(bookChapter.getChapterName());
-        holder.chapterLabel.setVisibility(View.VISIBLE);
+        //holder.chapterLabel.setVisibility(View.VISIBLE);
+        int bookType = bookChapter.getBookType();
+        if (bookType == 0) {
+            holder.chapterLabel.setVisibility(View.VISIBLE);
+            holder.chapterLabel.setText("FREE");
+            holder.chapterLabel.setBackgroundResource(R.drawable.bg_label_free);
+        } else if (bookType == 1) {
+            holder.chapterLabel.setVisibility(View.VISIBLE);
+            holder.chapterLabel.setText("PAID");
+            holder.chapterLabel.setBackgroundResource(R.drawable.bg_label_paid);
+        } else {
+            // Nếu là Pending (2) hoặc Declined (3) thì ẩn nhãn
+            holder.chapterLabel.setVisibility(View.GONE);
+        }
 
 
         holder.itemView.setOnClickListener(v -> {
-            if (onChapterClickListener != null) {
-                if (position != 0) {
-                    sendViewStatus(bookChapter,0,viewId);
+            if (bookChapter == null) return;
+
+            if (viewId == 1) {
+                // Sách nghe → mở AudioActivity
+                Intent intent = new Intent(context, AudioActivity.class);
+                intent.putExtra("bookId", bookChapter.getBookId());
+                intent.putExtra("chapterId", bookChapter.getId());
+                intent.putExtra("chapterList", (Serializable) chapterList);
+                intent.putExtra("selectedIndex", position);
+                context.startActivity(intent);
+            } else {
+                // Sách đọc → tracking + callback
+                if (onChapterClickListener != null) {
+                    if (position != 0) {
+                        sendViewStatus(bookChapter, 0, viewId);
+                    }
+                    onChapterClickListener.onChapterClick(position);
                 }
-                onChapterClickListener.onChapterClick(position);
             }
         });
+
 
     }
     private void setupApiCaller() {
@@ -92,15 +116,9 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
 
 
     private void sendViewStatus(BookChapter chapter, int status, int id) {
-        if (chapter == null || chapter.getBookId() == null || chapter.getBookId().trim().isEmpty()) return;
+        if (chapter == null) return;
 
-        int bookId;
-        try {
-            bookId = Integer.parseInt(chapter.getBookId());
-        } catch (NumberFormatException e) {
-            Log.e("BookTracking", "bookId không hợp lệ: " + chapter.getBookId());
-            return;
-        }
+        int bookId = chapter.getBookId();
 
         BookViewModel model = new BookViewModel();
         model.setId(id);

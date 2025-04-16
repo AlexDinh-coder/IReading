@@ -1,21 +1,33 @@
 package com.example.iread.Model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
+import java.util.List;
 
 public class BookChapter implements Serializable {
     private String id;
     private String chapterName;
+
     private int chaperId;
     private String summary;
     private String audioUrl;
     private String content;
 
-    private String modifyDate;
+    private List<SummaryTime> contentWithTime;
 
-    private String bookType;
+    private String modifyDate;
+    //0: free, 1: paid; PendingApproval = 2,
+    //        Decline = 3,
+    private int bookType;
+
+    private int price;
+    private String createBy;
 
     private String userId;
-    private String bookId;
+    private int bookId;
+
+    private String fileName;
 
     private int viewNo;
 
@@ -29,6 +41,14 @@ public class BookChapter implements Serializable {
 
     public int getViewNo() {
         return viewNo;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public void setViewNo(int viewNo) {
@@ -85,11 +105,12 @@ public class BookChapter implements Serializable {
         this.modifyDate = modifyDate;
     }
 
-    public String getBookType() {
+
+    public int getBookType() {
         return bookType;
     }
 
-    public void setBookType(String bookType) {
+    public void setBookType(int bookType) {
         this.bookType = bookType;
     }
 
@@ -101,11 +122,35 @@ public class BookChapter implements Serializable {
         this.userId = userId;
     }
 
-    public String getBookId() {
+    public int getBookId() {
         return bookId;
     }
 
-    public void setBookId(String bookId) {
+    public void setBookId(int bookId) {
         this.bookId = bookId;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public String getCreateBy() {
+        return createBy;
+    }
+
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy;
+    }
+
+    public List<SummaryTime> getContentWithTime() {
+        return contentWithTime;
+    }
+
+    public void setContentWithTime(List<SummaryTime> contentWithTime) {
+        this.contentWithTime = contentWithTime;
     }
 }

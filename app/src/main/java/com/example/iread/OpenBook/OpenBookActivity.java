@@ -34,6 +34,7 @@ import com.example.iread.Model.BookChapter;
 import com.example.iread.Model.Category;
 import com.example.iread.Model.CommentModel;
 import com.example.iread.R;
+import com.example.iread.SubscriptionActivity;
 import com.example.iread.apicaller.IAppApiCaller;
 import com.example.iread.apicaller.RetrofitClient;
 import com.example.iread.basemodel.ReponderModel;
@@ -57,7 +58,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     private IAppApiCaller apiCaller;
     private ReviewAdapter reviewAdapter;
     private TabLayout tabLayout;
-    private TextView totalRating, btnTotalReview, btnTextReview, totalReadView;
+    private TextView totalRating, btnTotalReview, btnTextReview, totalReadView,totalListenView;
 
     private TextView ratingTextStarTop, ratingTextStarBottom;
 
@@ -113,6 +114,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         btnActionBook = findViewById(R.id.btnActionBook);
         btnUpgrade = findViewById(R.id.btnUpgrade);
         iconLove = findViewById(R.id.iconLove);
+
 
         //Load dữ liệu user info
         SharedPreferences sharedPreferences = this.getSharedPreferences("MyPrefs", MODE_PRIVATE);
@@ -183,6 +185,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
 
         getBookReview(bookId);
         getBookTotalReview(bookId);
+        //getBookListenView(bookId);
     }
 
     private void removeFromFavorite(int bookId, String username) {
@@ -299,6 +302,11 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         btnBookRead.setBackgroundTintList(getColorStateList(R.color.dark_gray));
         btnActionBook.setText("NGHE THỬ");
         btnUpgrade.setVisibility(View.VISIBLE);
+        btnUpgrade.setOnClickListener(v -> {
+            Intent intent = new Intent(OpenBookActivity.this, SubscriptionActivity.class);
+            intent.putExtra("bookId", bookId);
+            startActivity(intent);
+        });
     }
 
     ////Xử lí phần sách nghe
@@ -327,6 +335,15 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                 startActivity(intent);
             });
         }
+        btnBookListen.setOnClickListener(v -> {
+            applyBookListenMode();
+            loadFragmentWithBookId(new ChapterFragment(), 1);
+        });
+        btnBookRead.setOnClickListener(v -> {
+            applyBookReadMode();
+            loadFragmentWithBookId(new ChapterFragment(), 0);
+        });
+
     }
 
     private void setupRecyclerView() {
@@ -334,18 +351,33 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         reviewAdapter = new ReviewAdapter(new ArrayList<>());
         rcv.setAdapter(reviewAdapter);
     }
+    private void loadFragmentWithBookId(Fragment fragment, int bookTypeStatus) {
+        Bundle bundle = new Bundle();
+        bundle.putInt("bookId", bookId);
+        bundle.putInt("bookTypeStatus", bookTypeStatus); // 0: đọc, 1: nghe
+        fragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.contentFrame, fragment)
+                .commit();
+    }
+
     //Hàm để khởi tạo các tab ấn click vô mục chương, có thể bạn thích
     private void setupTabs() {
         tabLayout.addTab(tabLayout.newTab().setText("Chương"));
         tabLayout.addTab(tabLayout.newTab().setText("Có thể bạn thích"));
 
-        loadFragmentWithBookId(new ChapterFragment());
+        loadFragmentWithBookId(new ChapterFragment(), 0);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                Fragment fragment = tab.getPosition() == 0 ? new ChapterFragment() : new MinghtLikeFragment();
-                loadFragmentWithBookId(fragment);
+                if (tab.getPosition() == 0){
+                    loadFragmentWithBookId(new ChapterFragment());
+                } else if (tab.getPosition() == 1) {
+                    loadFragmentWithBookId(new MinghtLikeFragment());
+                }
+//                Fragment fragment = tab.getPosition() == 0 ? new ChapterFragment() : new MinghtLikeFragment();
+//                loadFragmentWithBookId(fragment);TabLayout
             }
 
             @Override
@@ -353,6 +385,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
+
     }
 
     private void setupCommentLauncher() {
@@ -416,7 +449,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             @Override
             public void onResponse(@NonNull Call<ReponderModel<Integer>> call, @NonNull Response<ReponderModel<Integer>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Integer totalView = response.body().getData();
+                    int totalView = response.body().getData();
                     Log.d("API_VIEW", "Tổng lượt xem: " + totalView);
                     totalReadView.setText(String.valueOf(totalView));
                 }
@@ -428,7 +461,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             }
         });
     }
-    // Hiển thị toàn bộ thông tin chi tiết của sách như ảnh bìa, tên, tác giả, mô tả, thể loại.
     private void showBookDetailUI(Book book) {
         ImageView imgBook = findViewById(R.id.image_characters_in_detail);
         Glide.with(this).load(book.getPoster())
