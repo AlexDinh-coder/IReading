@@ -59,6 +59,16 @@ public class Account {
         this.registerType = registerType;
     }
 
+    public Account(String username, String fullName, String email, String phoneNumber, String password, String passwordConfirm,int registerType) {
+        this.username = username;
+        this.fullName = fullName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.password = password;
+        this.passwordConfirm = passwordConfirm;
+        this.registerType = registerType;
+    }
+
     public String getUsername() {
         return userName;
     }
