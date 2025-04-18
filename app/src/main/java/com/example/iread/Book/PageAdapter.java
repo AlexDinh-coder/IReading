@@ -42,7 +42,9 @@ public class PageAdapter extends RecyclerView.Adapter<PageAdapter.PageViewHolder
 
     @Override
     public int getItemCount() {
-        return pageList.size();
+//       return pageList.size();
+        return (pageList != null) ? pageList.size() : 0;
+
     }
 
     static class PageViewHolder extends RecyclerView.ViewHolder {

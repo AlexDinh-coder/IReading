@@ -18,19 +18,30 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.iread.LibraryCateAdapter;
 import com.example.iread.Model.Book;
+import com.example.iread.Model.BookSearch;
+import com.example.iread.Model.UserBook;
 import com.example.iread.OpenBook.BookDetailAdapter;
+import com.example.iread.apicaller.IAppApiCaller;
+import com.example.iread.apicaller.RetrofitClient;
+import com.example.iread.basemodel.ReponderModel;
+import com.example.iread.helper.Utils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LibraryFragment extends Fragment {
     private RecyclerView recyclerBookView;
     private BookDetailAdapter bookAdapter;
     private List<Book> bookList;
+
+    private IAppApiCaller iAppApiCaller;
 
     TextView tvUserName, tvFavorite, tvContinue, tvPurchased;
 
@@ -46,6 +57,8 @@ public class LibraryFragment extends Fragment {
         applyTopPadding(view);
         recyclerBookView = view.findViewById(R.id.rcv_book_library);
         RecyclerView recyclerView = view.findViewById(R.id.rcv_cate_library);
+
+        iAppApiCaller = RetrofitClient.getInstance(Utils.BASE_URL, requireContext()).create(IAppApiCaller.class);
 
         tvUserName = view.findViewById(R.id.tvUserName);
         tvFavorite = view.findViewById(R.id.tvFavorite);
@@ -66,7 +79,7 @@ public class LibraryFragment extends Fragment {
         recyclerBookView.setLayoutManager(layoutManagerBook);
         tvFavorite.setOnClickListener(v -> {
             currentTab = LibraryTab.FAVORITE;
-            loadSampleData();
+            loadFavoriteBook(username);
             updateTabUI();
         });
 
@@ -146,52 +159,39 @@ public class LibraryFragment extends Fragment {
     }
 
 
-    private void loadSampleData() {
-        // Khởi tạo danh sách để chứa các sách yêu thích
-        bookList = new ArrayList<>();
-
-        // Lấy SharedPreferences nơi lưu thông tin sách yêu thích
-        SharedPreferences sharedPreferences = requireContext()
-                .getSharedPreferences("FavoriteBooks", Context.MODE_PRIVATE);
-
-        // Lấy toàn bộ dữ liệu sách yêu thích dưới dạng Map (key: bookId, value: "name|author|poster")
-        Map<String, ?> favoriteEntries = sharedPreferences.getAll();
-
-        // Duyệt qua từng sách đã lưu
-        for (Map.Entry<String, ?> entry : favoriteEntries.entrySet()) {
-            String bookIdString = entry.getKey();                 // Lấy bookId
-            String rawBookData = entry.getValue().toString();     // Lấy chuỗi dữ liệu đã lưu
-
-            // Tách dữ liệu thành mảng: [tên sách, tác giả, poster]
-            String[] bookInfoParts = rawBookData.split("\\|");
-
-            // Kiểm tra xem dữ liệu có hợp lệ không (ít nhất 3 phần)
-            if (bookInfoParts.length >= 3) {
-                try {
-                    int bookId = Integer.parseInt(bookIdString);
-                    String bookName = bookInfoParts[0];
-                    String authorName = bookInfoParts[1];
-                    String posterUrl = bookInfoParts[2];
-
-                    // Tạo đối tượng Book và gán dữ liệu
-                    Book book = new Book();
-                    book.setId(bookId);
-                    book.setName(bookName);
-                    book.setCreateBy(authorName);
-                    book.setPoster(posterUrl);
-
-                    // Thêm vào danh sách hiển thị
-                    bookList.add(book);
-
-                } catch (NumberFormatException e) {
-                    Log.e("LibraryFragment", "Lỗi chuyển đổi bookId sang số nguyên: " + bookIdString);
-                }
-            }
+    private void loadFavoriteBook(String username) {
+        if (bookList == null) {
+            bookList = new ArrayList<>();
+        } else {
+            bookList.clear(); // 👈 CLEAR DATA CŨ TRƯỚC KHI LOAD MỚI
         }
 
-        // Gắn dữ liệu vào adapter và hiển thị lên RecyclerView
-        bookAdapter = new BookDetailAdapter(getContext(), bookList);
-        recyclerBookView.setAdapter(bookAdapter);
+
+        iAppApiCaller.getListFavoriteBook(username).enqueue(new Callback<ReponderModel<UserBook>>() {
+            @Override
+            public void onResponse(Call<ReponderModel<UserBook>> call, Response<ReponderModel<UserBook>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<UserBook> userBooks = response.body().getDataList();
+                    for (UserBook userBook : userBooks) {
+                        Book book = userBook.getBook();
+                        if (book != null) {
+                            bookList.add(book);
+                        }
+                    }
+                    bookAdapter = new BookDetailAdapter(getContext(), bookList);
+                    recyclerBookView.setAdapter(bookAdapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ReponderModel<UserBook>> call, Throwable t) {
+
+            }
+        });
+
+
+
+
 
     }
     // Gọi lại load danh sách mỗi lần quay lại màn
@@ -200,7 +200,7 @@ public class LibraryFragment extends Fragment {
         super.onResume();
         switch (currentTab) {
             case FAVORITE:
-                loadSampleData();
+                loadFavoriteBook(tvUserName.getText().toString());
                 break;
             case CONTINUE:
                 loadContinueBooks();

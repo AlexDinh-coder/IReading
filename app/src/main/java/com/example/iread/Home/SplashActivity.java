@@ -29,17 +29,6 @@ public class SplashActivity extends AppCompatActivity {
             }
 
             runOnUiThread(() -> {
-//                String savedUser = Paper.book().read("user");
-//                String savedPassword = Paper.book().read("password");
-//                if (savedUser != null && savedPassword != null) {
-//                    // Nếu đã đăng nhập rồi thì vào MainActivity
-//                    startActivity(new Intent(SplashActivity.this, MainActivity.class));
-//                } else {
-//                    // Nếu chưa có thông tin đăng nhập
-//                    startActivity(new Intent(SplashActivity.this, LoginOpenActivity.class));
-//                }
-//                finish();
-                // Luôn chạy LoginActivity (không check user)
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();

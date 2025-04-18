@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
         editPassword = findViewById(R.id.passwordEditText);
         btnLogin = findViewById(R.id.btn_login_open);
         gmailLogin = findViewById(R.id.gmailLogin);
-        txtIntentRegister = findViewById(R.id.txt_intent_register);
+        txtIntentRegister = findViewById(R.id.btn_Register);
 
         String savedUsername = Paper.book().read("user");
         String savedPassword = Paper.book().read("password");

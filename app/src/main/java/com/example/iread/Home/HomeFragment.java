@@ -33,6 +33,7 @@ import com.example.iread.DetailActivity;
 import com.example.iread.Home.Banner.CarouselTransformer;
 import com.example.iread.Home.Banner.ImageSliderAdapter;
 import com.example.iread.MenuBarInHome.CategoryActivity;
+import com.example.iread.MenuBarInHome.SearchActivity;
 import com.example.iread.Model.Book;
 import com.example.iread.Model.Category;
 import com.example.iread.SubscriptionActivity;
@@ -57,7 +58,7 @@ public class HomeFragment extends Fragment {
 
     private TextView btnPay;
 
-    private ImageView imgBar;
+    private ImageView imgBar, btnSearch;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private LinearLayout contentScrollLayout;
@@ -92,6 +93,14 @@ public class HomeFragment extends Fragment {
         scrollView = view.findViewById(R.id.scrollView2);
         contentScrollLayout = view.findViewById(R.id.content_scroll);
         backgroundView = view.findViewById(R.id.background_view);
+
+        btnSearch = view.findViewById(R.id.btnSearch);
+        btnSearch.setOnClickListener(v -> {
+            if (getContext() != null) {
+                Intent intent = new Intent(getContext(), SearchActivity.class);
+                startActivity(intent);
+            }
+        });
         btnPay = view.findViewById(R.id.btnPlan);
         btnPay.setOnClickListener(v -> {
             if (getContext() != null) {
@@ -145,7 +154,7 @@ public class HomeFragment extends Fragment {
     // Setup banner image carousel
     private void setupBannerSlider(View view) {
         viewPager2 = view.findViewById(R.id.viewPager);
-        List<Integer> imageList = Arrays.asList(R.drawable.image1, R.drawable.image2, R.drawable.image3);
+        List<Integer> imageList = Arrays.asList(R.drawable.image1, R.drawable.image2, R.drawable.image3, R.drawable.book5);
 
         viewPager2.setClipToPadding(false);
         viewPager2.setClipChildren(false);
