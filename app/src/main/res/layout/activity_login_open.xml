@@ -68,7 +68,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="90dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/logo_ireading"/>
+                android:src="@drawable/ireading1"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"

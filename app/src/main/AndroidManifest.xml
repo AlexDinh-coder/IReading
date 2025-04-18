@@ -72,6 +72,12 @@
             android:exported="true" >
 
         </activity>
+
+        <activity
+            android:name=".Account.RegisterActivity"
+            android:exported="true" >
+
+        </activity>
         <activity
             android:name=".DetailActivity"
             android:exported="true" >

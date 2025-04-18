@@ -80,7 +80,7 @@
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
             <Spinner
                 android:id="@+id/spinnerCategory"
-                android:layout_width="140dp"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:background="@drawable/spinner_background"
                 android:popupBackground="#2E2E2E"

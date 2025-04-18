@@ -104,7 +104,8 @@ public class DetailActivity extends AppCompatActivity {
                             R.layout.spinner_item_category,
                             categoryNames
                     );
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    adapter.setDropDownViewResource(R.layout.spinner_item_category);
+
                     spinner.setAdapter(adapter);
 
                     // Nếu có category được truyền từ màn trước thì chọn sẵn

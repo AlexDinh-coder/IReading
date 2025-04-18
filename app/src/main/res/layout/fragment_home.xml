@@ -68,12 +68,12 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 app:srcCompat="@drawable/ic_notification"
-                app:layout_constraintEnd_toStartOf="@+id/imageView4"
+                app:layout_constraintEnd_toStartOf="@+id/btnSearch"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
             <ImageView
-                android:id="@+id/imageView4"
+                android:id="@+id/btnSearch"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 app:srcCompat="@drawable/ic_search"

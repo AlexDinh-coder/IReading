@@ -436,6 +436,7 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/newChapter"
                             android:text="Phần mới nhất"
                             android:textColor="#FFFFFF"
                             android:textSize="16sp"
@@ -444,6 +445,7 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:id="@+id/chapterName"
                             android:text="Phần 68 | 06/04/2025"
                             android:textColor="#AAAAAA"
                             android:textSize="14sp"
@@ -454,6 +456,7 @@
 
                     <!-- Nút ĐỌC -->
                     <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnRead"
                         android:layout_width="64dp"
                         android:layout_height="32dp"
                         android:text="ĐỌC"

@@ -13,8 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Toàn bộ layout bạn có sẵn ở đây (ảnh, seekbar, nút điều khiển...) -->
-        <!-- Giữ nguyên phần bạn đã làm – mình không dán lại toàn bộ để tránh dài -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout2"
             android:layout_width="match_parent"

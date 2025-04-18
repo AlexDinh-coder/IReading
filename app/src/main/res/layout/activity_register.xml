@@ -122,6 +122,7 @@
                 android:layout_height="8dp" />
 
             <EditText
+                android:id="@+id/EmailEditText"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/input_background"
@@ -136,6 +137,7 @@
                 android:layout_height="8dp" />
 
             <EditText
+                android:id="@+id/FullNameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/input_background"
@@ -149,6 +151,7 @@
                 android:layout_height="8dp" />
 
             <EditText
+                android:id="@+id/NumberPhoneEditText"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/input_background"
@@ -168,6 +171,7 @@
                 android:background="@drawable/input_background">
 
                 <EditText
+                    android:id="@+id/PassWordEditText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:hint="Mật khẩu"
@@ -195,7 +199,7 @@
                 android:background="@drawable/input_background">
 
                 <EditText
-                    android:id="@+id/passwordEditText"
+                    android:id="@+id/ComEditText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:hint="Nhập lại mật khẩu"
@@ -224,7 +228,7 @@
             >
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_login_open"
+                android:id="@+id/btn_Register"
                 style="@style/Widget.AppCompat.Button"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
@@ -242,6 +246,7 @@
             android:layout_marginTop="20dp"
             >
             <TextView
+                android:id="@+id/btnCancel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Hủy bỏ"
