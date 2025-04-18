@@ -4,10 +4,12 @@ package com.example.iread.apicaller;
 import com.example.iread.Model.Account;
 import com.example.iread.Model.Book;
 import com.example.iread.Model.BookChapter;
+import com.example.iread.Model.BookSearch;
 import com.example.iread.Model.BookViewModel;
 import com.example.iread.Model.Category;
 import com.example.iread.Model.CommentModel;
 import com.example.iread.Model.PaymentRequestModel;
+import com.example.iread.Model.UserBook;
 import com.example.iread.Payment.PaymentItemModel;
 import com.example.iread.basemodel.ReponderModel;
 
@@ -68,11 +70,16 @@ public interface IAppApiCaller {
             @Query("bookTypeStatus") int statusType
     );
 
-    @GET("Book/AddFavouriteBook")
-    Call<ReponderModel<String>> addFavoriteBook(
+    @GET("Book/AddOrRemoveFavouriteBook")
+    Call<ReponderModel<String>> addOrRemoveFavoriteBook(
             @Query("bookId") int bookId,
              @Query("username") String username
 
+    );
+
+    @POST("Account/Register")
+    Call<ReponderModel<String>> Register(
+            @Body Account account
     );
     @GET("Payment/GetListPayment")
     Call<ReponderModel<PaymentItemModel>> getListPayment(
@@ -94,11 +101,19 @@ public interface IAppApiCaller {
     );
 
     @GET("Book/SearchBook")
-    Call<ReponderModel<BookChapter>> searchBook(
-            @Query("type") int type
+    Call<ReponderModel<BookSearch>> searchBook(
+            @Query("input") String input
+    );
+    @GET("Book/ListFavouriteBook")
+    Call<ReponderModel<UserBook>> getListFavoriteBook(
+            @Query("userName") String userName
     );
     @GET("Book/GetBookChapterWithVoice")
     Call<ReponderModel<BookChapter>> getBookChapterWithVoice(
             @Query("chapterId") String chapterId
+    );
+    @GET("Book/GetBook")
+    Call<ReponderModel<BookSearch>> getChapterById(
+            @Query("id") int id
     );
 }

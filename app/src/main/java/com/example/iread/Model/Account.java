@@ -22,6 +22,16 @@ public class Account {
 
     private String avatar;
 
+//    public Account(String username, String fullName, String email, String phoneNumber, String password, String passwordConfirm,int registerType) {
+//        this.username = username;
+//        this.fullName = fullName;
+//        this.email = email;
+//        this.phoneNumber = phoneNumber;
+//        this.password = password;
+//        this.passwordConfirm = passwordConfirm;
+//        this.registerType = registerType;
+//    }
+
 
 
     public int getRegisterType() {

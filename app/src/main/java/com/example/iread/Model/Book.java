@@ -1,5 +1,7 @@
 package com.example.iread.Model;
 
+import com.example.iread.basemodel.NewPublishedChapterModel;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,10 @@ public class Book {
     private String subCategory;
 
     private List<Category> listCategories = new ArrayList<>();
+
+    private boolean isNewPublishedChapter;
+
+    private NewPublishedChapterModel newPublishedChapter;
 
     public String getSubCategory() {
         return subCategory;
@@ -111,21 +117,21 @@ public class Book {
         this.ageLimitType = ageLimitType;
     }
 
-//    public Date getCreateDate() {
-//        return createDate;
-//    }
-//
-//    public void setCreateDate(Date createDate) {
-//        this.createDate = createDate;
-//    }
-//
-//    public Date getModifyDate() {
-//        return modifyDate;
-//    }
-//
-//    public void setModifyDate(Date modifyDate) {
-//        this.modifyDate = modifyDate;
-//    }
+    public boolean isNewPublishedChapter() {
+        return isNewPublishedChapter;
+    }
+
+    public void setNewPublishedChapter(boolean newPublishedChapter) {
+        isNewPublishedChapter = newPublishedChapter;
+    }
+
+    public NewPublishedChapterModel getNewPublishedChapter() {
+        return newPublishedChapter;
+    }
+
+    public void setNewPublishedChapter(NewPublishedChapterModel newPublishedChapter) {
+        this.newPublishedChapter = newPublishedChapter;
+    }
 
     public String getCreateBy() {
         return createBy;

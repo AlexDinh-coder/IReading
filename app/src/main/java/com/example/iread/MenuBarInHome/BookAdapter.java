@@ -1,5 +1,6 @@
 package com.example.iread.MenuBarInHome;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.iread.Model.Book;
-import com.example.iread.Model.BookSearch;
+import com.example.iread.OpenBook.OpenBookActivity;
 import com.example.iread.R;
 
 import java.util.List;
@@ -45,6 +46,13 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
                 .placeholder(R.drawable.loading_placeholder)
                 .error(R.drawable.error_image)
                 .into(holder.imgBookCover);
+
+        //Chuyển sang trang chi tiết sách cua OpenBookActivity
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, OpenBookActivity.class);
+            intent.putExtra("bookId", book.getId());
+            context.startActivity(intent);
+        });
     }
 
     @Override

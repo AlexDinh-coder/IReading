@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.iread.Model.Book;
+import com.example.iread.OpenBook.OpenBookActivity;
 import com.example.iread.R;
 
 import java.util.List;
@@ -47,7 +48,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ItemHolder>{
                 .error(R.drawable.error_image)
                 .into(holder.imgBook);
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, com.example.iread.OpenBook.OpenBookActivity.class);
+            Intent intent = new Intent(context, OpenBookActivity.class);
             intent.putExtra("bookId", book.getId());
             context.startActivity(intent);
         });
