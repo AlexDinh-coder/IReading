@@ -1,15 +1,28 @@
 package com.example.iread.Account;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,19 +52,22 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class InfoUserActivity extends AppCompatActivity {
-    private TextView txtFullName, txtUserName, txtPhoneNumber, txtEmail, txtChangePassword;
+    private TextView txtUserName, txtPhoneNumber, txtEmail, txtChangePassword;
 
     private IAppApiCaller iAppApiCaller;
+
+    private EditText txtFullName;
 
     private ImageButton btnBack;
     private static final int REQUEST_CODE_PICK_IMAGE = 1001;
 
-    private ImageView btnCamera, imgAvatar;
+    private ImageView btnCamera, imgAvatar, btnEditName;
 
     private Uri selectedImageUri;
 
     private Button btnSave;
 
+    @SuppressLint({"WrongViewCast"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +81,99 @@ public class InfoUserActivity extends AppCompatActivity {
         txtEmail = findViewById(R.id.txtEmail);
         txtChangePassword = findViewById(R.id.txtChangePassword);
         imgAvatar = findViewById(R.id.imgAvatar);
+        btnEditName = findViewById(R.id.btnEditName);
+        LinearLayout layoutEditBox = findViewById(R.id.layoutEditBox);
+
+        btnEditName.setOnClickListener(v -> {
+            txtFullName.setFocusable(true);
+            txtFullName.setFocusableInTouchMode(true);
+            txtFullName.setClickable(true);
+            txtFullName.requestFocus();
+            txtFullName.setSelection(txtFullName.getText().length());
+
+            layoutEditBox.removeAllViews();
+
+            // Tạo layout chứa 2 nút
+            LinearLayout btnRow = new LinearLayout(this);
+            btnRow.setOrientation(LinearLayout.HORIZONTAL);
+            btnRow.setGravity(Gravity.CENTER);
+            btnRow.setPadding(0, 20, 0, 0);
+
+            // Nút LƯU
+            Button btnSave = new Button(this);
+            btnSave.setText("LƯU");
+            btnSave.setTextColor(Color.WHITE);
+            btnSave.setBackground(createRoundedRippleDrawable("#02c18e", 12));
+            btnSave.setPadding(40, 20, 40, 20);
+
+            // Nút HỦY
+            Button btnCancel = new Button(this);
+            btnCancel.setText("HỦY");
+            btnCancel.setTextColor(Color.WHITE);
+            btnCancel.setBackground(createRoundedRippleDrawable("#444444", 12));
+            btnCancel.setPadding(40, 20, 40, 20);
+
+            // Căn lề giữa 2 nút
+            LinearLayout.LayoutParams saveParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams cancelParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            cancelParams.setMargins(20, 0, 0, 0);
+
+            btnSave.setLayoutParams(saveParams);
+            btnCancel.setLayoutParams(cancelParams);
+
+            btnCancel.setOnClickListener(cancelView -> {
+                txtFullName.setFocusable(false);
+                txtFullName.setFocusableInTouchMode(false);
+                txtFullName.setClickable(false);
+                layoutEditBox.setVisibility(View.GONE);
+            });
+
+            btnSave.setOnClickListener(saveView -> {
+                updateUserInfo();
+                txtFullName.setFocusable(false);
+                txtFullName.setFocusableInTouchMode(false);
+                txtFullName.setClickable(false);
+                layoutEditBox.setVisibility(View.GONE);
+            });
+
+            btnRow.addView(btnSave);
+            btnRow.addView(btnCancel);
+            layoutEditBox.addView(btnRow);
+
+            // 👇 Animation xuất hiện
+            Animation fadeSlide = new AnimationSet(true);
+            AlphaAnimation fade = new AlphaAnimation(0f, 1f);
+            fade.setDuration(300);
+
+            TranslateAnimation slide = new TranslateAnimation(
+                    Animation.RELATIVE_TO_SELF, 0f,
+                    Animation.RELATIVE_TO_SELF, 0f,
+                    Animation.RELATIVE_TO_SELF, 1f,
+                    Animation.RELATIVE_TO_SELF, 0f);
+            slide.setDuration(300);
+
+            ((AnimationSet) fadeSlide).addAnimation(fade);
+            ((AnimationSet) fadeSlide).addAnimation(slide);
+
+            layoutEditBox.setVisibility(View.VISIBLE);
+            layoutEditBox.startAnimation(fadeSlide);
+        });
+
+
+
+//
+//        btnEditName.setOnClickListener(v -> {
+//            txtFullName.setFocusable(true);
+//            txtFullName.setFocusableInTouchMode(true);
+//            txtFullName.setClickable(true);
+//            txtFullName.requestFocus();
+//            txtFullName.setSelection(txtFullName.getText().length());
+//        });
+
         btnSave = findViewById(R.id.btnSaveInfo);
         btnSave.setOnClickListener(v -> {
             if (selectedImageUri != null) {
@@ -99,6 +208,18 @@ public class InfoUserActivity extends AppCompatActivity {
         }else {
             Toast.makeText(this, "Không tìm thấy tài khoản người dùng", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private Drawable createRoundedRippleDrawable(String bgColor, int cornerDp) {
+        float radius = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, cornerDp, getResources().getDisplayMetrics());
+
+        GradientDrawable shape = new GradientDrawable();
+        shape.setColor(Color.parseColor(bgColor));
+        shape.setCornerRadius(radius);
+
+        ColorStateList rippleColor = ColorStateList.valueOf(Color.parseColor("#33FFFFFF"));
+        return new RippleDrawable(rippleColor, shape, null);
     }
 
     private void updateUserInfo() {

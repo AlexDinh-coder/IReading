@@ -45,8 +45,8 @@
                 android:textColor="@color/white"
                 android:textSize="16sp" />
         </LinearLayout>
-
     </LinearLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv_chapter_in_open_book"

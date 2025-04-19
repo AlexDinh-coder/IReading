@@ -26,6 +26,15 @@ public class Book {
     private List<Category> listCategories = new ArrayList<>();
 
     private boolean isNewPublishedChapter;
+    private boolean isFavorite;
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
 
     private NewPublishedChapterModel newPublishedChapter;
 

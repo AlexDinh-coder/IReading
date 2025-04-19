@@ -153,6 +153,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             public void onResponse(Call<ReponderModel<String>> call, Response<ReponderModel<String>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSussess()) {
 
+
                     // Toggle trạng thái local
                     isFavorite = !isFavorite;
                     iconLove.setImageResource(isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_love);
@@ -219,7 +220,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                 if (response.isSuccessful() && response.body() != null) {
                     Book book = response.body().getData();
                     if (book != null) {
-
+                       // isFavorite = book.isFavorite();
                         iconLove.setImageResource(isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_love); // 👈 cập nhật icon
 
                         showBookDetailUI(book);

@@ -75,21 +75,35 @@
                 android:orientation="horizontal"
                 android:layout_marginTop="8dp">
 
-                <TextView
+                <EditText
                     android:id="@+id/txtFullName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:inputType="textPersonName"
+                    android:singleLine="true"
+                    android:focusable="false"
+                    android:clickable="false"
                     android:text="Trung Đình Tuấn"
                     android:textSize="18sp"
                     android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"/>
 
                 <ImageView
+                    android:id="@+id/btnEditName"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginStart="8dp"
                     android:src="@drawable/ic_pen" />
             </LinearLayout>
+            <LinearLayout
+                android:id="@+id/layoutEditBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="16dp" />
+
 
             <TextView
                 android:id="@+id/txtUserName"
