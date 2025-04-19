@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.iread.MainActivity;
@@ -33,13 +35,17 @@ import retrofit2.Response;
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText username, Email, FullName, NumberPhone, Password, ConfirmPassword;
-    private Button btn_Register, btnCancel;
+    private Button btn_Register;
+
+    private TextView btnCancel;
 
     private Account account;
     private IAppApiCaller apiCaller;
 
+    private ImageView togglePasswordVisibility, toggleConfirmPasswordVisibility;
 
-    @SuppressLint("MissingInflatedId")
+
+    @SuppressLint({"MissingInflatedId", "WrongViewCast"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +57,38 @@ public class RegisterActivity extends AppCompatActivity {
         NumberPhone = findViewById(R.id.NumberPhoneEditText);
         Password = findViewById(R.id.PassWordEditText);
         ConfirmPassword = findViewById(R.id.ComEditText);
+        togglePasswordVisibility = findViewById(R.id.togglePasswordVisibility);
+        toggleConfirmPasswordVisibility = findViewById(R.id.toggleConfirmPasswordVisibility);
+        // Trạng thái hiển thị mật khẩu
+        final boolean[] isPassword = {false};
+        final boolean[] isConfirmPassword = {false};
+
+        // Toggle mật khẩu
+        togglePasswordVisibility.setOnClickListener(v -> {
+            isPassword[0] = !isPassword[0];
+            Password.setInputType(isPassword[0] ?
+                    android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD :
+                    android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            Password.setSelection(Password.getText().length());
+            togglePasswordVisibility.setImageResource(isPassword[0] ? R.drawable.ic_show : R.drawable.ic_hide);
+        });
+        // Toggle confirm mật khẩu
+        toggleConfirmPasswordVisibility.setOnClickListener(v -> {
+            isConfirmPassword[0] = !isConfirmPassword[0];
+            ConfirmPassword.setInputType(isConfirmPassword[0] ?
+                    android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD :
+                    android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            ConfirmPassword.setSelection(ConfirmPassword.getText().length());
+            toggleConfirmPasswordVisibility.setImageResource(isConfirmPassword[0] ? R.drawable.ic_show : R.drawable.ic_hide);
+        });
+
+
+        btnCancel = findViewById(R.id.btnCancel);
+        btnCancel.setOnClickListener(v -> {
+            Intent intent = new Intent(RegisterActivity.this, LoginOpenActivity.class);
+            startActivity(intent);
+            finish();
+        });
 
 
         btn_Register = findViewById(R.id.btn_Register);

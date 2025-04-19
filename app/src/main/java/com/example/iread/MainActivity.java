@@ -9,15 +9,18 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
 import com.example.iread.Home.HomeFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +35,27 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigation = findViewById(R.id.bottom_navigation);
 
-        // Mặc định hiển thị Fragment đầu tiên
-        loadFragment(new HomeFragment());
+        String fragment = getIntent().getStringExtra("fragment");
+        if ("user".equals(fragment)) {
+            bottomNavigation.setSelectedItemId(R.id.nav_user);
+
+        } else {
+            // Mặc định hiển thị Fragment đầu tiên
+            loadFragment(new HomeFragment());
+        }
+
+//        FirebaseMessaging.getInstance().getToken()
+//                .addOnCompleteListener(task -> {
+//                    if (!task.isSuccessful()) {
+//                        Log.w("FCM_TOKEN", "Fetching FCM registration token failed", task.getException());
+//                        return;
+//                    }
+//
+//                    String token = task.getResult();
+//                    Log.d("FCM_TOKEN", "Token: " + token);
+//                });
+
+
 
         bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override

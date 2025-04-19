@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,13 +30,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.iread.DetailActivity;
 import com.example.iread.Home.Banner.CarouselTransformer;
 import com.example.iread.Home.Banner.ImageSliderAdapter;
+import com.example.iread.Home.Banner.ImageSliderAdapterUrl;
 import com.example.iread.MenuBarInHome.CategoryActivity;
 import com.example.iread.MenuBarInHome.SearchActivity;
 import com.example.iread.Model.Book;
+import com.example.iread.Model.BookRating;
 import com.example.iread.Model.Category;
+import com.example.iread.OpenBook.OpenBookActivity;
 import com.example.iread.SubscriptionActivity;
 import com.example.iread.apicaller.IAppApiCaller;
 import com.example.iread.apicaller.RetrofitClient;
@@ -58,6 +65,8 @@ public class HomeFragment extends Fragment {
 
     private TextView btnPay;
 
+    private List<BookRating> topRatedBooks = new ArrayList<>();
+
     private ImageView imgBar, btnSearch;
 
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -78,7 +87,7 @@ public class HomeFragment extends Fragment {
         setupViews(view);
         setupSwipeToRefresh();
         setupCategoryRecycler(view);
-        setupBannerSlider(view);
+        loadTopRatedBooksBanner(view);
 
         // Initial data fetch
         getListCategory();
@@ -86,6 +95,8 @@ public class HomeFragment extends Fragment {
 
         return view;
     }
+
+
 
     // Setup references to views and layout padding
     private void setupViews(View view) {
@@ -150,31 +161,99 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+    // Load top-rated books for the banner
+    private void loadTopRatedBooksBanner(View view) {
+        apiCaller = RetrofitClient.getInstance(Utils.BASE_URL, requireContext()).create(IAppApiCaller.class);
+        apiCaller.getListRatingBook().enqueue(new Callback<ReponderModel<BookRating>>() {
+            @Override
+            public void onResponse(Call<ReponderModel<BookRating>> call, Response<ReponderModel<BookRating>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<BookRating> bookRating = response.body().getDataList();
+                    if (!bookRating.isEmpty()) {
+                        List<String> imageUrls = new ArrayList<>();
+                        for (BookRating book : bookRating) {
+                            imageUrls.add(book.getPoster());
+                        }
+                        topRatedBooks = bookRating; // Gắn dữ liệu sách
+                        // Sử dụng post để đảm bảo view đã được inflate
+                       setupBannerSlider(view, imageUrls);
+                    }
+                }
+            }
 
-    // Setup banner image carousel
-    private void setupBannerSlider(View view) {
+            @Override
+            public void onFailure(Call<ReponderModel<BookRating>> call, Throwable t) {
+
+            }
+        });
+    }
+    // lấy banner ảnh từ url imgur
+    private void setupBannerSlider(View view,List<String> imageUrls) {
         viewPager2 = view.findViewById(R.id.viewPager);
-        List<Integer> imageList = Arrays.asList(R.drawable.image1, R.drawable.image2, R.drawable.image3, R.drawable.book5);
-
         viewPager2.setClipToPadding(false);
         viewPager2.setClipChildren(false);
         viewPager2.setOffscreenPageLimit(3);
         viewPager2.getChildAt(0).setOverScrollMode(View.OVER_SCROLL_NEVER);
         viewPager2.setPageTransformer(new CarouselTransformer());
-        viewPager2.setAdapter(new ImageSliderAdapter(imageList));
+        // Gán adapter có listener click
+        ImageSliderAdapterUrl adapter = new ImageSliderAdapterUrl(imageUrls, position -> {
+            if (position < topRatedBooks.size()) {
+                int bookId = topRatedBooks.get(position).getId();
+                Intent intent = new Intent(requireContext(), OpenBookActivity.class);
+                intent.putExtra("bookId", bookId);
+                startActivity(intent);
+            }
+        });
+
+        viewPager2.setAdapter(adapter);
         viewPager2.setCurrentItem(Integer.MAX_VALUE / 2);
 
-        updateBackgroundColor(imageList.get(viewPager2.getCurrentItem() % imageList.size()));
+        // Load màu của ảnh đầu tiên khi khởi tạo
+        loadBannerColorFromUrl(imageUrls.get(viewPager2.getCurrentItem() % imageUrls.size()));
 
         viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
                 sliderHandler.removeCallbacks(sliderRunnable);
                 sliderHandler.postDelayed(sliderRunnable, 3000);
-                updateBackgroundColor(imageList.get(position % imageList.size()));
+
+                // Cập nhật màu nền khi lướt sang ảnh mới
+                loadBannerColorFromUrl(imageUrls.get(position % imageUrls.size()));
+
+
             }
         });
     }
+    // Load color from image URL using Glide and Palette
+    private void loadBannerColorFromUrl(String imageUrl) {
+        if (!isAdded()) return; // Kiểm tra fragment đã attach chưa
+        Glide.with(requireContext())
+                .asBitmap()
+                .load(imageUrl)
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        Palette.from(resource).generate(palette -> {
+                            if (!isAdded() || palette == null) return;
+                            int defaultColor = ContextCompat.getColor(requireContext(), android.R.color.black);
+                            int dominantColor = palette.getDominantColor(defaultColor);
+                            int startColor = addAlpha(dominantColor, 200);
+                            int endColor = Color.parseColor("#101318");
+
+                            GradientDrawable gradientDrawable = new GradientDrawable(
+                                    GradientDrawable.Orientation.TOP_BOTTOM,
+                                    new int[]{startColor, endColor}
+                            );
+                            gradientDrawable.setCornerRadius(0f);
+                            backgroundView.setBackground(gradientDrawable);
+                        });
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {}
+                });
+    }
+
 
     // Clear old book sections when refreshing
     private void clearOldBookSections() {
@@ -301,50 +380,8 @@ public class HomeFragment extends Fragment {
         return result;
     }
 
-    // Update background color based on banner image
-    private void updateBackgroundColor(int imageResId) {
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), imageResId);
-        Palette.from(bitmap).generate(palette -> {
-            if (!isAdded() || palette == null) return;
-            Context context = getContext();
-            if (context == null) return;
-
-            int defaultColor = ContextCompat.getColor(context, android.R.color.black);
-            int dominantColor = palette.getDominantColor(defaultColor);
-
-            int startColor = addAlpha(dominantColor, 200);
-            int endColor = Color.parseColor("#101318");
-
-            GradientDrawable gradientDrawable = new GradientDrawable(
-                    GradientDrawable.Orientation.TOP_BOTTOM,
-                    new int[]{startColor, endColor}
-            );
-            gradientDrawable.setCornerRadius(0f);
-            backgroundView.setBackground(gradientDrawable);
-        });
-    }
-
     // Helper: Add alpha to color
     private int addAlpha(int color, int alpha) {
         return (alpha << 24) | (color & 0x00FFFFFF);
-    }
-
-    // Optional: Get average color from image (not used)
-    private int getAverageColor(Bitmap bitmap) {
-        long redBucket = 0, greenBucket = 0, blueBucket = 0, pixelCount = 0;
-
-        for (int y = 0; y < bitmap.getHeight(); y += 10) {
-            for (int x = 0; x < bitmap.getWidth(); x += 10) {
-                int c = bitmap.getPixel(x, y);
-                redBucket += Color.red(c);
-                greenBucket += Color.green(c);
-                blueBucket += Color.blue(c);
-                pixelCount++;
-            }
-        }
-
-        return Color.rgb((int) (redBucket / pixelCount),
-                (int) (greenBucket / pixelCount),
-                (int) (blueBucket / pixelCount));
     }
 }

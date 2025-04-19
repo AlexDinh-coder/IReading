@@ -4,12 +4,14 @@ package com.example.iread.apicaller;
 import com.example.iread.Model.Account;
 import com.example.iread.Model.Book;
 import com.example.iread.Model.BookChapter;
+import com.example.iread.Model.BookRating;
 import com.example.iread.Model.BookSearch;
 import com.example.iread.Model.BookViewModel;
 import com.example.iread.Model.Category;
 import com.example.iread.Model.CommentModel;
 import com.example.iread.Model.PaymentRequestModel;
 import com.example.iread.Model.UserBook;
+import com.example.iread.Model.UserProfile;
 import com.example.iread.Payment.PaymentItemModel;
 import com.example.iread.basemodel.ReponderModel;
 
@@ -81,6 +83,11 @@ public interface IAppApiCaller {
     Call<ReponderModel<String>> Register(
             @Body Account account
     );
+
+    @POST("Account/ForgotPassword")
+    Call<ReponderModel<String>> forgotPassword(
+            @Body Account account
+    );
     @GET("Payment/GetListPayment")
     Call<ReponderModel<PaymentItemModel>> getListPayment(
             @Query("type") int type
@@ -89,9 +96,19 @@ public interface IAppApiCaller {
     Call<ReponderModel<String>> createPaymentLink(
             @Body PaymentRequestModel paymentRequestModel
     );
+    @POST("Account/UpdateInformation")
+    Call<ReponderModel<String>> updateInformation(
+            @Body Account account
+    );
+
+
 
     @POST("Account/LoginWithGoogle")
     Call<ReponderModel<String>> loginWithGoogle(
+            @Body Account account
+    );
+    @POST("Account/ChangePassword")
+    Call<ReponderModel<String>> changePassword(
             @Body Account account
     );
 
@@ -116,4 +133,17 @@ public interface IAppApiCaller {
     Call<ReponderModel<BookSearch>> getChapterById(
             @Query("id") int id
     );
+
+    @GET("Information/GetUserProfile")
+    Call<ReponderModel<UserProfile>> getUserProfile(
+            @Query("userName") String userName
+    );
+    @GET("Account/Information")
+    Call<ReponderModel<Account>> viewAccountInfo(
+            @Query("userName") String userName
+    );
+    @GET("Book/GetTop10BookRating")
+    Call<ReponderModel<BookRating>> getListRatingBook();
+
+
 }

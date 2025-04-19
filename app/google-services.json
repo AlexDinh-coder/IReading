@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "817855725596",
-    "project_id": "iread-6938a",
-    "storage_bucket": "iread-6938a.firebasestorage.app"
+    "project_number": "337443362705",
+    "project_id": "iread-44e54",
+    "storage_bucket": "iread-44e54.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:817855725596:android:5fb05c1411bfe04cc59fd9",
+        "mobilesdk_app_id": "1:337443362705:android:5f5564efb6e6dd294c6c30",
         "android_client_info": {
-          "package_name": "com.example.iread"
+          "package_name": "com.store.iread"
         }
       },
       "oauth_client": [
         {
-          "client_id": "817855725596-ms9cp1qv5gheav5mu4d0asf18k7furt8.apps.googleusercontent.com",
+          "client_id": "337443362705-7stj2mrmk9j6s1he22860nuutiibf4qg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.iread",
+            "package_name": "com.store.iread",
             "certificate_hash": "e06cd91cea9946a13a97d8fdc549d5247a18b0a5"
           }
         },
         {
-          "client_id": "817855725596-d22h02ikei1lls3ghn9q414r6j9gfja5.apps.googleusercontent.com",
+          "client_id": "337443362705-sgeekghc8vfk3la4pgsc8mlijm5qauv9.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBRirLe77Why8kaelaJCmOIUwkKrrgSGnE"
+          "current_key": "AIzaSyDLvMloHdteTnx5Q3pawR4b3Q9bVYexBtM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "817855725596-d22h02ikei1lls3ghn9q414r6j9gfja5.apps.googleusercontent.com",
+              "client_id": "337443362705-sgeekghc8vfk3la4pgsc8mlijm5qauv9.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

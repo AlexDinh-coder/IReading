@@ -1,20 +1,13 @@
+<!-- res/layout/item_page.xml -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFBEA"
+    android:padding="16dp">
 
-    <ScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcvPageContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
-        android:background="#FFFBEA">
-
-        <TextView
-            android:id="@+id/textPage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="48dp"
-            android:textSize="18sp"
-            android:textColor="#333333"
-            android:lineSpacingExtra="6dp" />
-    </ScrollView>
+        android:nestedScrollingEnabled="false" />
 </FrameLayout>

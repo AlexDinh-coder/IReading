@@ -1,26 +1,31 @@
 package com.example.iread.Book;
 
 
-import android.text.Html;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.iread.Model.BookChapter;
+
+import com.example.iread.Model.DataPageInBook;
 import com.example.iread.R;
 
 import java.util.List;
 
 public class PageAdapter extends RecyclerView.Adapter<PageAdapter.PageViewHolder> {
 
-    private List<BookChapter> pageList;
+   // private List<BookChapter> pageList;
+   private List<DataPageInBook> dataPage;
+   private Context context;
 
-    public PageAdapter(List<BookChapter> pageList) {
-        this.pageList = pageList;
+    public PageAdapter(List<DataPageInBook> dataPage, Context context) {
+        this.dataPage = dataPage;
+        this.context = context;
     }
 
     @NonNull
@@ -32,27 +37,28 @@ public class PageAdapter extends RecyclerView.Adapter<PageAdapter.PageViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull PageViewHolder holder, int position) {
-        BookChapter bookChapter = pageList.get(position);
-        if (bookChapter.getContent() != null)
-            holder.textPage.setText(Html.fromHtml(bookChapter.getContent(), Html.FROM_HTML_MODE_LEGACY));
-        else {
-            holder.textPage.setText("Nội dung đang cập nhật...");
-        }
+        ContentPageAdapter contentPageAdapter = new ContentPageAdapter(this.dataPage.get(position).getData());
+        holder.rcv.setAdapter(contentPageAdapter);
+
     }
 
     @Override
     public int getItemCount() {
-//       return pageList.size();
-        return (pageList != null) ? pageList.size() : 0;
+        //return (pageList != null) ? pageList.size() : 0;
+        return this.dataPage.size();
 
     }
 
     static class PageViewHolder extends RecyclerView.ViewHolder {
-        TextView textPage;
+        //TextView textPage;
+        RecyclerView rcv;
 
         public PageViewHolder(@NonNull View itemView) {
             super(itemView);
-            textPage = itemView.findViewById(R.id.textPage);
+            rcv = itemView.findViewById(R.id.rcvPageContent);
+            rcv.setLayoutManager(new LinearLayoutManager(rcv.getContext() , LinearLayoutManager.VERTICAL , false));
+            rcv.setNestedScrollingEnabled(false);
+
         }
     }
 }

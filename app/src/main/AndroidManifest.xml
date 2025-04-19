@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
 
     <application
         android:allowBackup="true"
@@ -14,11 +16,30 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.IRead"
         tools:targetApi="31">
+        <service
+            android:name=".Service.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".Book.ActivityBook"
             android:exported="true" >
 
         </activity>
+        <activity
+            android:name=".CloseConfirmEmail"
+            android:exported="true" >
+
+        </activity>
+        <activity
+            android:name=".ChangePasswordActivity"
+            android:exported="true" >
+
+        </activity>
+
 
         <activity
             android:name=".UpgradeActivity"
@@ -51,7 +72,6 @@
             android:name=".Home.SplashActivity"
             android:exported="true" >
 
-
         </activity>
 
         <activity
@@ -66,9 +86,22 @@
 
 
         </activity>
+        <activity
+            android:name=".Account.InfoUserActivity"
+            android:exported="true" >
+
+
+
+        </activity>
 
         <activity
             android:name=".Account.LoginActivity"
+            android:exported="true" >
+
+        </activity>
+
+        <activity
+            android:name=".Account.ForgotPasswordActivity"
             android:exported="true" >
 
         </activity>
@@ -116,5 +149,6 @@
         </activity>
 
     </application>
+
 
 </manifest>

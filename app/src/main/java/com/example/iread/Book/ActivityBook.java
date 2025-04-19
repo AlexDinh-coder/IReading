@@ -3,7 +3,9 @@ package com.example.iread.Book;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +19,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.iread.Model.BookChapter;
 import com.example.iread.Model.BookViewModel;
+import com.example.iread.Model.DataBook;
+import com.example.iread.Model.DataPageInBook;
 import com.example.iread.OpenBook.ChapterAdapter;
 import com.example.iread.R;
 import com.example.iread.apicaller.IAppApiCaller;
@@ -88,10 +92,56 @@ public class ActivityBook extends AppCompatActivity {
         chapterList = (List<BookChapter>) getIntent().getSerializableExtra("chapterList");
         int selectedIndex = getIntent().getIntExtra("selectedIndex", 0);
 
-        pageAdapter = new PageAdapter(chapterList);
+        List<DataPageInBook> pageDataList = new ArrayList<>();
+        for (int i = 0; i <chapterList.size(); i++) {
+            BookChapter chapter = chapterList.get(i);
+            String htmlContent = chapter.getContent();
+
+            List<DataBook> dataBookList = new ArrayList<>();
+
+            // Tách thẻ <img> và <p> ra khỏi content
+            String[] segments = htmlContent.split("(?=<img)|(?=<p)|(?<=</p>)");
+            for (String segment : segments) {
+                segment = segment.trim();
+                if (segment.contains("<img")) {
+                    String imgUrl = extractImgSrc(segment);
+                    Log.d("BOOK_CONTENT", "Extracted IMG URL: " + imgUrl);
+                    if(imgUrl != null && !imgUrl.isEmpty()) {
+                        DataBook imgItem = new DataBook(imgUrl, false);
+                        imgItem.setType(false);
+                        dataBookList.add(imgItem);
+                    }
+                } else {
+                    //Xu li noi dung
+                    String textContent = Html.fromHtml(segment, Html.FROM_HTML_MODE_LEGACY).toString().trim();
+                    Log.d("BOOK_CONTENT", "Extracted TEXT: " + textContent);
+                    if (!textContent.isEmpty()) {
+                        DataBook textItem = new DataBook(textContent, true);
+                        textItem.setType(true); // is text
+                        dataBookList.add(textItem);
+                    }
+                }
+            }
+            DataPageInBook dataPageInBook = new DataPageInBook(i, dataBookList);
+            pageDataList.add(dataPageInBook);
+        }
+
+        pageAdapter = new PageAdapter(pageDataList, this);
         viewPagerBook = findViewById(R.id.viewPagerBook);
         viewPagerBook.setAdapter(pageAdapter);
         viewPagerBook.setCurrentItem(selectedIndex);
+    }
+
+    private String extractImgSrc(String segment) {
+        int srcIndex = segment.indexOf("src=");
+        if (srcIndex == -1) return null;
+        int start = segment.indexOf("\"", srcIndex) + 1;
+        int end = segment.indexOf("\"", start);
+
+        if (start > 0 && end > start) {
+            return segment.substring(start,end);
+        }
+        return null;
     }
 
     // Cấu hình ViewPager để gửi view khi chuyển chương
@@ -105,14 +155,6 @@ public class ActivityBook extends AppCompatActivity {
                 BookChapter selectedChapter = chapterList.get(position);
                 sendViewStatus(selectedChapter,0,viewId);
 
-                //BookChapter selectedChapter = chapterList.get(position);
-//                if (oldPosition == null ){
-//                    sendViewStatus(selectedChapter, 0,0);
-//                } else if (oldPosition != position){
-//                    sendViewStatus(selectedChapter, 1,viewId);
-//
-//                }
-//                oldPosition = position;
             }
         });
     }

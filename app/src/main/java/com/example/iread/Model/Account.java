@@ -1,13 +1,15 @@
 package com.example.iread.Model;
 
 public class Account {
-    private String username;
+    private String userName;
     private String password;
     private String oldPassword;
     private String passwordConfirm;
     private String fullName;
     private String email;
     private String address;
+
+    private String deviceToken;
 
     private String phoneNumber;
     private String status;
@@ -33,6 +35,21 @@ public class Account {
 //    }
 
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getDeviceToken() {
+        return deviceToken;
+    }
+
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
+    }
 
     public int getRegisterType() {
         return registerType;
@@ -43,11 +60,11 @@ public class Account {
     }
 
     public String getUsername() {
-        return username;
+        return userName;
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.userName = username;
     }
 
     public String getPassword() {

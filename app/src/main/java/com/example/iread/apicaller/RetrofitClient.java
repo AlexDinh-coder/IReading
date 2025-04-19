@@ -3,6 +3,7 @@ package com.example.iread.apicaller;
 import android.content.Context;
 
 
+import com.example.iread.Interface.ImgurApi;
 import com.example.iread.R;
 
 import java.io.InputStream;
@@ -131,6 +132,22 @@ public class RetrofitClient {
        // return null;
         return okHttpClient;
     }
+
+    public static class ImgurClient {
+        private static Retrofit retrofit = null;
+
+        public static ImgurApi getClient() {
+            if (retrofit == null) {
+                retrofit = new Retrofit.Builder()
+                        .baseUrl("https://api.imgur.com/")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+            }
+            return retrofit.create(ImgurApi.class);
+        }
+    }
+
+
 
 
 }

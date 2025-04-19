@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,11 +36,13 @@ public class LoginActivity extends AppCompatActivity {
     private EditText editUsername, editPassword;
     private AppCompatButton btnLogin;
     private ImageButton gmailLogin;
-    private TextView txtIntentRegister;
+    private TextView txtIntentRegister, txtForgotPassword;
 
     private IAppApiCaller iAppApiCaller;
     private GoogleSignInClient googleSignInClient;
     private SharedPreferences sharedPreferences;
+
+    private ImageView togglePassword;
 
     private static final int RC_SIGN_IN = 1;
 
@@ -66,6 +69,20 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btn_login_open);
         gmailLogin = findViewById(R.id.gmailLogin);
         txtIntentRegister = findViewById(R.id.btn_Register);
+        txtForgotPassword = findViewById(R.id.btnForgotPassword);
+        togglePassword = findViewById(R.id.togglePasswordVisibility);
+        // Trạng thái hiển thị mật khẩu
+        final boolean[] isConfirmPassword = {false};
+
+        // Toggle mật khẩu
+        togglePassword.setOnClickListener(v -> {
+            isConfirmPassword[0] = !isConfirmPassword[0];
+            editPassword.setInputType(isConfirmPassword[0] ?
+                    android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD :
+                    android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            editPassword.setSelection(editPassword.getText().length());
+            togglePassword.setImageResource(isConfirmPassword[0] ? R.drawable.ic_show : R.drawable.ic_hide);
+        });
 
         String savedUsername = Paper.book().read("user");
         String savedPassword = Paper.book().read("password");
@@ -89,6 +106,9 @@ public class LoginActivity extends AppCompatActivity {
 
         txtIntentRegister.setOnClickListener(v -> {
             startActivity(new Intent(this, RegisterActivity.class));
+        });
+        txtForgotPassword.setOnClickListener(v -> {
+            startActivity(new Intent(this, ForgotPasswordActivity.class));
         });
     }
     //Cấu hình đăng nhập google mail
