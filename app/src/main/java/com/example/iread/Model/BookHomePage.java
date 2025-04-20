@@ -5,7 +5,7 @@ import java.util.List;
 public class BookHomePage {
     private int categoryId;
     private String categoryName;
-    private List<Book> book;
+    private List<Book> books;
 
     public int getCategoryId() {
         return categoryId;
@@ -23,11 +23,11 @@ public class BookHomePage {
         this.categoryName = categoryName;
     }
 
-    public List<Book> getBook() {
-        return book;
+    public List<Book> getBooks() {
+        return books;
     }
 
     public void setBook(List<Book> book) {
-        this.book = book;
+        this.books = book;
     }
 }

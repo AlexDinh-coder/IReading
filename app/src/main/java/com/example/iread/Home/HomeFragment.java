@@ -40,6 +40,7 @@ import com.example.iread.Home.Banner.ImageSliderAdapterUrl;
 import com.example.iread.MenuBarInHome.CategoryActivity;
 import com.example.iread.MenuBarInHome.SearchActivity;
 import com.example.iread.Model.Book;
+import com.example.iread.Model.BookHomePage;
 import com.example.iread.Model.BookRating;
 import com.example.iread.Model.Category;
 import com.example.iread.OpenBook.OpenBookActivity;
@@ -169,12 +170,13 @@ public class HomeFragment extends Fragment {
             public void onResponse(Call<ReponderModel<BookRating>> call, Response<ReponderModel<BookRating>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<BookRating> bookRating = response.body().getDataList();
-                    if (!bookRating.isEmpty()) {
+                    if (bookRating != null && !bookRating.isEmpty()) {
+                        List<BookRating> limitedBook = bookRating.subList(0, Math.min(5, bookRating.size()));
                         List<String> imageUrls = new ArrayList<>();
-                        for (BookRating book : bookRating) {
+                        for (BookRating book : limitedBook) {
                             imageUrls.add(book.getPoster());
                         }
-                        topRatedBooks = bookRating; // Gắn dữ liệu sách
+                        topRatedBooks = limitedBook; // Gắn dữ liệu sách
                         // Sử dụng post để đảm bảo view đã được inflate
                        setupBannerSlider(view, imageUrls);
                     }
@@ -287,28 +289,28 @@ public class HomeFragment extends Fragment {
     // Fetch book list for each category and add sections dynamically
     private void getListBookByCategory() {
         apiCaller = RetrofitClient.getInstance(Utils.BASE_URL, requireContext()).create(IAppApiCaller.class);
-        apiCaller.getCategories().enqueue(new Callback<ReponderModel<Category>>() {
+        apiCaller.getBookHomePage().enqueue(new Callback<ReponderModel<BookHomePage>>() {
             @Override
-            public void onResponse(Call<ReponderModel<Category>> call, Response<ReponderModel<Category>> response) {
+            public void onResponse(Call<ReponderModel<BookHomePage>> call, Response<ReponderModel<BookHomePage>> response) {
                 if (!isAdded()) return;
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Category> categories = response.body().getDataList();
-                    Collections.sort(categories, Comparator.comparingInt(Category::getId));
-                    for (Category category : categories) {
+                    List<BookHomePage> categories = response.body().getDataList();
+
+                    for (BookHomePage category : categories) {
                         addCategorySection(category);
                     }
                 }
             }
 
             @Override
-            public void onFailure(Call<ReponderModel<Category>> call, Throwable t) {
+            public void onFailure(Call<ReponderModel<BookHomePage>> call, Throwable t) {
                 Log.e("API Category", "Lỗi khi gọi API category: " + t.getMessage());
             }
         });
     }
 
     // Add UI section for a single category with books
-    private void addCategorySection(Category category) {
+    private void addCategorySection(BookHomePage category) {
         if (!isAdded()) return;
 
         LayoutInflater inflater = LayoutInflater.from(requireContext());
@@ -317,43 +319,47 @@ public class HomeFragment extends Fragment {
         TextView tvCategoryTitle = sectionView.findViewById(R.id.tv_category_title);
         RecyclerView rcvBooks = sectionView.findViewById(R.id.rcv_books_by_category);
 
-        tvCategoryTitle.setText(category.getName());
+        tvCategoryTitle.setText(category.getCategoryName());
         tvCategoryTitle.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), DetailActivity.class);
-            intent.putExtra("selectedCategory", category.getName());
+            intent.putExtra("selectedCategory", category.getCategoryName());
             startActivity(intent);
         });
 
         rcvBooks.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-
-        apiCaller.getBookByCategory(category.getName()).enqueue(new Callback<ReponderModel<Book>>() {
-            @Override
-            public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
-                if (!isAdded()) return;
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Book> books = response.body().getDataList();
-                    Map<Integer, Book> uniqueBooksMap = new LinkedHashMap<>();
-                    for (Book book : books) {
-                        uniqueBooksMap.put(book.getId(), book);
-                    }
-                    List<Book> uniqueBooks = new ArrayList<>(uniqueBooksMap.values());
-                    if (!uniqueBooks.isEmpty()) {
-                        if (uniqueBooks.size() > 10) uniqueBooks = uniqueBooks.subList(0, 10);
-                        BookAdapter adapter = new BookAdapter(requireContext(), uniqueBooks);
-                        rcvBooks.setAdapter(adapter);
+        //Lấy danh mục top 10
+        if (category.getCategoryId() == -1) {
+            List<Book> books = category.getBooks();
+            if (books != null && !books.isEmpty()) {
+                BookAdapter adapter = new BookAdapter(requireContext(), books.subList(0, Math.min(10, books.size())));
+                rcvBooks.setAdapter(adapter);
+            }
+        } else {
+            // Nếu là danh mục thường thì gọi API theo tên
+            apiCaller.getBookByCategory(category.getCategoryName()).enqueue(new Callback<ReponderModel<Book>>() {
+                @Override
+                public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
+                    if (!isAdded()) return;
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Book> books = response.body().getDataList();
+                        if (books != null && !books.isEmpty()) {
+                            BookAdapter adapter = new BookAdapter(requireContext(), books.subList(0, Math.min(10, books.size())));
+                            rcvBooks.setAdapter(adapter);
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<ReponderModel<Book>> call, Throwable t) {
-                Log.e("BookAPI", "Lỗi gọi sách: " + t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(Call<ReponderModel<Book>> call, Throwable t) {
+                    Log.e("BookAPI", "Lỗi gọi sách: " + t.getMessage());
+                }
+            });
+        }
 
         contentScrollLayout.addView(sectionView);
-        categorySectionMap.put(category.getId(), sectionView);
+        categorySectionMap.put(category.getCategoryId(), sectionView);
     }
+
 
     // Banner auto-scroll runnable
     private final Runnable sliderRunnable = () -> viewPager2.setCurrentItem(viewPager2.getCurrentItem() + 1);

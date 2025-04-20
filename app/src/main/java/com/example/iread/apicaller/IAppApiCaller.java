@@ -14,6 +14,8 @@ import com.example.iread.Model.NoteUser;
 import com.example.iread.Model.PaymentRequestModel;
 import com.example.iread.Model.UserBook;
 import com.example.iread.Model.UserProfile;
+import com.example.iread.Model.UserTranscationBook;
+import com.example.iread.Model.UserTranscationBookModel;
 import com.example.iread.Payment.PaymentItemModel;
 import com.example.iread.basemodel.ReponderModel;
 
@@ -161,6 +163,10 @@ public interface IAppApiCaller {
     Call<ReponderModel<NoteUser>> GetListNote(
             @Query("username") String username,
             @Query("chapterId") String chapterId
+    );
+    @GET("Payment/PaymentItem")
+    Call<ReponderModel<UserTranscationBookModel>> getPaymentItem(
+            @Query("userName") String userName
     );
 
 

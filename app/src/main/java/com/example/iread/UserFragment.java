@@ -24,6 +24,7 @@ import com.example.iread.Account.InfoUserActivity;
 import com.example.iread.Account.LoginOpenActivity;
 import com.example.iread.Model.UserProfile;
 import com.example.iread.Payment.PaymentActivity;
+import com.example.iread.Transaction.TransactionActivity;
 import com.example.iread.apicaller.IAppApiCaller;
 import com.example.iread.apicaller.RetrofitClient;
 import com.example.iread.basemodel.ReponderModel;
@@ -35,7 +36,7 @@ import retrofit2.Response;
 
 public class UserFragment extends Fragment {
     private AppCompatButton upgradeAccount;
-    private TextView btnLogOut, btnPayment, txtCoin;
+    private TextView btnLogOut, btnPayment, txtCoin, btnTransactionHistory;
     private TextView username, txtUpgradeAccount, txtAccountInfo;
 
     private ImageView avatar;
@@ -60,7 +61,11 @@ public class UserFragment extends Fragment {
             startActivity(intent);
         });
 
-
+        btnTransactionHistory = view.findViewById(R.id.HistoryTransaction);
+        btnTransactionHistory.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), TransactionActivity.class);
+            startActivity(intent);
+        });
 
         btnPayment.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), PaymentActivity.class);

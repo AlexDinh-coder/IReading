@@ -337,6 +337,7 @@
                     <!--                        android:tint="#00FFAA" />-->
 
                     <TextView
+                        android:id="@+id/HistoryTransaction"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"

@@ -56,6 +56,10 @@ public class LoginActivity extends AppCompatActivity {
 
         Paper.init(this);
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        String token = sharedPreferences.getString("token", "");
+        if (!token.isEmpty()) {
+            startActivity(new Intent(this, MainActivity.class));
+        }
         iAppApiCaller = RetrofitClient.getInstance(Utils.BASE_URL, this).create(IAppApiCaller.class);
 
         initViews();
