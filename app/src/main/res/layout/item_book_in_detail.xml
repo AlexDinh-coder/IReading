@@ -18,14 +18,32 @@
         card_view:cardPreventCornerOverlap="true"
         card_view:cardUseCompatPadding="true">
 
-        <ImageView
-            android:id="@+id/image_characters_in_detail"
+        <!-- Bọc trong FrameLayout để chồng CheckBox lên ảnh -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:adjustViewBounds="true"
-            android:src="@drawable/ngontinh1" />
+            android:layout_height="match_parent">
+
+            <!-- Ảnh bìa sách -->
+            <ImageView
+                android:id="@+id/image_characters_in_detail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ngontinh1" />
+
+            <!-- CheckBox góc trên cùng bên phải -->
+            <CheckBox
+                android:id="@+id/checkbox_select_book"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="6dp"
+                android:buttonTint="@color/teal_200"
+                android:visibility="gone" />
+        </FrameLayout>
     </androidx.cardview.widget.CardView>
+
 
     <!-- Tên sách -->
     <TextView

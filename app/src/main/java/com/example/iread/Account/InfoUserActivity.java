@@ -280,8 +280,6 @@ public class InfoUserActivity extends AppCompatActivity {
                         Glide.with(InfoUserActivity.this)
                                 .load(account.getAvatar())
                                 .placeholder(R.drawable.icon_avatar)
-                                .skipMemoryCache(true) // ❗ Bỏ cache RAM
-                                .diskCacheStrategy(DiskCacheStrategy.NONE) // ❗ Bỏ cache disk
                                 .into(imgAvatar);
                     }
                 }
