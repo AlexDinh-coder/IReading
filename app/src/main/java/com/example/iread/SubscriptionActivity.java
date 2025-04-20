@@ -94,21 +94,15 @@ public class SubscriptionActivity extends AppCompatActivity {
                         btnBuy1.setOnClickListener(v -> createPayment(item1));
                         btnBuy2.setOnClickListener(v -> createPayment(item2));
                         btnBuy3.setOnClickListener(v -> createPayment(item3));
-
-
                     }
-
                 }
-
             }
-
             @Override
             public void onFailure(Call<ReponderModel<PaymentItemModel>> call, Throwable t) {
                 Log.e("API_FAILURE", "Lỗi gọi API: " + t.getMessage());
             }
         });
     }
-
     private void createPayment(PaymentItemModel item) {
         PaymentRequestModel request = new PaymentRequestModel();
         request.setAmount(item.getAmountMoney());
@@ -122,7 +116,6 @@ public class SubscriptionActivity extends AppCompatActivity {
         paymentItem.setName(item.getPaymentName());
         paymentItem.setPrice(item.getAmountMoney());
         paymentItem.setQuantity(1);
-
 
         request.getItems().add(paymentItem);
 
@@ -138,7 +131,6 @@ public class SubscriptionActivity extends AppCompatActivity {
                     } else {
                         Log.e("PAYMENT", "Link thanh toán không tồn tại!");
                     }
-
                 }
             }
 

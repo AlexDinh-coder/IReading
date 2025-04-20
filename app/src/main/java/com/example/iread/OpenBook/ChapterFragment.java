@@ -106,21 +106,17 @@ public class ChapterFragment extends Fragment {
         chapterList.clear();
 
         for (BookChapter chapter : allChapters) {
-            Log.d("CHAPTER_CHECK", "Chapter: " + chapter.getChapterName() + ", BookType = " + chapter.getBookType() + ", FileName = " + chapter.getFileName());
-            if (chapter.getBookType() == 0) {
+            Log.d("CHAPTER_CHECK", "Chapter: " + chapter.getChapterName() + ", BookType = " + chapter.getBookType());
+
+            // Chỉ lấy chương đã duyệt (type = 1) và thuộc loại FREE hoặc PAID
+            if ((chapter.getBookType() == 0 || chapter.getBookType() == 1)) {
                 chapterList.add(chapter);
             }
-//            if (bookTypeStatus == 0) {
-//                // Chế độ đọc: chỉ lấy chương có BookType = 0
-//                if (chapter.getBookType() == 0) {
-//                    chapterList.add(chapter);
-//                }
-//            } else if (bookTypeStatus == 1) {
-//                // Chế độ nghe: chỉ lấy chương có audio (FileName không rỗng)
-//                if (chapter.getBookType() == 0 && chapter.getFileName() != null && !chapter.getFileName().isEmpty()) {
-//                    chapterList.add(chapter);
-//                }
+//            Log.d("CHAPTER_CHECK", "Chapter: " + chapter.getChapterName() + ", BookType = " + chapter.getBookType() + ", FileName = " + chapter.getFileName());
+//            if (chapter.getBookType() == 0) {
+//                chapterList.add(chapter);
 //            }
+
         }
 
         sortChapterList();

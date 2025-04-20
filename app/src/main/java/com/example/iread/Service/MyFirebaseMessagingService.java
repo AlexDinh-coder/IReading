@@ -5,11 +5,10 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
-import com.example.iread.Account.LoginOpenActivity;
-import com.example.iread.CloseConfirmEmail;
+import com.example.iread.ConfirmEmailActivity;
 import com.example.iread.R;
+import com.example.iread.SuccessConfirmEmailActivity;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -30,9 +29,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String body = remoteMessage.getNotification().getBody();
             Log.d("FCM", "Notification received: " + title + " - " + body);
           //  showNotification(title, body);
-//            Intent intent = new Intent(this, LoginOpenActivity.class);
-//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            startActivity(intent);
+            Intent intent = new Intent(this, SuccessConfirmEmailActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         }
         if (remoteMessage.getData().size() > 0) {
             String value = remoteMessage.getData().get("screen");

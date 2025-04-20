@@ -68,7 +68,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="90dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/logo_ireading"/>
+                android:src="@drawable/ireading1"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -79,7 +79,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tài khoản cá nhân"
+                android:text=" Xác thực email thành công"
                 android:textColor="#FFFFFF"
                 android:textSize="19sp"
                 android:layout_centerHorizontal="true"
@@ -96,7 +96,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Bạn cần đăng nhập trước khi sử dụng tính năng này để đảm bảo việc đồng bộ dữ liệu của tài khoản trên nhiều thiết bị"
+                android:text="Bạn đã xác thực email thành công để đăng nhập tài khoản. Vui lòng đợi trong giây lát"
                 android:textColor="#AFAEAE"
                 android:textSize="17sp"
                 />
@@ -108,33 +108,22 @@
             android:layout_marginTop="20dp"
             >
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_login_open"
-                style="@style/Widget.AppCompat.Button"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:background="@drawable/bg_button_upgrade"
-                android:paddingStart="24dp"
-                android:paddingEnd="24dp"
-                android:text="ĐĂNG NHẬP"
-                android:textColor="@android:color/white"
-                android:textStyle="bold" />
         </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="20dp"
-            >
-           <TextView
-               android:id="@+id/btnClose"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:text="Hủy bỏ"
-               android:gravity="center"
-               android:textColor="#02c18e"
-               android:textSize="17sp"/>
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:gravity="center"-->
+<!--            android:layout_marginTop="20dp"-->
+<!--            >-->
+<!--            <TextView-->
+<!--                android:id="@+id/btnClose"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Hủy bỏ"-->
+<!--                android:gravity="center"-->
+<!--                android:textColor="#02c18e"-->
+<!--                android:textSize="17sp"/>-->
 
-        </LinearLayout>
+<!--        </LinearLayout>-->
     </LinearLayout>
 </FrameLayout>

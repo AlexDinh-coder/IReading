@@ -4,6 +4,7 @@ package com.example.iread.apicaller;
 import com.example.iread.Model.Account;
 import com.example.iread.Model.Book;
 import com.example.iread.Model.BookChapter;
+import com.example.iread.Model.BookHomePage;
 import com.example.iread.Model.BookRating;
 import com.example.iread.Model.BookSearch;
 import com.example.iread.Model.BookViewModel;
@@ -78,6 +79,13 @@ public interface IAppApiCaller {
             @Query("bookId") int bookId,
              @Query("username") String username
 
+    );
+    @GET("Book/GetBookHomePage")
+    Call<ReponderModel<BookHomePage>> getBookHomePage(
+    );
+
+    @GET("Book/GetTop10CategoryView")
+    Call<ReponderModel<Category>> getTop10CategoryView(
     );
 
     @POST("Account/Register")

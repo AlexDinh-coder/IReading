@@ -17,7 +17,7 @@ public class BookChapter implements Serializable {
     private List<SummaryTime> contentWithTime;
 
     private String modifyDate;
-    //0: free, 1: paid; PendingApproval = 2,
+    //0: free, 2: paid; PendingApproval = 2,
     //        Decline = 3,
     private int bookType;
 

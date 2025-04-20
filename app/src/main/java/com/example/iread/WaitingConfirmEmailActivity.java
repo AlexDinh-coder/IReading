@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.iread.Account.LoginActivity;
 
-public class CloseConfirmEmail extends AppCompatActivity {
+public class WaitingConfirmEmailActivity extends AppCompatActivity {
     private Button btnLoginOpen;
     private TextView btnClose;
     @SuppressLint("MissingInflatedId")
@@ -23,23 +23,7 @@ public class CloseConfirmEmail extends AppCompatActivity {
         setContentView(R.layout.activity_waiting_confirm_email);
         makeStatusBarTransparent();
         applyTopPadding();
-        btnLoginOpen = findViewById(R.id.btn_login_open);
-        btnLoginOpen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(CloseConfirmEmail.this, LoginActivity.class);
-                startActivity(intent);
-            }
-        });
-        btnClose = findViewById(R.id.btnClose);
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(CloseConfirmEmail.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+
 
     }
     private void makeStatusBarTransparent() {

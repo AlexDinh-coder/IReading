@@ -109,21 +109,6 @@
             >
 
         </LinearLayout>
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:gravity="center"-->
-<!--            android:layout_marginTop="20dp"-->
-<!--            >-->
-<!--            <TextView-->
-<!--                android:id="@+id/btnClose"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Hủy bỏ"-->
-<!--                android:gravity="center"-->
-<!--                android:textColor="#02c18e"-->
-<!--                android:textSize="17sp"/>-->
 
-<!--        </LinearLayout>-->
     </LinearLayout>
 </FrameLayout>

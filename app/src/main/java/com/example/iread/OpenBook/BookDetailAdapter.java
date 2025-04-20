@@ -101,12 +101,6 @@ public class BookDetailAdapter extends RecyclerView.Adapter<BookDetailAdapter.It
             return true;
         });
 
-        // Bắt sự kiện click
-//        holder.itemView.setOnClickListener(v -> {
-//            Intent intent = new Intent(holder.itemView.getContext(), OpenBookActivity.class);
-//            intent.putExtra("bookId", item.getId());
-//            holder.itemView.getContext().startActivity(intent);
-//        });
     }
 
     @Override

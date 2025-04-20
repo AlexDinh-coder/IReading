@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,10 +22,12 @@ import com.example.iread.Model.Author;
 import com.example.iread.Model.Book;
 import com.example.iread.OpenBook.BookByCategoryAdapter;
 import com.example.iread.R;
+import com.example.iread.WaitingConfirmEmailActivity;
 import com.example.iread.apicaller.IAppApiCaller;
 import com.example.iread.apicaller.RetrofitClient;
 import com.example.iread.basemodel.ReponderModel;
 import com.example.iread.helper.Utils;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.List;
 
@@ -38,6 +41,8 @@ public class RegisterActivity extends AppCompatActivity {
     private Button btn_Register;
 
     private TextView btnCancel;
+
+    private SharedPreferences sharedPreferences;
 
     private Account account;
     private IAppApiCaller apiCaller;
@@ -59,6 +64,7 @@ public class RegisterActivity extends AppCompatActivity {
         ConfirmPassword = findViewById(R.id.ComEditText);
         togglePasswordVisibility = findViewById(R.id.togglePasswordVisibility);
         toggleConfirmPasswordVisibility = findViewById(R.id.toggleConfirmPasswordVisibility);
+        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         // Trạng thái hiển thị mật khẩu
         final boolean[] isPassword = {false};
         final boolean[] isConfirmPassword = {false};
@@ -115,7 +121,9 @@ public class RegisterActivity extends AppCompatActivity {
         account.setPassword(pass);
         account.setPasswordConfirm(confirmPass);
         account.setGrantPerMission(0);
-        account.setRegisterType(0); // 0: user
+        account.setRegisterType(0);// 0: user
+        String deviceToken = sharedPreferences.getString("deviceToken", "");
+        account.setDeviceToken(deviceToken);
 
         if (user.isEmpty() || email.isEmpty() || name.isEmpty() || phone.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
             Toast.makeText(RegisterActivity.this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
@@ -134,10 +142,10 @@ public class RegisterActivity extends AppCompatActivity {
             public void onResponse(Call<ReponderModel<String>> call, Response<ReponderModel<String>> response) {
                 if (response.isSuccessful() && response.body() != null) {
 
-                    int status = response.body().getStatusCode();
+                    boolean status = response.body().isSussess();
 
-                    if (status ==200) {
-                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                    if (status) {
+                        Intent intent = new Intent(RegisterActivity.this, WaitingConfirmEmailActivity.class);
                         startActivity(intent);
                         finish();
                         Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();

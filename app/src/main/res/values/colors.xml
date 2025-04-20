@@ -3,6 +3,7 @@
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
     <color name="dark_gray">#2C2C2C</color>
+    <color name="teal_200">#03DAC5</color>
     <color name="color_background_primary">#101318</color>
     <color name="teal_200">#03DAC5</color>
 </resources>

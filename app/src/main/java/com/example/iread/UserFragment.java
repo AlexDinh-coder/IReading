@@ -108,7 +108,7 @@ public class UserFragment extends Fragment {
     }
     @Override
     public void onResume() {
-        // ✅ Bổ sung đoạn này để load avatar mới nhất ngay khi quay lại
+        // Bổ sung đoạn này để load avatar mới nhất ngay khi quay lại
         super.onResume();
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
         String avatarUrl = sharedPreferences.getString("avatar", "");

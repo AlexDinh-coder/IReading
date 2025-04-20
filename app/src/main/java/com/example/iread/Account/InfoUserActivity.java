@@ -4,12 +4,15 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -42,6 +45,7 @@ import com.example.iread.basemodel.ReponderModel;
 import com.example.iread.helper.Utils;
 import com.google.gson.JsonObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import okhttp3.MediaType;
@@ -144,7 +148,7 @@ public class InfoUserActivity extends AppCompatActivity {
             btnRow.addView(btnCancel);
             layoutEditBox.addView(btnRow);
 
-            // 👇 Animation xuất hiện
+            // Animation xuất hiện
             Animation fadeSlide = new AnimationSet(true);
             AlphaAnimation fade = new AlphaAnimation(0f, 1f);
             fade.setDuration(300);
@@ -163,21 +167,10 @@ public class InfoUserActivity extends AppCompatActivity {
             layoutEditBox.startAnimation(fadeSlide);
         });
 
-
-
-//
-//        btnEditName.setOnClickListener(v -> {
-//            txtFullName.setFocusable(true);
-//            txtFullName.setFocusableInTouchMode(true);
-//            txtFullName.setClickable(true);
-//            txtFullName.requestFocus();
-//            txtFullName.setSelection(txtFullName.getText().length());
-//        });
-
         btnSave = findViewById(R.id.btnSaveInfo);
         btnSave.setOnClickListener(v -> {
             if (selectedImageUri != null) {
-                uploadToImgurAndUpdateProfile(selectedImageUri); // Có ảnh mới
+                updateAvatarToServer();
             } else {
                 updateUserInfo(); // Không đổi ảnh, chỉ lưu thông tin
             }
@@ -299,76 +292,31 @@ public class InfoUserActivity extends AppCompatActivity {
             selectedImageUri = data.getData();
             if (selectedImageUri != null) {
                 imgAvatar.setImageURI(selectedImageUri);
-                uploadToImgurAndUpdateProfile(selectedImageUri);
+
             }
         }
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if (requestCode == REQUEST_CODE_PICK_IMAGE && resultCode == RESULT_OK && data != null) {
-//            if (data.getData() != null) {
-//                imgAvatar.setImageURI(data.getData());
-//            }
-//        }
-    }
-    private RequestBody getRequestBodyFromUri(Uri uri) {
-        try {
-            InputStream inputStream = getContentResolver().openInputStream(uri);
-            byte[] bytes = new byte[inputStream.available()];
-            inputStream.read(bytes);
-            inputStream.close();
-            return RequestBody.create(MediaType.parse("image/*"), bytes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+
     }
 
+    private String convertImageViewtoBase64(ImageView v){
+        Bitmap bitmap =((BitmapDrawable)v.getDrawable()).getBitmap();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        byte[] byteArray = outputStream.toByteArray();
+        return "data:image/png;base64," + Base64.encodeToString(byteArray, Base64.NO_WRAP);
 
-    private void uploadToImgurAndUpdateProfile(Uri selectedImageUri) {
-        RequestBody requestBody = getRequestBodyFromUri(selectedImageUri);
-        if (requestBody == null) {
-            Toast.makeText(this, "Không thể đọc ảnh từ thiết bị", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        MultipartBody.Part body = MultipartBody.Part.createFormData("image", "avatar.jpg", requestBody);
-
-        ImgurApi imgurApi = RetrofitClient.ImgurClient.getClient();
-        imgurApi.uploadImage("Client-ID ade11444bbdac5b", body).enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    String imgurLink = response.body().getAsJsonObject("data").get("link").getAsString();
-                    updateAvatarToServer(imgurLink);
-                } else {
-                    Toast.makeText(InfoUserActivity.this, "Upload thất bại: " + response.code(), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                Toast.makeText(InfoUserActivity.this, "Upload ảnh thất bại", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
-    private void updateAvatarToServer(String imgurLink) {
+    private void updateAvatarToServer() {
+        String imgLink = convertImageViewtoBase64(imgAvatar);
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        sharedPreferences.edit().putString("avatar", imgurLink).apply(); // lưu local
-        selectedImageUri = null;
-
-        Glide.with(this)
-                .load(imgurLink + "?t=" + System.currentTimeMillis())
-                .placeholder(R.drawable.icon_avatar)
-                .skipMemoryCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .into(imgAvatar);
-        // 👉 Gửi avatar mới kèm thông tin lên server
+        //  Gửi avatar mới kèm thông tin lên server
         Account account = new Account();
         account.setUsername(sharedPreferences.getString("username", ""));
         account.setFullName(txtFullName.getText().toString());
         account.setPhoneNumber(txtPhoneNumber.getText().toString());
         account.setEmail(txtEmail.getText().toString());
-        account.setAvatar(imgurLink); // rất quan trọng
+        account.setAvatar(imgLink);
 
         iAppApiCaller.updateInformation(account).enqueue(new Callback<ReponderModel<String>>() {
             @Override
@@ -383,8 +331,6 @@ public class InfoUserActivity extends AppCompatActivity {
                 Toast.makeText(InfoUserActivity.this, "Lỗi lưu!", Toast.LENGTH_SHORT).show();
             }
         });
-
-        //updateUserInfo();
     }
 
 

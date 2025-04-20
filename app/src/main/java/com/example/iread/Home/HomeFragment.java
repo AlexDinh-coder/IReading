@@ -266,7 +266,7 @@ public class HomeFragment extends Fragment {
     // Fetch and display categories
     private void getListCategory() {
         apiCaller = RetrofitClient.getInstance(Utils.BASE_URL, requireContext()).create(IAppApiCaller.class);
-        apiCaller.getCategories().enqueue(new Callback<ReponderModel<Category>>() {
+        apiCaller.getTop10CategoryView().enqueue(new Callback<ReponderModel<Category>>() {
             @Override
             public void onResponse(Call<ReponderModel<Category>> call, Response<ReponderModel<Category>> response) {
                 if (response.isSuccessful() && response.body() != null) {

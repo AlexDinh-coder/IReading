@@ -78,12 +78,12 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
             holder.chapterLabel.setBackgroundResource(R.drawable.bg_label_free);
         } else if (bookType == 1) {
             holder.chapterLabel.setVisibility(View.VISIBLE);
-            holder.chapterLabel.setText("PAID");
+            holder.chapterLabel.setText(String.valueOf(bookChapter.getPrice()));
             holder.chapterLabel.setBackgroundResource(R.drawable.bg_label_paid);
         } else {
-            // Nếu là Pending (2) hoặc Declined (3) thì ẩn nhãn
             holder.chapterLabel.setVisibility(View.GONE);
         }
+
 
 
         holder.itemView.setOnClickListener(v -> {
