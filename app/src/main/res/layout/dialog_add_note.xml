@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:padding="16dp">
+
+    <!-- Thanh tiêu đề -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:id="@+id/dialogTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ghi chú 15:16"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#444444" />
+
+        <TextView
+            android:id="@+id/btnDone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xong"
+            android:textColor="#6200EE"
+            android:textStyle="bold"
+            android:padding="4dp" />
+    </LinearLayout>
+
+    <!-- Đoạn văn đã chọn -->
+    <TextView
+        android:id="@+id/tvSelectedText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Selected quote"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        android:background="#F6F6F6"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp"
+
+        android:drawablePadding="8dp" />
+
+    <!-- EditText ghi chú -->
+    <EditText
+        android:id="@+id/etNoteContent"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:hint="Thêm ghi chú..."
+        android:textColor="#000000"
+        android:textColorHint="#AAAAAA"
+        android:background="@android:color/transparent"
+        android:gravity="top"
+        android:padding="12dp"
+        android:textSize="14sp" />
+</LinearLayout>

@@ -114,6 +114,7 @@ public class BookDetailAdapter extends RecyclerView.Adapter<BookDetailAdapter.It
         return dataBook.size();
     }
 
+
     public class ItemHolder extends RecyclerView.ViewHolder{
         private ImageView imgBook;
         private TextView txtNameBook ;

@@ -1,5 +1,6 @@
 package com.example.iread;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -9,7 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -41,7 +46,11 @@ public class LibraryFragment extends Fragment {
     private BookDetailAdapter bookAdapter;
     private List<Book> bookList;
 
+    private LinearLayout deleteActionLayout;
+
     private IAppApiCaller iAppApiCaller;
+
+    private ImageView btnDelete;
 
     TextView tvUserName, tvFavorite, tvContinue, tvPurchased;
 
@@ -51,6 +60,7 @@ public class LibraryFragment extends Fragment {
         FAVORITE, CONTINUE, PURCHASED
     }
     private LibraryTab currentTab = LibraryTab.FAVORITE;
+    @SuppressLint("MissingInflatedId")
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_library , container , false);
         makeStatusBarTransparent();
@@ -65,6 +75,53 @@ public class LibraryFragment extends Fragment {
         tvContinue = view.findViewById(R.id.tvContinue);
         tvPurchased = view.findViewById(R.id.tvBuy);
         viewAccount = view.findViewById(R.id.viewAccount);
+        btnDelete = view.findViewById(R.id.btnDelete);
+        btnDelete.setOnClickListener(v -> {
+            if (bookAdapter == null) return;
+            Log.d("DELETE", "Đã nhấn vào nút delete");
+            bookAdapter.setSelectMode(true);
+            recyclerBookView.setAdapter(bookAdapter);
+        });
+        deleteActionLayout = new LinearLayout(requireContext());
+        deleteActionLayout.setOrientation(LinearLayout.HORIZONTAL);
+        deleteActionLayout.setVisibility(View.GONE);
+        deleteActionLayout.setPadding(16, 16, 16, 16);
+        deleteActionLayout.setBackgroundColor(Color.parseColor("#1E1E1E"));
+
+        Button btnConfirmDelete = new Button(requireContext());
+        btnConfirmDelete.setText("Xoá");
+        btnConfirmDelete.setTextColor(Color.WHITE);
+        btnConfirmDelete.setBackgroundColor(Color.RED);
+        btnConfirmDelete.setPadding(40, 20, 40, 20);
+
+        Button btnCancelDelete = new Button(requireContext());
+        btnCancelDelete.setText("Huỷ");
+        btnCancelDelete.setTextColor(Color.WHITE);
+        btnCancelDelete.setBackgroundColor(Color.GRAY);
+        btnCancelDelete.setPadding(40, 20, 40, 20);
+
+        btnCancelDelete.setOnClickListener(v1 -> {
+            if (bookAdapter != null) {
+                bookAdapter.setSelectMode(false); // ẩn checkboxes
+                bookAdapter.notifyDataSetChanged();
+            }
+            deleteActionLayout.setVisibility(View.GONE); // ẩn layout
+        });
+
+        btnConfirmDelete.setOnClickListener(v2 -> {
+            // TODO: xử lý xoá sách đang được chọn
+            Toast.makeText(getContext(), "Xoá các sách đã chọn (chưa cài logic xoá)", Toast.LENGTH_SHORT).show();
+            deleteActionLayout.setVisibility(View.GONE);
+        });
+
+
+        // Add buttons to layout
+        deleteActionLayout.addView(btnConfirmDelete);
+        deleteActionLayout.addView(btnCancelDelete);
+
+        // Add layout to root view
+        ((ViewGroup) view).addView(deleteActionLayout); // view = root của onCreateView
+
 
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String username = sharedPreferences.getString("username", "User");
@@ -102,6 +159,14 @@ public class LibraryFragment extends Fragment {
         });
 
         return view;
+    }
+
+    public void showDeleteUI() {
+        btnDelete.setVisibility(View.GONE);// ẩn nút delete
+        if (bookAdapter != null) {
+            bookAdapter.setSelectMode(true);
+            deleteActionLayout.setVisibility(View.VISIBLE); // show nút xoá/huỷ
+        }
     }
 
 
@@ -179,6 +244,12 @@ public class LibraryFragment extends Fragment {
                         }
                     }
                     bookAdapter = new BookDetailAdapter(getContext(), bookList);
+                    // Gắn listener để hiển thị UI Xoá/Huỷ khi có tick chọn
+                    bookAdapter.setOnSelectionChangedListener(() -> {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> showDeleteUI());
+                        }
+                    });
                     recyclerBookView.setAdapter(bookAdapter);
                 }
             }

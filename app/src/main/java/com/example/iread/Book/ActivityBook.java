@@ -122,16 +122,15 @@ public class ActivityBook extends AppCompatActivity {
                     }
                 }
             }
-            DataPageInBook dataPageInBook = new DataPageInBook(i, dataBookList);
+            DataPageInBook dataPageInBook = new DataPageInBook(i, dataBookList,chapterList.get(i));
             pageDataList.add(dataPageInBook);
         }
 
-        pageAdapter = new PageAdapter(pageDataList, this);
+        pageAdapter = new PageAdapter(pageDataList, this,username);
         viewPagerBook = findViewById(R.id.viewPagerBook);
         viewPagerBook.setAdapter(pageAdapter);
         viewPagerBook.setCurrentItem(selectedIndex);
     }
-
     private String extractImgSrc(String segment) {
         int srcIndex = segment.indexOf("src=");
         if (srcIndex == -1) return null;

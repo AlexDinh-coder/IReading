@@ -4,12 +4,27 @@ import java.util.List;
 
 public class DataPageInBook {
     private int IdPage; // id Page
+
     private List<DataBook> Data; // data in page (uri and text)
 
-    public DataPageInBook(int idPage, List<DataBook> data) {
+    private BookChapter BookChapter;
+
+
+
+    public DataPageInBook(int idPage, List<DataBook> data,BookChapter bookChapter) {
         IdPage = idPage;
         Data = data;
+        BookChapter = bookChapter;
     }
+    public BookChapter getBookChapter() {
+        return BookChapter;
+    }
+
+    public void setBookChapter(BookChapter bookChapter) {
+        this.BookChapter = bookChapter;
+    }
+
+
 
     public int getIdPage() {
         return IdPage;

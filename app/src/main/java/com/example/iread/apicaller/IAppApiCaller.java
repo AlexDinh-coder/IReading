@@ -9,6 +9,7 @@ import com.example.iread.Model.BookSearch;
 import com.example.iread.Model.BookViewModel;
 import com.example.iread.Model.Category;
 import com.example.iread.Model.CommentModel;
+import com.example.iread.Model.NoteUser;
 import com.example.iread.Model.PaymentRequestModel;
 import com.example.iread.Model.UserBook;
 import com.example.iread.Model.UserProfile;
@@ -144,6 +145,15 @@ public interface IAppApiCaller {
     );
     @GET("Book/GetTop10BookRating")
     Call<ReponderModel<BookRating>> getListRatingBook();
+    @POST("Book/UpdateNoteUser")
+    Call<ReponderModel<String>> UpdateNoteUser(
+            @Body NoteUser noteUser
+    );
+    @GET("Book/GetListNote")
+    Call<ReponderModel<NoteUser>> GetListNote(
+            @Query("username") String username,
+            @Query("chapterId") String chapterId
+    );
 
 
 }

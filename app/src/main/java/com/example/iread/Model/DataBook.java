@@ -5,10 +5,14 @@ public class DataBook {
     private String content; // uri or text
     private Boolean type; // 0 là uri, 1 là text
 
+
     public DataBook(String content, Boolean type) {
         this.content = content;
         this.type = type;
+
+
     }
+
 
     public String getContent() {
         return content;
