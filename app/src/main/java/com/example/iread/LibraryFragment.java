@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.iread.LibraryCateAdapter;
 import com.example.iread.Model.Book;
 import com.example.iread.Model.BookSearch;
 import com.example.iread.Model.UserBook;
