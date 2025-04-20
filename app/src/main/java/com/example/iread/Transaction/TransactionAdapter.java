@@ -9,15 +9,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.iread.Model.Transaction;
+import com.example.iread.Model.UserTranscationBook;
+import com.example.iread.Model.UserTranscationBookModel;
 import com.example.iread.R;
 
 import java.util.List;
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
 
-    private List<Transaction> transactionList;
+    private List<UserTranscationBookModel> transactionList;
 
-    public TransactionAdapter(List<Transaction> transactionList) {
+    public TransactionAdapter(List<UserTranscationBookModel> transactionList) {
         this.transactionList = transactionList;
     }
 
@@ -31,12 +33,13 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
-        Transaction transaction = transactionList.get(position);
-        holder.tvTransactionId.setText(transaction.getId());
-        holder.tvContent.setText(transaction.getContent());
-        holder.tvDate.setText(transaction.getDate());
+        UserTranscationBookModel transaction = transactionList.get(position);
+        holder.tvTransactionId.setText(String.valueOf(transaction.getId()));
+        holder.tvContent.setText(transaction.getPaymentName());
+        holder.tvDate.setText(transaction.getCreateDate());
+        //holder.tvAmount.setText(transaction.getPrice());
 
-        int amount = transaction.getAmount();
+        int amount = transaction.getPrice();
         holder.tvAmount.setText(String.valueOf(amount));
         holder.tvAmount.setTextColor(amount < 0 ? 0xFFFF5555 : 0xFF00C853); // đỏ nếu âm, xanh nếu dương
     }
