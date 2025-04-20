@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.iread.Model.CommentModel;
-import com.example.iread.Model.Review;
 import com.example.iread.R;
 
 import java.util.List;
