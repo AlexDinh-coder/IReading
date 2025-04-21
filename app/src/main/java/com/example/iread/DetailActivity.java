@@ -6,11 +6,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -99,13 +101,31 @@ public class DetailActivity extends AppCompatActivity {
                     }
 
                     // Adapter gán vào Spinner
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                             DetailActivity.this,
                             R.layout.spinner_item_category,
+                            R.id.spinnerText,
                             categoryNames
-                    );
-                    adapter.setDropDownViewResource(R.layout.spinner_item_category);
+                    ) {
+                        @Override
+                        public View getView(int position, View convertView, ViewGroup parent) {
+                            View view = super.getView(position, convertView, parent);
+                            TextView arrow = view.findViewById(R.id.spinnerArrow);
+                            if (arrow != null)
+                                arrow.setVisibility(View.VISIBLE); // hiển thị mũi tên
+                            return view;
+                        }
 
+                        @Override
+                        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                            View view = super.getDropDownView(position, convertView, parent);
+                            TextView arrow = view.findViewById(R.id.spinnerArrow);
+                            if (arrow != null)
+                                arrow.setVisibility(View.GONE); // ẩn mũi tên trong dropdown
+                            return view;
+                        }
+                    };
+                    adapter.setDropDownViewResource(R.layout.spinner_item_category);
                     spinner.setAdapter(adapter);
 
                     // Nếu có category được truyền từ màn trước thì chọn sẵn

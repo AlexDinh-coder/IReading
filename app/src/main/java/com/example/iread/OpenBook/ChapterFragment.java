@@ -112,10 +112,6 @@ public class ChapterFragment extends Fragment {
             if ((chapter.getBookType() == 0 || chapter.getBookType() == 1)) {
                 chapterList.add(chapter);
             }
-//            Log.d("CHAPTER_CHECK", "Chapter: " + chapter.getChapterName() + ", BookType = " + chapter.getBookType() + ", FileName = " + chapter.getFileName());
-//            if (chapter.getBookType() == 0) {
-//                chapterList.add(chapter);
-//            }
 
         }
 

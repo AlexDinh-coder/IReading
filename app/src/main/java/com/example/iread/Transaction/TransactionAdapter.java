@@ -37,11 +37,20 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.tvTransactionId.setText(String.valueOf(transaction.getId()));
         holder.tvContent.setText(transaction.getPaymentName());
         holder.tvDate.setText(transaction.getCreateDate());
-        //holder.tvAmount.setText(transaction.getPrice());
+
 
         int amount = transaction.getPrice();
-        holder.tvAmount.setText(String.valueOf(amount));
-        holder.tvAmount.setTextColor(amount < 0 ? 0xFFFF5555 : 0xFF00C853); // đỏ nếu âm, xanh nếu dương
+
+        UserTranscationBookModel.PaymentNameEnum type = transaction.getPaymentNameEnum();
+        if (type == UserTranscationBookModel.PaymentNameEnum.Deposit) {
+            // Nạp tiền
+            holder.tvAmount.setText("+" + amount + " xu");
+            holder.tvAmount.setTextColor(0xFF00C853); // Màu xanh
+        } else if (type == UserTranscationBookModel.PaymentNameEnum.Pay) {
+            // Mặc định là Pay (trừ tiền)
+            holder.tvAmount.setText("-" + amount + " xu");
+            holder.tvAmount.setTextColor(0xFFFF5555); // Màu đỏ
+        }
     }
 
     @Override

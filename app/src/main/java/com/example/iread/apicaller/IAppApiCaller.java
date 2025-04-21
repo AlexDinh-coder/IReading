@@ -165,9 +165,13 @@ public interface IAppApiCaller {
             @Query("chapterId") String chapterId
     );
     @GET("Payment/PaymentItem")
-    Call<ReponderModel<UserTranscationBookModel>> getPaymentItem(
+    Call<ReponderModel<UserTranscationBookModel>> getHistoryPaymentItem(
             @Query("userName") String userName
     );
 
+    @POST("Payment/PaymentItem")
+    Call<ReponderModel<String>> postPaymentItem(
+            @Body UserTranscationBook userTranscationBook
+    );
 
 }

@@ -1,5 +1,7 @@
 package com.example.iread.Model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class UserTranscationBookModel {
     private int id;
     private String paymentName;
@@ -10,7 +12,9 @@ public class UserTranscationBookModel {
 
     private PaymentNameEnum paymentNameEnum;
     public enum PaymentNameEnum {
+        @SerializedName("0")
         Deposit, // value = 0
+        @SerializedName("1")
         Pay      // value = 1
     }
 

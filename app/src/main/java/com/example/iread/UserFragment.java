@@ -145,7 +145,13 @@ public class UserFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     UserProfile userProfile = response.body().getData();
                     if (userProfile != null) {
-                        txtCoin.setText(userProfile.getClamPoint() + " xu");
+                       // txtCoin.setText(userProfile.getClamPoint() + " xu");
+                        long coin = userProfile.getClamPoint();
+                        txtCoin.setText(coin + " xu");
+
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putInt("coin", (int) coin);
+                        editor.apply();
                         txtUpgradeAccount.setText(userProfile.getPaymentName());
 
                         String newAvatar = userProfile.getAvatar();

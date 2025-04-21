@@ -2,6 +2,7 @@ package com.example.iread.OpenBook;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +21,7 @@ import com.example.iread.Book.ActivityBook;
 import com.example.iread.Interface.OnChapterClickListener;
 import com.example.iread.Model.BookChapter;
 import com.example.iread.Model.BookViewModel;
+import com.example.iread.Model.UserTranscationBook;
 import com.example.iread.R;
 import com.example.iread.apicaller.IAppApiCaller;
 import com.example.iread.apicaller.RetrofitClient;
@@ -66,6 +69,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
         return new ChapterViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull ChapterViewHolder holder, int position) {
         BookChapter bookChapter= chapterList.get(position);
@@ -98,18 +102,31 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
                 intent.putExtra("selectedIndex", position);
                 context.startActivity(intent);
             } else {
-                // Sách đọc → tracking + callback
-                if (onChapterClickListener != null) {
-                    if (position != 0) {
-                        sendViewStatus(bookChapter, 0, viewId);
+                if (bookChapter.getBookType() == 1 && !isChapterUnlocked(bookChapter.getId())) {
+                    // Nếu chương chưa mở khoá → hiển thị dialog
+                    showUnlockDialog(bookChapter);
+                } else {
+                    // Nếu chương miễn phí hoặc đã mở khoá → mở luôn
+                    if (onChapterClickListener != null) {
+                        if (position != 0) {
+                            sendViewStatus(bookChapter, 0, viewId);
+                        }
+                        onChapterClickListener.onChapterClick(position);
                     }
-                    onChapterClickListener.onChapterClick(position);
                 }
+
             }
         });
 
 
     }
+
+    private boolean isChapterUnlocked(String chapterId) {
+        SharedPreferences prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        return prefs.getBoolean(chapterId, false);
+
+    }
+
     private void setupApiCaller() {
        apiCaller = RetrofitClient.getInstance(Utils.BASE_URL, context).create(IAppApiCaller.class);
     }
@@ -160,6 +177,75 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
             chapterLabel = itemView.findViewById(R.id.chapter_label);
         }
     }
+    private void showUnlockDialog(BookChapter chapter) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.overlay, null);
+
+        TextView tvTitle = dialogView.findViewById(R.id.tvTitle);
+        TextView tvContent = dialogView.findViewById(R.id.tvContent);
+        Button btnUnlock = dialogView.findViewById(R.id.btnUnlock);
+
+        int price = chapter.getPrice();
+        // Lấy số xu hiện tại từ SharedPreferences
+        SharedPreferences prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        int currentCoin = prefs.getInt("coin", 0);
+
+        tvTitle.setText(price + " xu để mở khoá chapter!");
+        tvContent.setText("Số xu hiện tại của bạn là " + currentCoin + " bạn cần " + price + " xu để mở khoá chapter này!");
+
+        AlertDialog dialog = new AlertDialog.Builder(context)
+                .setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+        btnUnlock.setOnClickListener(v -> {
+            SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            String userId = sharedPreferences.getString("userId", "");
+            String username = sharedPreferences.getString("username", "");
+
+            UserTranscationBook transcationBook = new UserTranscationBook();
+            transcationBook.setAmount(chapter.getPrice());
+            transcationBook.setChapterId(chapter.getId());
+            transcationBook.setBookId(chapter.getBookId());
+            transcationBook.setUserId(userId);
+            transcationBook.setUsername(username);
+
+            apiCaller.postPaymentItem(transcationBook).enqueue(new Callback<ReponderModel<String>>() {
+                @Override
+                public void onResponse(Call<ReponderModel<String>> call, Response<ReponderModel<String>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSussess()) {
+                        saveUnlockedChapter(chapter.getId());
+                        dialog.dismiss();
+
+                        //Mở chương sách khi mở khoá thành công
+                        if (onChapterClickListener != null) {
+                            onChapterClickListener.onChapterClick(chapterList.indexOf(chapter));
+                        }
+
+                        //Trừ xu hiển thị trong sharePreference
+                        int newCoin = sharedPreferences.getInt("coin", 0) - chapter.getPrice();
+                        sharedPreferences.edit().putInt("coin", newCoin).apply();
+                    } else {
+                        tvContent.setText("Không thể mở khoá chương.Vui lòng thử lại");
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ReponderModel<String>> call, Throwable t) {
+                    Log.e("UnlockChapter", "Lỗi khi trừ xu: " + t.getMessage());
+                }
+            });
+
+        });
+
+        dialog.show();
+    }
+
+    private void saveUnlockedChapter(String chapterId) {
+        SharedPreferences prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        prefs.edit().putBoolean(chapterId, true).apply();
+
+    }
+
     public void updateData(List<BookChapter> newList) {
         this.chapterList = newList;
         notifyDataSetChanged();

@@ -42,11 +42,13 @@ public class CateAdapter extends RecyclerView.Adapter<CateAdapter.CategoryViewHo
         holder.tvCategory.setText(category.getName());
 
         if (selectedPosition == position) {
-            holder.tvCategory.setBackgroundResource(R.drawable.bg_category_selected);
-            holder.tvCategory.setTextColor(Color.BLACK);
+            holder.tvCategory.setTextColor(Color.parseColor("#FFFFFF"));
+//            holder.tvCategory.setBackgroundResource(R.drawable.bg_category_selected);
+//            holder.tvCategory.setTextColor(Color.BLACK);
         } else {
-            holder.tvCategory.setBackgroundResource(R.drawable.bg_category_unselected);
-            holder.tvCategory.setTextColor(Color.WHITE);
+            holder.tvCategory.setTextColor(Color.parseColor("#AAAAAA"));
+//            holder.tvCategory.setBackgroundResource(R.drawable.bg_category_unselected);
+//            holder.tvCategory.setTextColor(Color.WHITE);
         }
 
         holder.tvCategory.setOnClickListener(v -> {

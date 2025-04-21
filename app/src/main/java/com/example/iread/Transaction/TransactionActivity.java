@@ -45,7 +45,7 @@ public class TransactionActivity extends AppCompatActivity {
 
     private void loadTransactionHistory(String username) {
         iAppApiCaller = RetrofitClient.getInstance(Utils.BASE_URL, this).create(IAppApiCaller.class);
-        iAppApiCaller.getPaymentItem(username).enqueue(new Callback<ReponderModel<UserTranscationBookModel>>() {
+        iAppApiCaller.getHistoryPaymentItem(username).enqueue(new Callback<ReponderModel<UserTranscationBookModel>>() {
             @Override
             public void onResponse(Call<ReponderModel<UserTranscationBookModel>> call, Response<ReponderModel<UserTranscationBookModel>> response) {
                 if (response.isSuccessful() && response.body() != null) {

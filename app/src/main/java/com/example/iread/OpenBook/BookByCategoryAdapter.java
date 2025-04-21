@@ -22,7 +22,7 @@ public class BookByCategoryAdapter extends RecyclerView.Adapter<BookByCategoryAd
     Context context;
     private List<Book> dataBook;
 
-    List<BookChapter> bookChapter;
+
 
     public BookByCategoryAdapter(Context context, List<Book> dataBook) {
         this.context = context;

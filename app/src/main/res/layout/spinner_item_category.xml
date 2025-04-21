@@ -1,11 +1,26 @@
-<!-- res/layout/spinner_item_category.xml -->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tvSpinnerItem"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
     android:padding="10dp"
-    android:textColor="@android:color/white"
-    android:textSize="16sp"
-    android:ellipsize="none"
-    android:singleLine="true"
-    android:maxLines="1" />
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/spinnerText"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:ellipsize="end"
+        android:maxLines="1" />
+
+    <TextView
+        android:id="@+id/spinnerArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="▾"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_marginStart="6dp" />
+</LinearLayout>
