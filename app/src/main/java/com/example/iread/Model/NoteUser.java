@@ -11,7 +11,7 @@ public class NoteUser {
     private String noteContent;
     private String color;
     private String createDate;
-    private int BookId;
+    private int bookId;
 
     public NoteUser() {
     }
@@ -32,13 +32,12 @@ public class NoteUser {
     // Getter và Setter
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-    public int getBookId() {
-        return BookId;
+    public int getBookId() {return bookId;
     }
 
-    public void setBookId(int bookId) {
-        this.BookId = bookId;
+    public void setBookId(int bookId) {this.bookId = bookId;
     }
+
 
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }

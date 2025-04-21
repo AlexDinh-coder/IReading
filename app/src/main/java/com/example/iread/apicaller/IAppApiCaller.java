@@ -160,7 +160,7 @@ public interface IAppApiCaller {
     @GET("Book/GetListNote")
     Call<ReponderModel<NoteUser>> GetListNote(
             @Query("username") String username,
-            @Query("chapterId") String chapterId
+            @Query("bookId") int bookId
     );
 
 

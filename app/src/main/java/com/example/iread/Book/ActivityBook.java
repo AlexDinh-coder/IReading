@@ -1,6 +1,7 @@
 package com.example.iread.Book;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
@@ -46,6 +47,7 @@ public class ActivityBook extends AppCompatActivity {
     private Integer viewId = 0;
 
     private String username, userId;
+    private int bookid;
 
     private boolean clickView = false;
 
@@ -58,6 +60,8 @@ public class ActivityBook extends AppCompatActivity {
         username = sharedPreferences.getString("username", "");
         userId = sharedPreferences.getString("userId", "");
         clickView = getIntent().getBooleanExtra("isView", false);
+        bookid = getIntent().getIntExtra("bookid",0);
+
 
         setupUI();
         setupApiCaller();
@@ -210,22 +214,33 @@ public class ActivityBook extends AppCompatActivity {
 
     // Hiển thị danh sách chương dưới dạng BottomSheet
     private void showChapterMenu() {
-        BottomSheetDialog dialog = new BottomSheetDialog(this);
-        View view = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_chapters, null);
+//        BottomSheetDialog dialog = new BottomSheetDialog(this);
+//        View view = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_chapters, null);
+//
+//        RecyclerView recyclerView = view.findViewById(R.id.recyclerChapters);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//
+//        ChapterAdapter menuAdapter = new ChapterAdapter(
+//                position -> {
+//                    viewPagerBook.setCurrentItem(position);
+//                    dialog.dismiss();
+//                }, this, chapterList, viewId
+//        );
+//
+//        recyclerView.setAdapter(menuAdapter);
+//        dialog.setContentView(view);
+//        dialog.show();
+        Intent intent = new Intent(ActivityBook.this, ChapterActivity.class);
+        intent.putExtra("chapterList", new ArrayList<>(chapterList));
+        intent.putExtra("bookid", bookid);
 
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerChapters);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        ChapterAdapter menuAdapter = new ChapterAdapter(
-                position -> {
-                    viewPagerBook.setCurrentItem(position);
-                    dialog.dismiss();
-                }, this, chapterList, viewId
-        );
 
-        recyclerView.setAdapter(menuAdapter);
-        dialog.setContentView(view);
-        dialog.show();
+        startActivity(intent);
+
+
+
+
     }
 
     // Làm trong suốt thanh trạng thái

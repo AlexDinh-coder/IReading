@@ -122,6 +122,11 @@
             android:exported="true" >
 
         </activity>
+        <activity
+            android:name=".Book.ChapterActivity"
+            android:exported="true" >
+
+        </activity>
 
         <activity
             android:name=".Account.RegisterActivity"

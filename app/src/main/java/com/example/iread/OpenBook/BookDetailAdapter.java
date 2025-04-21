@@ -112,7 +112,6 @@ public class BookDetailAdapter extends RecyclerView.Adapter<BookDetailAdapter.It
     public class ItemHolder extends RecyclerView.ViewHolder{
         private ImageView imgBook;
         private TextView txtNameBook ;
-
         CheckBox checkBox;
         public ItemHolder(@NonNull View itemView) {
             super(itemView);
