@@ -80,20 +80,6 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
-//        edtSearch.setOnEditorActionListener((v, actionId, even) -> {
-//            String keyword = edtSearch.getText().toString().trim();
-//            if (!keyword.isEmpty()) {
-//                searchBook(keyword);
-//            }
-//            return true;
-//        });
-//        btnSearch = findViewById(R.id.btnSearch);
-//        btnSearch.setOnClickListener(v -> {
-//            String keyword = edtSearch.getText().toString().trim();
-//            if (!keyword.isEmpty()) {
-//                searchBook(keyword);
-//            }
-//        });
 
         // Gắn adapter
         bookAdapter = new BookAdapter(bookList, this);
@@ -117,6 +103,7 @@ public class SearchActivity extends AppCompatActivity {
                             book.setSummary(search.getSummary());
                             book.setBookType(search.getBookType());
                             book.setStatus(search.getStatus());
+                            book.setPrice(search.getPrice());
                             book.setAgeLimitType(search.getAgeLimitType());
                             book.setCreateDate(search.getCreateDate());
                             book.setModifyDate(search.getModifyDate());

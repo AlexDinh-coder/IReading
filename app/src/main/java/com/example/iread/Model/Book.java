@@ -13,6 +13,7 @@ public class Book {
     private String summary;
     private String poster;
     private int bookType;
+    //0: done , 4:da xuat ban
     private int status;
     private int ageLimitType;
     private String createDate;
@@ -22,6 +23,8 @@ public class Book {
     private String userId;
 
     private String subCategory;
+
+    private int price;
 
     private List<Category> listCategories = new ArrayList<>();
 
@@ -128,6 +131,14 @@ public class Book {
 
     public boolean isNewPublishedChapter() {
         return isNewPublishedChapter;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
     }
 
     public void setNewPublishedChapter(boolean newPublishedChapter) {

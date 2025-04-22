@@ -215,12 +215,12 @@ public class ActivityBook extends AppCompatActivity {
 
         RecyclerView recyclerView = view.findViewById(R.id.recyclerChapters);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
+        int bookId = chapterList.isEmpty() ? -1 : chapterList.get(0).getBookId();
         ChapterAdapter menuAdapter = new ChapterAdapter(
                 position -> {
                     viewPagerBook.setCurrentItem(position);
                     dialog.dismiss();
-                }, this, chapterList, viewId
+                }, this, chapterList, viewId,bookId
         );
 
         recyclerView.setAdapter(menuAdapter);

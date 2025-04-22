@@ -24,6 +24,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
+                android:id="@+id/btnDown"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center_vertical"
@@ -348,5 +349,12 @@
         </LinearLayout>
 
     </LinearLayout>
+    <FrameLayout
+        android:id="@+id/miniAudioContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone"/>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

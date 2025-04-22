@@ -41,6 +41,15 @@ public class BookByCategoryAdapter extends RecyclerView.Adapter<BookByCategoryAd
     public void onBindViewHolder(@NonNull ItemHolder holder, int position) {
         Book item = dataBook.get(position);
         holder.txtNameBook.setText(item.getName() +"");
+
+        int price = item.getPrice();
+        if (price > 0) {
+            holder.txtPrice.setText(String.valueOf(item.getPrice()));
+            holder.txtPrice.setVisibility(View.VISIBLE);
+        }else {
+            holder.txtPrice.setVisibility(View.GONE);
+        }
+
         Glide.with(holder.imgBook.getContext())
                 .load(dataBook.get(position).getPoster())
                 .placeholder(R.drawable.loading_placeholder)
@@ -60,12 +69,13 @@ public class BookByCategoryAdapter extends RecyclerView.Adapter<BookByCategoryAd
 
     public class ItemHolder extends RecyclerView.ViewHolder {
         private ImageView imgBook;
-        private TextView txtNameBook;
+        private TextView txtNameBook, txtPrice;
 
         public ItemHolder(@NonNull View itemView) {
             super(itemView);
             imgBook = itemView.findViewById(R.id.image_characters_in_detail);
             txtNameBook = itemView.findViewById(R.id.book_title_in_detail);
+            txtPrice = itemView.findViewById(R.id.txt_price_overlay);
 
         }
     }

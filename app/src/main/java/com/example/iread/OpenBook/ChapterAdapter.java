@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,19 +46,26 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
 
     private Integer viewId = 0;
 
+    private boolean isBookPurchased;
+
     private String username, userId;
+
+    private int bookId;
     //private List<BookChapter> chapterList;
 
 
-    public ChapterAdapter(OnChapterClickListener onChapterClickListener, Context context, List<BookChapter> chapterList, int viewId) {
+    public ChapterAdapter(OnChapterClickListener onChapterClickListener, Context context, List<BookChapter> chapterList, int viewId, int bookId) {
         this.onChapterClickListener = onChapterClickListener;
         this.context = context;
         this.chapterList = chapterList;
         this.viewId = viewId;
+        this.bookId = bookId;
 
         SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", MODE_PRIVATE);
         username = sharedPreferences.getString("username", "");
         userId = sharedPreferences.getString("userId", "");
+        //bookId = chapterList.isEmpty() ? -1 : chapterList.get(0).getBookId();
+        isBookPurchased = sharedPreferences.getBoolean("isPurchase_" + bookId, false);
     }
 
 
@@ -88,10 +96,13 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
             holder.chapterLabel.setVisibility(View.GONE);
         }
 
-
-
         holder.itemView.setOnClickListener(v -> {
             if (bookChapter == null) return;
+
+            if (!isBookPurchased) {
+                Toast.makeText(context, "Bạn cần mua sách trước khi đọc chương!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             if (viewId == 1) {
                 // Sách nghe → mở AudioActivity

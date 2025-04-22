@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide;
 import com.example.iread.Model.Book;
 import com.example.iread.OpenBook.OpenBookActivity;
 import com.example.iread.R;
+import com.example.iread.helper.Utils;
 
 import java.util.List;
 
@@ -42,6 +43,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ItemHolder>{
         Book book = dataBook.get(position);
         holder.txtNameBook.setText(dataBook.get(position).getName());
         Log.d("BookAdapter", "Bind book: " + book.getName());
+        int price = book.getPrice();
+        if (price > 0) {
+            holder.txtPrice.setText(String.valueOf(book.getPrice()));
+            holder.txtPrice.setVisibility(View.VISIBLE);
+        }else {
+            holder.txtPrice.setVisibility(View.GONE);
+        }
+
         Glide.with(holder.imgBook.getContext())
                 .load(dataBook.get(position).getPoster())
                 .placeholder(R.drawable.loading_placeholder)
@@ -61,11 +70,15 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ItemHolder>{
 
     public class ItemHolder extends RecyclerView.ViewHolder{
         private ImageView imgBook;
+        private TextView txtPrice;
         private TextView txtNameBook;
         public ItemHolder(@NonNull View itemView) {
             super(itemView);
             imgBook = itemView.findViewById(R.id.image_characters);
             txtNameBook = itemView.findViewById(R.id.book_title);
+            txtPrice = itemView.findViewById(R.id.txtBookPrice);
         }
     }
+
+
 }

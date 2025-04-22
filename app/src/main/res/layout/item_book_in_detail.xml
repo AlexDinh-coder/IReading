@@ -31,6 +31,20 @@
                 android:scaleType="centerCrop"
                 android:adjustViewBounds="true"
                 android:src="@drawable/ngontinh1" />
+            <!-- Thêm giá tiền tại đây -->
+            <TextView
+                android:id="@+id/txt_price_overlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="6dp"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="3dp"
+                android:background="@drawable/bg_price_tag"
+                android:text="129.000₫"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:visibility="gone" />
 
             <!-- CheckBox góc trên cùng bên phải -->
             <CheckBox
@@ -49,7 +63,7 @@
     <TextView
         android:id="@+id/book_title_in_detail"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="match_parent"
         android:text="Lịch sử Việt – Góc khuất chưa từng kể"
         android:textColor="@android:color/white"
         android:textSize="15sp"

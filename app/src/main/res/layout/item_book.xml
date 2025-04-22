@@ -14,13 +14,39 @@
         card_view:cardElevation="4dp"
         card_view:cardUseCompatPadding="true">
 
-        <ImageView
-            android:id="@+id/image_characters"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:adjustViewBounds="true" />
+            android:layout_height="match_parent">
+
+            <!-- Ảnh bìa -->
+            <ImageView
+                android:id="@+id/image_characters"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="true" />
+
+            <!-- Giá tiền -->
+            <TextView
+                android:id="@+id/txtBookPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="6dp"
+                android:background="@drawable/bg_price_tag"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="129.000₫"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:visibility="gone"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </FrameLayout>
     </androidx.cardview.widget.CardView>
+
 
     <!-- Tên sách nằm ngoài CardView -->
     <TextView

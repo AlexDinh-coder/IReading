@@ -102,6 +102,7 @@ public class ChapterFragment extends Fragment {
     }
 
     private void filterAndShowChapters(List<BookChapter> allChapters) {
+        if (!isAdded()) return;
         Log.d("CHAPTER_CHECK", "bookTypeStatus = " + bookTypeStatus);
         chapterList.clear();
 
@@ -146,7 +147,7 @@ public class ChapterFragment extends Fragment {
             intent.putExtra("chapterList", new ArrayList<>(chapterList));
             intent.putExtra("bookTypeStatus", bookTypeStatus); // truyền để phân biệt khi mở chương
             startActivity(intent);
-        }, getContext(), chapterList, bookTypeStatus);
+        }, requireContext(), chapterList, bookTypeStatus, bookId);
         recyclerView.setAdapter(chapterAdapter);
     }
 }

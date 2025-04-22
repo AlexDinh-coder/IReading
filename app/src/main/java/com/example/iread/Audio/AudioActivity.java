@@ -10,8 +10,10 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,6 +40,7 @@ import retrofit2.Response;
 
 import com.bumptech.glide.Glide;
 import com.example.iread.Comment.ReviewAdapter;
+import com.example.iread.MainActivity;
 import com.example.iread.Model.Book;
 import com.example.iread.Model.BookChapter;
 import com.example.iread.Model.SummaryTime;
@@ -78,7 +81,9 @@ public class AudioActivity extends AppCompatActivity {
 
     private int bookId;
 
-    ImageView imgPoster, btnHome;
+    ImageView imgPoster, btnHome, btnDown, btnPlay, btnHomePage;
+
+    private FrameLayout miniAudioContainer;
 
 
     @SuppressLint("MissingInflatedId")
@@ -131,6 +136,21 @@ public class AudioActivity extends AppCompatActivity {
             Intent intent = new Intent(AudioActivity.this, OpenBookActivity.class);
             intent.putExtra("bookId", bookId); // Truyền bookId sang
             startActivity(intent);
+        });
+        btnHomePage = findViewById(R.id.imageView8);
+        btnHomePage.setOnClickListener(v -> {
+            Intent intent = new Intent(AudioActivity.this, MainActivity.class);
+            startActivity(intent);
+        });
+        miniAudioContainer = findViewById(R.id.miniAudioContainer);
+        btnDown = findViewById(R.id.btnDown);
+        btnDown.setOnClickListener(v -> {
+            showMiniAudio();
+            //Intent resultIntent = new Intent();
+//            resultIntent.putExtra("audio_title", chapterTitle); // tên chương audio
+//            resultIntent.putExtra("audio_image", currentPosterUrl); // URL ảnh bìa
+           // setResult(RESULT_OK, resultIntent);
+            //finish(); // quay lại màn trước
         });
 
         txtContentDisplay = findViewById(R.id.txtAudioTitle);
@@ -230,6 +250,45 @@ public class AudioActivity extends AppCompatActivity {
         });
 
     }
+
+    private void showMiniAudio() {
+        if (miniAudioContainer.getChildCount() == 0) {
+            View miniAudioView = LayoutInflater.from(this).inflate(R.layout.item_audio_track, miniAudioContainer, false);
+
+            TextView title = miniAudioView.findViewById(R.id.txtMiniTitle);
+            ImageView poster = miniAudioView.findViewById(R.id.imgMiniPoster);
+            ImageView btnMiniPlay = miniAudioView.findViewById(R.id.btnMiniPlay);
+
+            // Hiển thị tiêu đề chương hiện tại
+            if (chapterList != null && chapterList.size() > currentChapterIndex) {
+                title.setText(chapterList.get(currentChapterIndex).getChapterName());
+                title.setSelected(true);
+                title.requestFocus(); // thêm dòng này sau setSelected
+
+            } else {
+                title.setText("Đang phát chương");
+            }
+
+            // Lấy ảnh poster đang hiển thị
+            poster.setImageDrawable(imgPoster.getDrawable());
+
+            // Xử lý play/pause
+            btnMiniPlay.setOnClickListener(v -> {
+                if (exoPlayer.isPlaying()) {
+                    exoPlayer.pause();
+                    btnMiniPlay.setImageResource(R.drawable.ic_play);
+                } else {
+                    exoPlayer.play();
+                    btnMiniPlay.setImageResource(R.drawable.ic_pause_circle);
+                }
+            });
+
+            miniAudioContainer.addView(miniAudioView);
+        }
+
+        miniAudioContainer.setVisibility(View.VISIBLE);
+    }
+
 
     private void getBookPoster(int bookId) {
         iAppApiCaller.getBookById(bookId).enqueue(new Callback<ReponderModel<Book>>() {

@@ -1,5 +1,6 @@
 package com.example.iread.OpenBook;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -8,6 +9,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.iread.Audio.BaseActivity;
 import com.example.iread.Book.ActivityBook;
 import com.example.iread.Comment.ReviewActivity;
 import com.example.iread.CommentActivity;
@@ -33,6 +36,7 @@ import com.example.iread.Model.Book;
 import com.example.iread.Model.BookChapter;
 import com.example.iread.Model.Category;
 import com.example.iread.Model.CommentModel;
+import com.example.iread.Model.UserTranscationBook;
 import com.example.iread.R;
 import com.example.iread.SubscriptionActivity;
 import com.example.iread.apicaller.IAppApiCaller;
@@ -79,6 +83,8 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     private int bookId;
 
     private String username;
+
+    private boolean isPurchase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,9 +149,12 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                 openFirstChapter(); // gọi API lấy chương đầu tiên
             }
         });
+
         btnBookRead.setOnClickListener(v -> applyBookReadMode());
         btnBookListen.setOnClickListener(v -> applyBookListenMode());
     }
+
+
 
     private void toggleFavoriteBook(int bookId, String username) {
         apiCaller.addOrRemoveFavoriteBook(bookId, username).enqueue(new Callback<ReponderModel<String>>() {
@@ -454,6 +463,39 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                 .error(R.drawable.error_image)
                 .into(imagePoster);
 
+        TextView txtPriceOnPoster = findViewById(R.id.txtPriceOnPoster);
+        if (book.getPrice() > 0) {
+            txtPriceOnPoster.setText(String.valueOf(book.getPrice()));
+            txtPriceOnPoster.setVisibility(View.VISIBLE);
+        } else {
+            txtPriceOnPoster.setVisibility(View.GONE);
+        }
+
+        if (book.getPrice() > 0) {
+            SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+            username = preferences.getString("username", "");
+            boolean purchased = preferences.getBoolean("isPurchase_" + book.getId(), false);
+
+            if (purchased) {
+                isPurchase = true;
+                //Đã mua -> đọc sách
+                btnActionBook.setText("ĐỌC SÁCH");
+                btnActionBook.setOnClickListener(v -> openFirstChapter());
+                btnRead.setVisibility(View.VISIBLE);
+            } else {
+                btnActionBook.setText("MUA SÁCH");
+                btnActionBook.setText("MUA SÁCH");
+                btnActionBook.setOnClickListener(v -> {
+                    showPaymentDialog(book.getName(), book.getPrice()); // hiển thị overlay thanh toán
+                });
+                btnRead.setVisibility(View.GONE);
+            }
+        } else {
+            btnActionBook.setText("ĐỌC SÁCH");
+            btnActionBook.setOnClickListener(v -> openFirstChapter());
+            btnRead.setVisibility(View.VISIBLE);
+        }
+
         //Xử lí phần hiển thị tên sách
         TextView tvName = findViewById(R.id.book_title_in_detail);
         if (tvName != null) {
@@ -462,6 +504,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             tvName.setTextColor(Color.WHITE);
             tvName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         }
+
 
         TextView authorName = findViewById(R.id.author_name);
         if (authorName != null) {
@@ -496,6 +539,69 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         setupBookSummary(book);
         setupBookCategories(book);
     }
+
+    private void showPaymentDialog(String bookTitle, int price) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_payment, null);
+        builder.setView(view);
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.show();
+
+        TextView tvTitle = view.findViewById(R.id.tvPaymentTitle);
+        TextView tvContent = view.findViewById(R.id.tvPaymentContent);
+        TextView tvPrice = view.findViewById(R.id.tvPaymentPrice);
+        Button btnCancel = view.findViewById(R.id.btnCancel);
+        Button btnConfirm = view.findViewById(R.id.btnConfirm);
+
+        tvTitle.setText("THANH TOÁN");
+        tvContent.setText("Bạn đang mua: " + bookTitle + " qua kênh thanh toán App.");
+        tvPrice.setText("Đơn giá: " + price + " xu");
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnConfirm.setOnClickListener(v -> {
+            SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+            String username = preferences.getString("username", "");
+            String userId = preferences.getString("userId", "");
+
+            SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
+            editor.putBoolean("isPurchase_" + bookId, true); // lưu theo bookId
+            editor.apply();
+
+
+            UserTranscationBook payment = new UserTranscationBook();
+            payment.setUsername(username);
+            payment.setUserId(userId);
+            payment.setBookId(bookId);
+            payment.setAmount(price);
+
+            Log.d("PAYMENT_DATA", "UserId: " + userId + ", BookId: " + bookId + ", Price: " + price);
+
+            apiCaller.postPaymentItem(payment).enqueue(new Callback<ReponderModel<String>>() {
+                @Override
+                public void onResponse(Call<ReponderModel<String>> call, Response<ReponderModel<String>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSussess()) {
+                        Toast.makeText(OpenBookActivity.this, "Thanh toán thành công!", Toast.LENGTH_SHORT).show();
+                        isPurchase = true;
+                        btnActionBook.setText("ĐỌC SÁCH");
+                        btnActionBook.setOnClickListener(vv -> openFirstChapter());
+                        btnRead.setVisibility(View.VISIBLE);
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(OpenBookActivity.this, "Thanh toán thất bại!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ReponderModel<String>> call, Throwable t) {
+                    Toast.makeText(OpenBookActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+    }
+
+
     //Hàm này hiện thị phần xem thêm hoặc thu gọn ở phần giới thiệu sách
     private void setupBookSummary(Book book) {
         TextView tvSummary = findViewById(R.id.descriptionTextView);
@@ -601,7 +707,13 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     @Override
     protected void onResume() {
         super.onResume();
-        if (bookId != -1) getBookTotalReview(bookId);
+        if (bookId != -1) {
+            // Load lại trạng thái mua
+            SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+            isPurchase = preferences.getBoolean("isPurchase_" + bookId, false);
+            getBookTotalReview(bookId);
+            loadBookDetails();
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.example.iread.MenuBarInHome;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,15 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         Book book = bookList.get(position);
         holder.tvBookTitle.setText(book.getName());
         holder.tvBookInfo.setText(book.getCreateBy());
+        int price = book.getPrice();
+        if (price > 0) {
+            holder.txtPrice.setText(String.valueOf(book.getPrice()));
+            holder.txtPrice.setVisibility(View.VISIBLE);
+        }else {
+            holder.txtPrice.setVisibility(View.GONE);
+        }
+        Log.d("BookPrice", "Book: " + book.getName() + ", Price: " + book.getPrice());
+
         Glide.with(holder.imgBookCover.getContext())
                 .load(bookList.get(position).getPoster())
                 .placeholder(R.drawable.loading_placeholder)
@@ -62,13 +72,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
     public static class BookViewHolder extends RecyclerView.ViewHolder {
         ImageView imgBookCover;
-        TextView tvBookTitle, tvBookInfo;
+        TextView tvBookTitle, tvBookInfo, txtPrice;
 
         public BookViewHolder(@NonNull View itemView) {
             super(itemView);
             imgBookCover = itemView.findViewById(R.id.imgBookCover);
             tvBookTitle = itemView.findViewById(R.id.tvBookTitle);
             tvBookInfo = itemView.findViewById(R.id.tvBookInfo);
+            txtPrice = itemView.findViewById(R.id.tvPrice);
         }
     }
 }

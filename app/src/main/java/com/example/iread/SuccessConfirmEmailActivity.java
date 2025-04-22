@@ -23,11 +23,11 @@ public class SuccessConfirmEmailActivity extends AppCompatActivity {
         makeStatusBarTransparent();
         applyTopPadding();
 
-//        new Handler().postDelayed(() -> {
-//            Intent intent = new Intent(SuccessConfirmEmailActivity.this, LoginActivity.class);
-//            startActivity(intent);
-//            finish();
-//        }, 5000);
+        new Handler().postDelayed(() -> {
+            Intent intent = new Intent(SuccessConfirmEmailActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }, 2000);
     }
     private void makeStatusBarTransparent() {
         Window window = getWindow();

@@ -14,8 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.iread.Account.LoginActivity;
 
 public class WaitingConfirmEmailActivity extends AppCompatActivity {
-    private Button btnLoginOpen;
-    private TextView btnClose;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
