@@ -93,4 +93,8 @@ dependencies {
     implementation("androidx.media3:media3-ui:1.2.1")
     implementation("androidx.media3:media3-datasource-okhttp:1.2.1")
 
+    //MPAndroidChart
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+
 }

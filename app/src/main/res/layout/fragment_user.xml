@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#000000"
     >
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="16dp"
@@ -186,6 +186,7 @@
                                 android:textSize="14sp" />
 
                             <TextView
+                                android:id="@+id/viewReadMinute"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="4dp"
@@ -211,6 +212,7 @@
                                 android:textSize="14sp" />
 
                             <TextView
+                                android:id="@+id/viewListenMinute"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="4dp"
@@ -221,15 +223,15 @@
                         </LinearLayout>
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:background="@drawable/bg_button_read_goal"
-                        android:padding="12dp"
-                        android:text="📖 THIẾT LẬP MỤC TIÊU ĐỌC SÁCH"
-                        android:textAllCaps="false"
-                        android:textColor="#00FFAA" />
+<!--                    <androidx.appcompat.widget.AppCompatButton-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginTop="12dp"-->
+<!--                        android:background="@drawable/bg_button_read_goal"-->
+<!--                        android:padding="12dp"-->
+<!--                        android:text="📖 THIẾT LẬP MỤC TIÊU ĐỌC SÁCH"-->
+<!--                        android:textAllCaps="false"-->
+<!--                        android:textColor="#00FFAA" />-->
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
             <LinearLayout
@@ -241,37 +243,30 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:text="Bản đồ Waka"
+                    android:text="Bản đồ Ireading"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:layout_weight="1"
                     android:textStyle="bold" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Bảng xếp hạng"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:layout_gravity="bottom"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:background="@drawable/bg_label_rounded" />
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Bảng xếp hạng"-->
+<!--                    android:textColor="#FFFFFF"-->
+<!--                    android:textSize="16sp"-->
+<!--                    android:layout_gravity="bottom"-->
+<!--                    android:paddingStart="12dp"-->
+<!--                    android:paddingEnd="12dp"-->
+<!--                    android:paddingTop="4dp"-->
+<!--                    android:paddingBottom="4dp"-->
+<!--                    android:background="@drawable/bg_label_rounded" />-->
             </LinearLayout>
 
 
-            <!--            <com.github.mikephil.charting.charts.LineChart-->
-            <!--                android:id="@+id/lineChart"-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="200dp"-->
-            <!--                android:layout_margin="16dp"-->
-            <!--                android:background="#1C1C1C"-->
-            <!--                tools:ignore="MissingClass" />-->
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/barChart"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
+                android:layout_height="300dp"
                 android:layout_margin="16dp"
                 android:background="@drawable/bg_card_dark"
                 tools:ignore="MissingClass" />
@@ -288,28 +283,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="6dp"
-                    android:text="Vua Một"
                     android:textColor="#00FF00" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="6dp"
-                    android:text="Một Thông Thái"
                     android:textColor="#FFFF00" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="6dp"
-                    android:text="Một Sách"
                     android:textColor="#FFA500" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="6dp"
-                    android:text="..."
                     android:textColor="#FF3300" />
 
             </LinearLayout>
@@ -330,12 +321,6 @@
                     android:gravity="center_vertical"
                     android:paddingHorizontal="12dp">
 
-                    <!--                    <ImageView-->
-                    <!--                        android:layout_width="24dp"-->
-                    <!--                        android:layout_height="24dp"-->
-                    <!--                        android:src="@drawable/ic_history"-->
-                    <!--                        android:tint="#00FFAA" />-->
-
                     <TextView
                         android:id="@+id/HistoryTransaction"
                         android:layout_width="0dp"
@@ -346,11 +331,6 @@
                         android:textColor="#FFFFFF"
                         android:textSize="16sp" />
 
-                    <!--                    <ImageView-->
-                    <!--                        android:layout_width="16dp"-->
-                    <!--                        android:layout_height="16dp"-->
-                    <!--                        android:src="@drawable/ic_arrow_right"-->
-                    <!--                        android:tint="#888888" />-->
                 </LinearLayout>
 
                 <View android:layout_width="match_parent"
@@ -363,11 +343,6 @@
                     android:orientation="horizontal"
                     android:paddingHorizontal="12dp">
 
-                    <!--                    <ImageView-->
-                    <!--                        android:layout_width="24dp"-->
-                    <!--                        android:layout_height="24dp"-->
-                    <!--                        android:src="@drawable/ic_notification"-->
-                    <!--                        android:tint="#00FFAA" />-->
 
                     <TextView
                         android:layout_width="0dp"
@@ -378,11 +353,6 @@
                         android:textColor="#FFFFFF"
                         android:textSize="16sp" />
 
-                    <!--                    <ImageView-->
-                    <!--                        android:layout_width="16dp"-->
-                    <!--                        android:layout_height="16dp"-->
-                    <!--                        android:src="@drawable/ic_arrow_right"-->
-                    <!--                        android:tint="#888888" />-->
                 </LinearLayout>
 
                 <View android:layout_width="match_parent"
@@ -395,11 +365,6 @@
                     android:orientation="horizontal"
                     android:paddingHorizontal="12dp">
 
-                    <!--                    <ImageView-->
-                    <!--                        android:layout_width="24dp"-->
-                    <!--                        android:layout_height="24dp"-->
-                    <!--                        android:src="@drawable/ic_notification"-->
-                    <!--                        android:tint="#00FFAA" />-->
 
                     <TextView
                         android:layout_width="0dp"
@@ -410,11 +375,6 @@
                         android:textColor="#FFFFFF"
                         android:textSize="16sp" />
 
-                    <!--                    <ImageView-->
-                    <!--                        android:layout_width="16dp"-->
-                    <!--                        android:layout_height="16dp"-->
-                    <!--                        android:src="@drawable/ic_arrow_right"-->
-                    <!--                        android:tint="#888888" />-->
                 </LinearLayout>
 
                 <View android:layout_width="match_parent"
@@ -427,11 +387,6 @@
                     android:orientation="horizontal"
                     android:paddingHorizontal="12dp">
 
-                    <!--                    <ImageView-->
-                    <!--                        android:layout_width="24dp"-->
-                    <!--                        android:layout_height="24dp"-->
-                    <!--                        android:src="@drawable/ic_notification"-->
-                    <!--                        android:tint="#00FFAA" />-->
 
                     <TextView
                         android:id="@+id/btnPayment"
@@ -443,11 +398,6 @@
                         android:textColor="#FFFFFF"
                         android:textSize="16sp" />
 
-                    <!--                    <ImageView-->
-                    <!--                        android:layout_width="16dp"-->
-                    <!--                        android:layout_height="16dp"-->
-                    <!--                        android:src="@drawable/ic_arrow_right"-->
-                    <!--                        android:tint="#888888" />-->
                 </LinearLayout>
 
                 <View android:layout_width="match_parent"
@@ -460,11 +410,6 @@
                     android:orientation="horizontal"
                     android:paddingHorizontal="12dp">
 
-                    <!--                    <ImageView-->
-                    <!--                        android:layout_width="24dp"-->
-                    <!--                        android:layout_height="24dp"-->
-                    <!--                        android:src="@drawable/ic_notification"-->
-                    <!--                        android:tint="#00FFAA" />-->
 
                     <TextView
                         android:layout_width="0dp"
@@ -475,11 +420,6 @@
                         android:textColor="#FFFFFF"
                         android:textSize="16sp" />
 
-                    <!--                    <ImageView-->
-                    <!--                        android:layout_width="16dp"-->
-                    <!--                        android:layout_height="16dp"-->
-                    <!--                        android:src="@drawable/ic_arrow_right"-->
-                    <!--                        android:tint="#888888" />-->
                 </LinearLayout>
 
                 <View android:layout_width="match_parent"
@@ -505,6 +445,6 @@
                     />
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

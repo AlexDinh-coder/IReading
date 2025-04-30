@@ -87,7 +87,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Thanh toán qua Paypal, Visa, Master Card"
+            android:text="Thanh toán qua QR code"
             android:textColor="#000000"
             android:textStyle="bold" />
     </LinearLayout>

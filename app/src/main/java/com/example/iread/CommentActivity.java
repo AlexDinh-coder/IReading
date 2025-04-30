@@ -102,13 +102,20 @@ public class CommentActivity extends AppCompatActivity {
         //Xu li phan send
         btnSend.setOnClickListener(v -> {
             String content = editText.getText().toString().trim();
-            if (content.isEmpty()){
+            if (content.isEmpty()) {
                 Toast.makeText(this, "Hãy cho chúng mình một vài nhận xét & đóng góp ý kiến nhé !", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+            boolean hasAccess = prefs.getBoolean("hasAccess_" + bookId, false);
 
+            if (!hasAccess) {
+                Toast.makeText(this, "Bạn cần đọc hoặc nghe sách trước khi đánh giá!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+            // Nếu đã đọc/nghe => cho phép gửi đánh giá
             CommentModel commentModel = new CommentModel();
             commentModel.setBookId(bookId);
             commentModel.setContent(content);
@@ -121,6 +128,7 @@ public class CommentActivity extends AppCompatActivity {
 
             postComment(commentModel);
         });
+
     }
 
     private void updateStarUI(int rating) {

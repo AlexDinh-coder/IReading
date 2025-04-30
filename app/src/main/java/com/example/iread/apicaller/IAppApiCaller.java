@@ -13,6 +13,7 @@ import com.example.iread.Model.CommentModel;
 import com.example.iread.Model.NoteUser;
 import com.example.iread.Model.PaymentRequestModel;
 import com.example.iread.Model.UserBook;
+import com.example.iread.Model.UserMinuteModel;
 import com.example.iread.Model.UserProfile;
 import com.example.iread.Model.UserTranscationBook;
 import com.example.iread.Model.UserTranscationBookModel;
@@ -173,5 +174,32 @@ public interface IAppApiCaller {
     Call<ReponderModel<String>> postPaymentItem(
             @Body UserTranscationBook userTranscationBook
     );
+
+
+    @GET("Payment/CheckEnoughCoins")
+    Call<ReponderModel<Integer>> checkEnoughCoins(
+            @Query("userName") String userName,
+            @Query("amount") int amount
+    );
+
+    @GET("Book/GetListMinuteViewByUser")
+    Call<ReponderModel<UserMinuteModel>> getUserMinute(
+            @Query("userName") String username
+    );
+
+    @GET("Book/CheckReadingEnough")
+    Call<ReponderModel<String>> checkReadingEnough(
+            @Query("userName") String username,
+            @Query("bookId") int bookId
+
+    );
+
+    @GET("Book/GetListBookChapterByUserName")
+    Call<ReponderModel<BookChapter>> getListBookChapterByUsername(
+            @Query("userName") String username,
+            @Query("bookId") int bookId
+
+    );
+
 
 }

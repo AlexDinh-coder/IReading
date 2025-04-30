@@ -1,6 +1,8 @@
 package com.example.iread.OpenBook;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,8 +14,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.iread.Audio.AudioActivity;
 import com.example.iread.Book.ActivityBook;
 import com.example.iread.Model.BookChapter;
+import com.example.iread.Model.UserProfile;
+import com.example.iread.Model.UserTranscationBookModel;
 import com.example.iread.R;
 import com.example.iread.apicaller.IAppApiCaller;
 import com.example.iread.apicaller.RetrofitClient;
@@ -30,17 +35,21 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ChapterFragment extends Fragment {
-
     private RecyclerView recyclerView;
     private ChapterAdapter chapterAdapter;
     private TextView totalChapters, sortOrderView;
-
     private boolean isAscending = true;
     private List<BookChapter> chapterList = new ArrayList<>();
-
     private IAppApiCaller iAppApiCaller;
     private int bookTypeStatus = 0; // 0 - đọc, 1 - nghe
     private int bookId = -1;
+    private String bookTitle ="";
+
+    private List<String> unlockedChapterIds = new ArrayList<>();
+    private long userCoin;
+
+    private int bookPrice;
+    private boolean isBookPurchased = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,7 +58,13 @@ public class ChapterFragment extends Fragment {
         initArguments();
         initViews(view);
         initApi();
-        fetchChapters();
+       // checkBookPurchasedFromServer(this::fetchChapters);
+        checkBookPurchasedFromServer(() -> {
+            Log.d("CheckPurchased", "Đã kiểm tra xong, giá trị isBookPurchased = " + isBookPurchased);
+            fetchChapters();
+        });
+
+
 
         return view;
     }
@@ -59,6 +74,8 @@ public class ChapterFragment extends Fragment {
         if (args != null) {
             bookId = args.getInt("bookId", -1);
             bookTypeStatus = args.getInt("bookTypeStatus", 0);
+            bookTitle = args.getString("bookTitle", "");
+            bookPrice = args.getInt("bookPrice",0);
         }
     }
 
@@ -77,9 +94,11 @@ public class ChapterFragment extends Fragment {
     }
 
     private void fetchChapters() {
+        SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String username = prefs.getString("username", "");
         if (bookId == -1) return;
 
-        iAppApiCaller.getListByBookId(bookId).enqueue(new Callback<ReponderModel<BookChapter>>() {
+        iAppApiCaller.getListBookChapterByUsername(username,bookId).enqueue(new Callback<ReponderModel<BookChapter>>() {
             @Override
             public void onResponse(Call<ReponderModel<BookChapter>> call, Response<ReponderModel<BookChapter>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -103,32 +122,27 @@ public class ChapterFragment extends Fragment {
 
     private void filterAndShowChapters(List<BookChapter> allChapters) {
         if (!isAdded()) return;
-        Log.d("CHAPTER_CHECK", "bookTypeStatus = " + bookTypeStatus);
+
         chapterList.clear();
-
-        for (BookChapter chapter : allChapters) {
-            Log.d("CHAPTER_CHECK", "Chapter: " + chapter.getChapterName() + ", BookType = " + chapter.getBookType());
-
-            // Chỉ lấy chương đã duyệt (type = 1) và thuộc loại FREE hoặc PAID
-            if ((chapter.getBookType() == 0 || chapter.getBookType() == 1)) {
-                chapterList.add(chapter);
+        if (bookTypeStatus ==1){
+            for(BookChapter chapter: allChapters){
+                if(chapter.getAudioUrl() != null && chapter.getAudioUrl().equals("Audio")) {
+                    chapterList.add(chapter);
+                }
             }
-
         }
-
+        else chapterList = allChapters;
         sortChapterList();
         totalChapters.setText(chapterList.size() + " chương");
         setupRecyclerView();
     }
 
-
-
     private void sortChapterList() {
         if (isAscending) {
-            Collections.sort(chapterList, Comparator.comparing(BookChapter::getChaperId));
+            Collections.sort(chapterList, Comparator.comparing(BookChapter::getChapterNumber));
             sortOrderView.setText("Cũ nhất");
         } else {
-            Collections.sort(chapterList, (c1, c2) -> c2.getChaperId() - c1.getChaperId());
+            Collections.sort(chapterList, (c1, c2) -> c2.getChapterNumber() - c1.getChapterNumber());
             sortOrderView.setText("Mới nhất");
         }
     }
@@ -142,12 +156,88 @@ public class ChapterFragment extends Fragment {
     private void setupRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         chapterAdapter = new ChapterAdapter(position -> {
-            Intent intent = new Intent(getContext(), ActivityBook.class);
-            intent.putExtra("selectedIndex", position);
-            intent.putExtra("chapterList", new ArrayList<>(chapterList));
-            intent.putExtra("bookTypeStatus", bookTypeStatus); // truyền để phân biệt khi mở chương
+            BookChapter selectedChapter = chapterList.get(position);
+
+            Intent intent;
+            if (bookTypeStatus == 1) {
+                // Sách nói → mở AudioActivity
+                intent = new Intent(getContext(), AudioActivity.class);
+                intent.putExtra("chapterId", selectedChapter.getId());
+                intent.putExtra("chapterList", new ArrayList<>(chapterList));
+                intent.putExtra("bookId", bookId);
+            } else {
+                // Sách đọc → mở ActivityBook
+                ChapterDataHolder.getInstance().setChapterList(chapterList);
+                intent = new Intent(getContext(), ActivityBook.class);
+                intent.putExtra("selectedIndex", position);
+               // intent.putExtra("chapterList", new ArrayList<>(chapterList));
+                intent.putExtra("bookTypeStatus", bookTypeStatus);
+                intent.putExtra("bookId", bookId);
+                startActivity(intent);
+            }
+            SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            prefs.edit().putBoolean("hasAccess_" + bookId, true).apply();
+
             startActivity(intent);
-        }, requireContext(), chapterList, bookTypeStatus, bookId);
+        }, requireContext(), chapterList, bookTypeStatus, bookId, bookTypeStatus,unlockedChapterIds,userCoin, isBookPurchased,bookPrice);
+
         recyclerView.setAdapter(chapterAdapter);
     }
+
+
+    private void checkBookPurchasedFromServer(Runnable onDone) {
+        SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String username = prefs.getString("username", "");
+
+        iAppApiCaller.getListBookChapterByUsername(username, bookId).enqueue(new Callback<ReponderModel<BookChapter>>() {
+            @Override
+            public void onResponse(Call<ReponderModel<BookChapter>> call, Response<ReponderModel<BookChapter>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    unlockedChapterIds.clear();
+                }
+
+                iAppApiCaller.getHistoryPaymentItem(username).enqueue(new Callback<ReponderModel<UserTranscationBookModel>>() {
+                    @Override
+                    public void onResponse(Call<ReponderModel<UserTranscationBookModel>> call, Response<ReponderModel<UserTranscationBookModel>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            for (UserTranscationBookModel item : response.body().getDataList()) {
+                                String paymentName = item.getPaymentName().toLowerCase();
+                                if (paymentName.startsWith("mở khóa sách") && paymentName.contains(bookTitle.toLowerCase())) {
+                                    isBookPurchased = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        iAppApiCaller.getUserProfile(username).enqueue(new Callback<ReponderModel<UserProfile>>() {
+                            @Override
+                            public void onResponse(Call<ReponderModel<UserProfile>> call, Response<ReponderModel<UserProfile>> response) {
+                                if (response.isSuccessful() && response.body() != null) {
+                                    userCoin = response.body().getData().getClamPoint();
+                                    Log.d("USER_PROFILE", "Số xu nhận được: " + userCoin);
+                                }
+                                if (onDone != null) onDone.run();
+                            }
+
+                            @Override
+                            public void onFailure(Call<ReponderModel<UserProfile>> call, Throwable t) {
+                                if (onDone != null) onDone.run();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Call<ReponderModel<UserTranscationBookModel>> call, Throwable t) {
+                        if (onDone != null) onDone.run();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Call<ReponderModel<BookChapter>> call, Throwable t) {
+                if (onDone != null) onDone.run();
+            }
+        });
+    }
+
 }

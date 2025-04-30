@@ -362,7 +362,12 @@ public class HomeFragment extends Fragment {
 
 
     // Banner auto-scroll runnable
-    private final Runnable sliderRunnable = () -> viewPager2.setCurrentItem(viewPager2.getCurrentItem() + 1);
+    private final Runnable sliderRunnable = () -> {
+        if (viewPager2 != null && viewPager2.getAdapter() != null && viewPager2.getAdapter().getItemCount() > 0) {
+            viewPager2.setCurrentItem(viewPager2.getCurrentItem() + 1);
+        }
+    };
+
 
     @Override
     public void onPause() {

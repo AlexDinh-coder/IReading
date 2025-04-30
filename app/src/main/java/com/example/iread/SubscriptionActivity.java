@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -31,6 +32,8 @@ public class SubscriptionActivity extends AppCompatActivity {
     TextView txtPrice1, txtPrice2, txtPrice3, txtDescription1, txtDescription2, txtDescription3;
 
     RelativeLayout btnBuy1, btnBuy2, btnBuy3;
+
+    private ImageView btnBack;
     private IAppApiCaller iAppApiCaller;
     String username;
 
@@ -43,10 +46,13 @@ public class SubscriptionActivity extends AppCompatActivity {
         username = sharedPreferences.getString("username", "");
 
         tvNotice = findViewById(R.id.tvNotice);
-        tvNotice.setText("• Lưu ý: Thanh toán trực tiếp khi chưa Đăng nhập.\\n\"" +
-                "        \"Bạn sẽ chỉ được sử dụng gói Hội Viên trên thiết bị này. Nếu đã có tài khoản, vui lòng đăng nhập.\\n\\n\" +\n" +
-                "        \"• Các gói Hội viên đã bao gồm phí kênh thanh toán, chi tiết tại điều khoản sử dụng dịch vụ.\\n\\n\" +\n" +
-                "        \"• Thanh toán sẽ được tính cho QR theo tài khoản của bạn khi xác thực mua hàng.");
+        tvNotice.setText(
+                "• Lưu ý: Thanh toán trực tiếp khi chưa Đăng nhập.\n" +
+                        "Bạn sẽ chỉ được sử dụng gói Hội Viên trên thiết bị này. Nếu đã có tài khoản, vui lòng đăng nhập.\n\n" +
+                        "• Các gói Hội viên đã bao gồm phí kênh thanh toán, chi tiết tại điều khoản sử dụng dịch vụ.\n\n" +
+                        "• Thanh toán sẽ được tính cho QR theo tài khoản của bạn khi xác thực mua hàng."
+        );
+
 
         getMembershipPackage();
     }
@@ -65,6 +71,8 @@ public class SubscriptionActivity extends AppCompatActivity {
         btnBuy1 = findViewById(R.id.buy_12m);
         btnBuy2 = findViewById(R.id.buy_6m);
         btnBuy3 = findViewById(R.id.buy_3m);
+        btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
     }
 
     private void getMembershipPackage() {

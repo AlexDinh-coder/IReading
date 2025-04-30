@@ -2,6 +2,7 @@ package com.example.iread.Transaction;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -28,6 +29,7 @@ public class TransactionActivity extends AppCompatActivity {
     private RecyclerView rcvTransactions;
     private IAppApiCaller iAppApiCaller;
     private TransactionAdapter transactionAdapter;
+    private ImageView btnClose;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +37,8 @@ public class TransactionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_transaction);
         rcvTransactions = findViewById(R.id.rcvTransactions);
         rcvTransactions.setLayoutManager(new LinearLayoutManager(this));
+        btnClose = findViewById(R.id.btnClose);
+        btnClose.setOnClickListener(v -> finish());
         SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         String username = prefs.getString("username", "");
 

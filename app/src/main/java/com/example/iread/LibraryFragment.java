@@ -21,10 +21,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.iread.LibraryCateAdapter;
 import com.example.iread.Model.Book;
 import com.example.iread.Model.BookSearch;
 import com.example.iread.Model.UserBook;
+import com.example.iread.Model.UserProfile;
 import com.example.iread.OpenBook.BookDetailAdapter;
 import com.example.iread.apicaller.IAppApiCaller;
 import com.example.iread.apicaller.RetrofitClient;
@@ -50,7 +52,7 @@ public class LibraryFragment extends Fragment {
 
     private IAppApiCaller iAppApiCaller;
 
-    private ImageView btnDelete;
+    private ImageView btnDelete, imgAvatar;
 
     TextView tvUserName, tvFavorite, tvContinue, tvPurchased;
 
@@ -71,6 +73,38 @@ public class LibraryFragment extends Fragment {
         iAppApiCaller = RetrofitClient.getInstance(Utils.BASE_URL, requireContext()).create(IAppApiCaller.class);
 
         tvUserName = view.findViewById(R.id.tvUserName);
+        imgAvatar = view.findViewById(R.id.imgAvatarProfile);
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String username = sharedPreferences.getString("username", "");
+        iAppApiCaller.getUserProfile(username).enqueue(new Callback<ReponderModel<UserProfile>>() {
+            @Override
+            public void onResponse(Call<ReponderModel<UserProfile>> call, Response<ReponderModel<UserProfile>> response) {
+                if(response.isSuccessful() && response.body() != null && response.body().isSussess()) {
+                    UserProfile profile = response.body().getData();
+                    if(profile != null) {
+                        tvUserName.setText(profile.getFullName());
+
+                        if(profile.getAvatar() != null && !profile.getAvatar().isEmpty()) {
+                            Glide.with(LibraryFragment.this)
+                                    .load(profile.getAvatar())
+                                    .placeholder(R.drawable.error_image)
+                                    .into(imgAvatar);
+
+                        }
+                    }
+                } else {
+                    Log.e("UserProfile", "Error user");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ReponderModel<UserProfile>> call, Throwable t) {
+
+            }
+        });
+
+
+
         tvFavorite = view.findViewById(R.id.tvFavorite);
         tvContinue = view.findViewById(R.id.tvContinue);
         tvPurchased = view.findViewById(R.id.tvBuy);
@@ -109,7 +143,6 @@ public class LibraryFragment extends Fragment {
         });
 
         btnConfirmDelete.setOnClickListener(v2 -> {
-            // TODO: xử lý xoá sách đang được chọn
             Toast.makeText(getContext(), "Xoá các sách đã chọn (chưa cài logic xoá)", Toast.LENGTH_SHORT).show();
             deleteActionLayout.setVisibility(View.GONE);
         });
@@ -122,17 +155,10 @@ public class LibraryFragment extends Fragment {
         // Add layout to root view
         ((ViewGroup) view).addView(deleteActionLayout); // view = root của onCreateView
 
-
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String username = sharedPreferences.getString("username", "User");
-
-        tvUserName.setText(username);
-
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
         // ============================================================
-        GridLayoutManager layoutManagerBook = new GridLayoutManager(getContext(), 3, GridLayoutManager.VERTICAL, false);
+        GridLayoutManager layoutManagerBook = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
         recyclerBookView.setLayoutManager(layoutManagerBook);
         tvFavorite.setOnClickListener(v -> {
             currentTab = LibraryTab.FAVORITE;
@@ -269,9 +295,12 @@ public class LibraryFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String username = sharedPreferences.getString("username", "User");
         switch (currentTab) {
             case FAVORITE:
-                loadFavoriteBook(tvUserName.getText().toString());
+                loadFavoriteBook(username);
                 break;
             case CONTINUE:
                 loadContinueBooks();

@@ -20,10 +20,7 @@ import java.util.List;
 
 public class PageAdapter extends RecyclerView.Adapter<PageAdapter.PageViewHolder> {
 
-   // private List<BookChapter> pageList;
-
    private List<DataPageInBook> dataPage;
-   private BookChapter bookChapter;
    private Context context;
    private String username;
 
@@ -45,18 +42,21 @@ public class PageAdapter extends RecyclerView.Adapter<PageAdapter.PageViewHolder
     public void onBindViewHolder(@NonNull PageViewHolder holder, int position) {
         ContentPageAdapter contentPageAdapter = new ContentPageAdapter(this.dataPage.get(position).getData(),this.dataPage.get(position).getBookChapter(),context,username);
         holder.rcv.setAdapter(contentPageAdapter);
-
-
-         // Cho phép chọn văn bản
-
     }
 
     @Override
     public int getItemCount() {
         //return (pageList != null) ? pageList.size() : 0;
         return this.dataPage.size();
-
     }
+
+    public void clearPages() {
+        if (dataPage != null) {
+            dataPage.clear();
+            notifyDataSetChanged(); // Cập nhật lại ViewPager sau khi xóa
+        }
+    }
+
 
     static class PageViewHolder extends RecyclerView.ViewHolder {
         //TextView textPage;

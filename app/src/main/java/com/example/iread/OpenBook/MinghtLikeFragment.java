@@ -85,7 +85,7 @@ public class MinghtLikeFragment extends Fragment {
         recommendedBook.clear(); // xóa cũ trước
         addBookIds.clear(); //
         //Set adapter mot lần
-        bookDetailAdapter = new BookDetailAdapter(requireContext(), recommendedBook);
+        bookDetailAdapter = new BookDetailAdapter(getContext(), recommendedBook);
         rcvBookDetail.setAdapter(bookDetailAdapter);
         String categoryName = "";
         for (Category category : categoryNames) {

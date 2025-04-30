@@ -29,6 +29,15 @@
         android:layout_marginBottom="16dp" />
 
     <TextView
+        android:id="@+id/tvCurrentBalance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Xu hiện tại: 0"
+        android:textSize="15sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
         android:id="@+id/tvPaymentPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

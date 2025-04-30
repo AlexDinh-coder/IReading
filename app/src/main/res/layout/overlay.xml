@@ -1,6 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#000000"
     android:gravity="center"
     android:padding="24dp">
@@ -44,4 +45,16 @@
         android:layout_below="@id/tvContent"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"/>
+    <!-- Nút Close -->
+    <ImageView
+        android:id="@+id/btnClose"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:contentDescription="Đóng"
+        app:tint="#FFFFFF" />
+
 </RelativeLayout>

@@ -8,6 +8,8 @@ public class UserTranscationBook {
     private String createDate;
     private String chapterId;
     private int bookId;
+    //0: doc, 1:voice
+    private int type;
 
     private Book book;
 
@@ -86,5 +88,13 @@ public class UserTranscationBook {
 
     public void setUser(Account user) {
         this.user = user;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }
