@@ -56,6 +56,7 @@ public class ChapterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chapter, container, false);
 
+
         initArguments();
         initViews(view);
         initApi();
@@ -77,6 +78,7 @@ public class ChapterFragment extends Fragment {
             bookTypeStatus = args.getInt("bookTypeStatus", 0);
             bookTitle = args.getString("bookTitle", "");
             bookPrice = args.getInt("bookPrice",0);
+            isBookPurchased = args.getBoolean("isPurchase", false);
         }
     }
 
@@ -127,19 +129,12 @@ public class ChapterFragment extends Fragment {
         chapterList.clear();
 
         if (bookPrice > 0 && !isBookPurchased) {
-            // Nếu chưa mua trọn sách, chỉ hiển thị các chương FREE
-            for (BookChapter chapter : allChapters) {
-                if (chapter.getBookType() == 0) { // FREE chapter
-                    chapterList.add(chapter);
-                }
-            }
-
-            sortChapterList();
-            totalChapters.setText(chapterList.size() + " chương");
+            // Ẩn toàn bộ nếu chưa mua sách
+            totalChapters.setText("0 chương");
+            chapterList.clear();
             setupRecyclerView();
             return;
         }
-
 
         if (bookTypeStatus == 1) {
             for (BookChapter chapter : allChapters) {

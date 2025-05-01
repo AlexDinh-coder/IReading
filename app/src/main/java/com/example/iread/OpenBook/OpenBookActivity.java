@@ -436,7 +436,17 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         btnBookListen.setTextColor(Color.GRAY);
         btnBookRead.setBackgroundTintList(getColorStateList(android.R.color.transparent));
         btnBookListen.setBackgroundTintList(getColorStateList(R.color.dark_gray));
-        btnActionBook.setText("ĐỌC SÁCH");
+
+        if (bookPrice > 0 && !isPurchase) {
+            btnActionBook.setText("MUA SÁCH");
+            btnActionBook.setOnClickListener(v -> showPaymentDialog(bookTitle, bookPrice));
+            btnRead.setVisibility(View.GONE);
+        } else {
+            btnActionBook.setText("ĐỌC SÁCH");
+            btnActionBook.setOnClickListener(v -> openFirstChapter());
+            btnRead.setVisibility(View.VISIBLE);
+        }
+
         btnUpgrade.setVisibility(View.GONE);
     }
 
@@ -445,7 +455,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     private void setupUI() {
         makeStatusBarTransparent();
         applyTopPadding();
-        loadFragmentWithBookId(new ChapterFragment(), 0);
         //Xử lí nút back
         btnBack.setOnClickListener(v -> finish());
         //Xem tổng đánh giá
@@ -478,6 +487,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         bundle.putInt("bookTypeStatus", bookTypeStatus); // 0: đọc, 1: nghe
         bundle.putString("bookTitle", bookTitle);
         bundle.putInt("bookPrice", bookPrice);
+        bundle.putBoolean("isPurchase", isPurchase);
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.contentFrame, fragment)
@@ -732,9 +742,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                                     btnActionBook.setOnClickListener(vv -> openFirstChapter());
                                     btnRead.setVisibility(View.VISIBLE);
 
-                                    // Lưu trạng thái đã mua
-                                   // preferences.edit().putBoolean("isPurchase_" + bookId, true).apply();
-
                                     dialog.dismiss();
                                 } else {
                                     Toast.makeText(OpenBookActivity.this, "Thanh toán thất bại!", Toast.LENGTH_SHORT).show();
@@ -875,6 +882,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
             username = preferences.getString("username", "");
 
+            // KHÔNG gọi loadBookDetails ở đây nữa
             apiCaller.getBookById(bookId).enqueue(new Callback<ReponderModel<Book>>() {
                 @Override
                 public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
@@ -882,8 +890,14 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                         Book book = response.body().getData();
                         if (book != null) {
                             checkBookPurchasedFromServer(bookId, username, book.getName(), () -> {
-                                loadBookDetails();
-                                checkReadingEnoughToEnableRating();
+                                // GỌI Ở ĐÂY SAU KHI isPurchase ĐÃ ĐƯỢC CẬP NHẬT
+                                bookTitle = book.getName();
+                                bookPrice = book.getPrice();
+                                runOnUiThread(() -> {
+                                    showBookDetailUI(book);
+                                    checkReadingEnoughToEnableRating();
+                                    loadFragmentWithBookId(new ChapterFragment(), currentBookTypeStatus);
+                                });
                             });
                         }
                     }
@@ -898,6 +912,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             getBookTotalReview(bookId);
         }
     }
+
 
 
     @Override
