@@ -19,6 +19,7 @@ import com.example.iread.basemodel.PaymentItem;
 import com.example.iread.basemodel.ReponderModel;
 import com.example.iread.helper.Utils;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,6 +83,7 @@ public class SubscriptionActivity extends AppCompatActivity {
             public void onResponse(Call<ReponderModel<PaymentItemModel>> call, Response<ReponderModel<PaymentItemModel>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<PaymentItemModel> paymentItemModels = response.body().getDataList();
+                    DecimalFormat formatter = new DecimalFormat("#,###");
                     if (paymentItemModels.size() >= 3) {
                         PaymentItemModel item1 = paymentItemModels.get(0);
                         PaymentItemModel item2 = paymentItemModels.get(1);
@@ -89,15 +91,15 @@ public class SubscriptionActivity extends AppCompatActivity {
 
                         txtName1.setText(item1.getPaymentName());
                         txtDescription1.setText(item1.getDescription().replace("\\n", "\n"));
-                        txtPrice1.setText(item1.getAmountMoney() + " VNĐ");
+                        txtPrice1.setText(formatter.format(item1.getAmountMoney()) + " VNĐ");
 
                         txtName2.setText(item2.getPaymentName());
                         txtDescription2.setText(item2.getDescription().replace("\\n", "\n"));
-                        txtPrice2.setText(item2.getAmountMoney() + " VNĐ");
+                        txtPrice2.setText(formatter.format(item2.getAmountMoney()) + " VNĐ");
 
                         txtName3.setText(item3.getPaymentName());
                         txtDescription3.setText(item3.getDescription().replace("\\n", "\n"));
-                        txtPrice3.setText(item3.getAmountMoney() + " VNĐ");
+                        txtPrice3.setText(formatter.format(item3.getAmountMoney()) + " VNĐ");
 
                         btnBuy1.setOnClickListener(v -> createPayment(item1));
                         btnBuy2.setOnClickListener(v -> createPayment(item2));

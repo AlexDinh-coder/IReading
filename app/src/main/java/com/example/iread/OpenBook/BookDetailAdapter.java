@@ -118,7 +118,6 @@ public class BookDetailAdapter extends RecyclerView.Adapter<BookDetailAdapter.It
             super(itemView);
             imgBook = itemView.findViewById(R.id.image_characters_in_detail);
             txtNameBook = itemView.findViewById(R.id.book_title_in_detail);
-            //checkBox = itemView.findViewById(R.id.checkbox_select_book);
             checkBox = new CheckBox(context);
             checkBox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#02c18e")));
             checkBox.setVisibility(View.GONE);

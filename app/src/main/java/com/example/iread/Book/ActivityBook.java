@@ -199,7 +199,11 @@ public class ActivityBook extends AppCompatActivity {
         setupViewPager();
         BookChapter initialChapter = chapterList.get(selectedIndex);
         currentChapterId = initialChapter.getId();
-        sendViewStatus(initialChapter, 0);
+        if (!viewIdMap.containsKey(initialChapter.getId())) {
+            sendViewStatus(initialChapter, 0);
+        } else {
+            Log.d("BookTracking", "Không mở lại chương đầu tiên vì đã có viewId");
+        }
     }
     private String extractImgSrc(String segment) {
         int srcIndex = segment.indexOf("src=");
@@ -266,15 +270,23 @@ public class ActivityBook extends AppCompatActivity {
 
         int bookId = chapter.getBookId();
 
+        if (status == 0 && viewIdMap.containsKey(chapter.getId())) {
+            Log.d("BookTracking", "Đã từng mở chương [" + chapter.getChapterName() + "] → không mở lại");
+            return;
+        }
+
         BookViewModel model = new BookViewModel();
 
         // Nếu status là 1 (close), gán id đã lưu
         if (status == 1) {
             int existingId = viewIdMap.getOrDefault(chapter.getId(), 0);
+            if (existingId == 0) {
+                Log.w("BookTracking", "Không gửi đóng chương vì chưa có viewId!");
+                return; // bỏ qua nếu chưa có viewId
+            }
             model.setId(existingId);
-        } else {
-            model.setId(0); // Khi mở chương, gửi id = 0 để server tạo mới
         }
+
 
         model.setBookId(bookId);
         model.setChapterId(chapter.getId());
@@ -286,10 +298,10 @@ public class ActivityBook extends AppCompatActivity {
         if (status == 1) {
             int existingId = viewIdMap.getOrDefault(chapter.getId(), 0);
             model.setId(existingId);
-            Log.d("BookTracking", "📤 Đóng chương [" + chapter.getChapterName() + "] -> ID = " + existingId);
+            Log.d("BookTracking", "Đóng chương [" + chapter.getChapterName() + "] -> ID = " + existingId);
         } else {
             model.setId(0); // tạo mới
-            Log.d("BookTracking", "📥 Mở chương [" + chapter.getChapterName() + "]");
+            Log.d("BookTracking", "Mở chương [" + chapter.getChapterName() + "]");
         }
 
         apiCaller.createBookView(model).enqueue(new Callback<ReponderModel<Integer>>() {

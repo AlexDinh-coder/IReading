@@ -31,6 +31,7 @@ import com.example.iread.basemodel.ReponderModel;
 import com.example.iread.helper.Utils;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,7 +110,10 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
         } else if (bookType == 0) {
             setLabel(holder, "FREE", R.drawable.bg_label_free);
         } else if (bookType == 1) {
-            setLabel(holder, String.valueOf(bookChapter.getPrice()), R.drawable.bg_label_paid);
+            int priceToDisplay = (bookTypeStatus == 0)
+                    ? bookChapter.getPrice()
+                    : bookChapter.getPriceVoice();
+            setLabel(holder, priceToDisplay + "", R.drawable.bg_label_paid);
         } else {
             holder.chapterLabel.setVisibility(View.GONE);
         }
@@ -122,41 +126,51 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
                 return;
             }
 
+            //  Nếu sách có giá toàn bộ
+            if (bookPrice > 0 && !isBookPurchased) {
+                Toast.makeText(context, "Bạn cần mua sách để truy cập các chương!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            //  Nếu đã mua hoặc sách không có giá → xử lý từng chương
             if (bookTypeStatus == 0) { // Sách đọc
-                if (bookPrice == 0) {
-                    // Sách miễn phí (book price = 0) → cho mua từng chương đọc
-                    if (bookType == 0 || isPaid) {
-                        if (onChapterClickListener != null) {
-                            sendViewStatus(bookChapter, 0, viewId);
-                            onChapterClickListener.onChapterClick(position);
-                        }
-                    } else {
-                        showUnlockDialog(bookChapter); // Mua chương đọc lẻ
-                    }
+                if (bookChapter.getBookType() == 0 || bookChapter.isPaidChapter()) {
+                    openChapter(position, bookChapter);
                 } else {
-                    // Sách có giá > 0 → phải mua cả sách mới được đọc
-                    if (isBookPurchased) {
-                        if (onChapterClickListener != null) {
-                            sendViewStatus(bookChapter, 0, viewId);
-                            onChapterClickListener.onChapterClick(position);
-                        }
-                    } else {
-                        Toast.makeText(context, "Bạn cần mua sách để đọc chương này!", Toast.LENGTH_SHORT).show();
-                    }
+                    showUnlockDialog(bookChapter); // Mua chương đọc lẻ
                 }
             } else if (bookTypeStatus == 1) { // Sách nghe
-                if (bookType == 0 || isPaid) {
-                    if (onChapterClickListener != null) {
-                        sendViewStatus(bookChapter, 0, viewId);
-                        onChapterClickListener.onChapterClick(position);
-                    }
+                if (bookChapter.getBookType() == 0 || bookChapter.isPaidVoice()) {
+                    openChapter(position, bookChapter);
                 } else {
                     showUnlockDialog(bookChapter); // Mua chương nghe lẻ
                 }
             }
         });
 
+
+
     }
+
+    private void openChapter(int position, BookChapter bookChapter) {
+        sendViewStatus(bookChapter, 0, viewId);
+
+        Intent intent;
+        if (bookTypeStatus == 1) {
+            intent = new Intent(context, AudioActivity.class);
+            intent.putExtra("chapterId", bookChapter.getId());
+            intent.putExtra("chapterList", new ArrayList<>(chapterList));
+            intent.putExtra("bookId", bookId);
+        } else {
+            ChapterDataHolder.getInstance().setChapterList(chapterList);
+            intent = new Intent(context, ActivityBook.class);
+            intent.putExtra("selectedIndex", position);
+            intent.putExtra("bookTypeStatus", bookTypeStatus);
+            intent.putExtra("bookId", bookId);
+        }
+        context.startActivity(intent);
+    }
+
 
     private void setLabel(ChapterViewHolder holder, String text, int backgroundResource) {
         holder.chapterLabel.setVisibility(View.VISIBLE);
@@ -227,12 +241,12 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
         btnClose = dialogView.findViewById(R.id.btnClose);
         btnClose.setOnClickListener(v -> dialog.dismiss());
 
+        int price = (bookTypeStatus == 0)
+                ? chapter.getPrice()
+                : chapter.getPriceVoice();
 
-        int price = chapter.getPrice();
-
-        tvTitle.setText(price + " xu để mở khoá chapter!");
-        tvContent.setText("Số xu hiện tại của bạn là " + userCoin + " bạn cần " + price + " xu để mở khoá chapter này!");
-
+        tvTitle.setText(formatXu(price) + " để mở khoá chapter!");
+        tvContent.setText("Số xu hiện tại của bạn là " + formatXu(userCoin) + ", bạn cần " + formatXu(price) + " để mở khoá chapter này!");
 
         btnUnlock.setOnClickListener(v -> {
             SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", MODE_PRIVATE);
@@ -271,15 +285,12 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
                                     } else if (bookTypeStatus == 1) {
                                         chapter.setPaidVoice(true);
                                     }
-
                                     //Cap nhap giao dien chuong  -> đã mua
                                     notifyItemChanged(chapterList.indexOf(chapter));
-
                                     //Vào đọc sau khi paid
                                     if (onChapterClickListener != null) {
                                         onChapterClickListener.onChapterClick(chapterList.indexOf(chapter));
                                     }
-
 
                                 } else {
                                     tvContent.setText(response.body().getMessage());
@@ -304,12 +315,12 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
             });
         });
 
-
-
         dialog.show();
     }
-
-
+    private String formatXu(long value) {
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        return formatter.format(value) + " xu";
+    }
 
     public void updateData(List<BookChapter> newList) {
         this.chapterList = newList;

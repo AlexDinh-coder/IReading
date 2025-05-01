@@ -89,6 +89,8 @@ public class AudioActivity extends AppCompatActivity {
 
     private Map<String, Integer> viewIdMap = new HashMap<>();
     private String currentChapterId = null;
+    private boolean isFirstLoad = true;
+
 
 
 
@@ -218,17 +220,21 @@ public class AudioActivity extends AppCompatActivity {
 
         btnPrevious.setOnClickListener(v -> {
             if (currentChapterIndex > 0) {
-                // Đóng chương hiện tại
+                // Đóng chương hiện tại (nếu có viewId đã lưu)
                 BookChapter currentChapter = chapterList.get(currentChapterIndex);
-                sendViewStatus(currentChapter, 1);
+                sendViewStatus(currentChapter, 1); // status = 1: Đóng
 
+                // Cập nhật index và ID
                 currentChapterIndex--;
                 BookChapter previousChapter = chapterList.get(currentChapterIndex);
-                currentChapterId = previousChapter.getId(); // cập nhật ID mới
-                sendViewStatus(previousChapter, 0); // Mở chương mới
+                currentChapterId = previousChapter.getId();
 
                 txtContentDisplay.setText(previousChapter.getChapterName());
                 fetchChapterAudio(previousChapter.getId());
+
+                // Chờ fetch xong rồi mở chương (tránh bị viewId = 0)
+                new Handler().postDelayed(() -> sendViewStatus(previousChapter, 0), 500);
+
                 Toast.makeText(this, "Đang ở: " + previousChapter.getChapterName(), Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Đây là chương đầu tiên", Toast.LENGTH_SHORT).show();
@@ -236,24 +242,31 @@ public class AudioActivity extends AppCompatActivity {
         });
 
 
+
+
         btnNext.setOnClickListener(v -> {
             if (currentChapterIndex < chapterList.size() - 1) {
                 // Đóng chương hiện tại
                 BookChapter currentChapter = chapterList.get(currentChapterIndex);
-                sendViewStatus(currentChapter, 1);
+                sendViewStatus(currentChapter, 1); // status = 1: Đóng
 
+                // Cập nhật index và ID mới
                 currentChapterIndex++;
                 BookChapter nextChapter = chapterList.get(currentChapterIndex);
-                currentChapterId = nextChapter.getId(); // cập nhật ID mới
-                sendViewStatus(nextChapter, 0); // Mở chương mới
+                currentChapterId = nextChapter.getId();
 
                 txtContentDisplay.setText(nextChapter.getChapterName());
                 fetchChapterAudio(nextChapter.getId());
+
+                // Sau khi tải xong audio, mở chương (status = 0)
+                new Handler().postDelayed(() -> sendViewStatus(nextChapter, 0), 500);
+
                 Toast.makeText(this, "Đang ở: " + nextChapter.getChapterName(), Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Đây là chương cuối cùng", Toast.LENGTH_SHORT).show();
             }
         });
+
 
         // Khi kéo SeekBar
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -339,20 +352,21 @@ public class AudioActivity extends AppCompatActivity {
             Log.d("AudioTracking", "Bỏ qua: chương đang phát giống chương hiện tại");
             return;
         }
-        iAppApiCaller = RetrofitClient.getInstance(Utils.BASE_URL, this).create(IAppApiCaller.class);
+
         iAppApiCaller.getBookChapterWithVoice(chapterId).enqueue(new Callback<ReponderModel<BookChapter>>() {
             @Override
             public void onResponse(Call<ReponderModel<BookChapter>> call, Response<ReponderModel<BookChapter>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     BookChapter bookChapter = response.body().getData();
                     currentChapterId = bookChapter.getId();
-                    sendViewStatus(bookChapter, 0); // mở chương
+
+                    Log.d("🎧 AudioTracking", " Đã tải chương: " + bookChapter.getChapterName() + " (ID: " + bookChapter.getId() + ")");
 
                     if (bookChapter.getContentWithTime() != null) {
                         summaryTimes.clear();
                         summaryTimes.addAll(bookChapter.getContentWithTime());
                     }
-                    // Gán danh sách chapter từ intent nếu có
+
                     List<BookChapter> intentList = (List<BookChapter>) getIntent().getSerializableExtra("chapterList");
                     if (intentList != null && !intentList.isEmpty()) {
                         chapterList = intentList;
@@ -362,18 +376,30 @@ public class AudioActivity extends AppCompatActivity {
                         chapterList.add(bookChapter);
                         currentChapterIndex = 0;
                     }
+
                     if (bookChapter.getFileName() != null && !bookChapter.getFileName().isEmpty()) {
                         String audioUrl = "https://ireading.store/api/Book/Audio/" + bookChapter.getFileName();
-                        // Reset ExoPlayer trước khi set media mới
                         exoPlayer.stop();
-                        exoPlayer.clearMediaItems(); // Xóa media cũ
+                        exoPlayer.clearMediaItems();
                         MediaItem mediaItem = MediaItem.fromUri(audioUrl);
                         exoPlayer.setMediaItem(mediaItem);
                         exoPlayer.prepare();
-                       // exoPlayer.play();
                     } else {
                         Toast.makeText(AudioActivity.this, "Audio URL is empty", Toast.LENGTH_SHORT).show();
                     }
+
+                    // ✅ Chỉ mở chương khi load lần đầu
+                    if (isFirstLoad) {
+                        isFirstLoad = false;
+                        if (!viewIdMap.containsKey(bookChapter.getId())) {
+                            sendViewStatus(bookChapter, 0);
+                            Log.d(" AudioTracking", " Mở chương lần đầu: " + bookChapter.getChapterName());
+                        } else {
+                            Log.d("📥AudioTracking", " Chương đã từng được mở - bỏ qua mở lại");
+                        }
+                    }
+
+
                 } else {
                     Toast.makeText(AudioActivity.this, "Failed to fetch audio URL", Toast.LENGTH_SHORT).show();
                 }
@@ -381,7 +407,7 @@ public class AudioActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ReponderModel<BookChapter>> call, Throwable t) {
-
+                Log.e("AudioTracking", "Fetch audio thất bại: " + t.getMessage());
             }
         });
     }
@@ -410,6 +436,15 @@ public class AudioActivity extends AppCompatActivity {
         model.setStatus(status);
         model.setUserId(userId);
 
+        if (status == 0) {
+            // Kiểm tra nếu viewId đã tồn tại → bỏ qua mở lại
+            if (viewIdMap.containsKey(chapter.getId())) {
+                Log.d("AudioTracking", "🔁 Bỏ qua mở chương đã từng mở: " + chapter.getChapterName());
+                return;
+            }
+        }
+
+
         iAppApiCaller.createBookView(model).enqueue(new Callback<ReponderModel<Integer>>() {
             @Override
             public void onResponse(Call<ReponderModel<Integer>> call, Response<ReponderModel<Integer>> response) {
@@ -417,9 +452,9 @@ public class AudioActivity extends AppCompatActivity {
                     if (status == 0) {
                         int returnedId = response.body().getData();
                         viewIdMap.put(chapter.getId(), returnedId);
-                        Log.d("AudioTracking", "✔ Mở chương - viewId được lưu: " + returnedId);
+                        Log.d("AudioTracking", " Mở chương - viewId được lưu: " + returnedId);
                     } else {
-                        Log.d("AudioTracking", "✔ Đóng chương đã gửi với viewId: " + model.getId());
+                        Log.d("AudioTracking", " Đóng chương đã gửi với viewId: " + model.getId());
                     }
                 }
             }

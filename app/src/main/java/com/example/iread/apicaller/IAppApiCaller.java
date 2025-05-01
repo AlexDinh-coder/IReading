@@ -113,8 +113,6 @@ public interface IAppApiCaller {
             @Body Account account
     );
 
-
-
     @POST("Account/LoginWithGoogle")
     Call<ReponderModel<String>> loginWithGoogle(
             @Body Account account
@@ -198,8 +196,5 @@ public interface IAppApiCaller {
     Call<ReponderModel<BookChapter>> getListBookChapterByUsername(
             @Query("userName") String username,
             @Query("bookId") int bookId
-
     );
-
-
 }

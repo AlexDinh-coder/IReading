@@ -52,6 +52,7 @@ import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -108,7 +109,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         // Lấy bookTypeStatus từ Intent
         currentBookTypeStatus = getIntent().getIntExtra("bookTypeStatus", 0);
         if (currentBookTypeStatus == 1) {
-            applyBookListenMode(); // Thêm dòng này nếu chưa có
+            applyBookListenMode();
         } else {
             applyBookReadMode();
         }
@@ -116,11 +117,10 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         //Cấu hình giao diện
         setupUI();
         setupRecyclerView();
-       // setupTabs();
+        setupTabs();
         setupCommentLauncher();
-        //Load lại chi tiết sách và dữ liệu
-        loadBookDetails();
-        //applyBookReadMode();
+
+
     }
 
     //Hàm ánh xạ tới các view từ layout xml
@@ -169,6 +169,11 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         ratingStarBottom[4] = findViewById(R.id.star5);
 
         btnActionBook.setOnClickListener(v -> {
+            if (bookPrice > 0 && !isPurchase) {
+                showPaymentDialog(bookTitle, bookPrice);
+                return;
+            }
+
             if (currentBookTypeStatus == 1) {
                 openFirstAudioChapter();  // sách NGHE thì mở AudioActivity
             } else {
@@ -201,7 +206,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                     // Tạo danh sách chỉ chứa các chương có file audio
                     List<BookChapter> audioChapters = new ArrayList<>();
                     for (BookChapter chapter : chapters) {
-                        if (chapter.getFileName() != null && !chapter.getFileName().isEmpty()) {
+                        if (chapter.getBookType() == 2 || (chapter.getAudioUrl() != null && !chapter.getAudioUrl().isEmpty())) {
                             audioChapters.add(chapter);
                         }
                     }
@@ -471,7 +476,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         Bundle bundle = new Bundle();
         bundle.putInt("bookId", bookId);
         bundle.putInt("bookTypeStatus", bookTypeStatus); // 0: đọc, 1: nghe
-        bundle.putString("bookTitle", bookTitle); // thêm dòng này
+        bundle.putString("bookTitle", bookTitle);
         bundle.putInt("bookPrice", bookPrice);
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
@@ -663,6 +668,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         setupBookCategories(book);
     }
 
+
     private void showPaymentDialog(String bookTitle, int price) {
         if (!isUserLoggedIn()) {
             Toast.makeText(this, "Bạn cần đăng nhập để mua sách!", Toast.LENGTH_SHORT).show();
@@ -685,7 +691,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
 
         tvTitle.setText("THANH TOÁN");
         tvContent.setText("Bạn đang mua: " + bookTitle + " qua kênh thanh toán App.");
-        tvPrice.setText("Đơn giá: " + price + " xu");
+        tvPrice.setText("Đơn giá: " + formatXu(price));
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
@@ -699,7 +705,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             public void onResponse(Call<ReponderModel<com.example.iread.Model.UserProfile>> call, Response<ReponderModel<com.example.iread.Model.UserProfile>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     long currentCoin = response.body().getData().getClamPoint();
-                    tvBalance.setText("Xu hiện tại: " + currentCoin);
+                    tvBalance.setText("Xu hiện tại: " + formatXu(currentCoin));
                     if (currentCoin < price) {
                         tvBalance.setTextColor(Color.RED);
                     } else {
@@ -758,8 +764,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         });
     }
 
-
-
     //Hàm này hiện thị phần xem thêm hoặc thu gọn ở phần giới thiệu sách
     private void setupBookSummary(Book book) {
         TextView tvSummary = findViewById(R.id.descriptionTextView);
@@ -790,6 +794,11 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                 isExpanded = !isExpanded;
             }
         });
+    }
+
+    private String formatXu(long value) {
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        return formatter.format(value) + " xu";
     }
     //Hiển thị các thể loại của sách dưới dạng tag trong FlexboxLayout
     private void setupBookCategories(Book book) {
@@ -876,8 +885,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                         Book book = response.body().getData();
                         if (book != null) {
                             checkBookPurchasedFromServer(bookId, username, book.getName(), () -> {
-                                // Sau khi kiểm tra xong thì mới load UI
-                              //  isPurchase = preferences.getBoolean("isPurchase_" + bookId, false);
                                 loadBookDetails();
                                 checkReadingEnoughToEnableRating();
                             });
@@ -903,37 +910,35 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     }
 
     private void checkBookPurchasedFromServer(int bookId, String username, String bookTitle, Runnable onFinished) {
-        apiCaller.getHistoryPaymentItem(username).enqueue(new Callback<ReponderModel<UserTranscationBookModel>>() {
+        apiCaller.getListBookChapterByUsername(username, bookId).enqueue(new Callback<ReponderModel<BookChapter>>() {
             @Override
-            public void onResponse(Call<ReponderModel<UserTranscationBookModel>> call, Response<ReponderModel<UserTranscationBookModel>> response) {
-                //boolean purchased = false;
+            public void onResponse(Call<ReponderModel<BookChapter>> call, Response<ReponderModel<BookChapter>> response) {
                 isPurchase = false;
                 if (response.isSuccessful() && response.body() != null) {
-                    List<UserTranscationBookModel> list = response.body().getDataList();
-                    for (UserTranscationBookModel item : list) {
-                        if (item.getPaymentName() != null &&
-                                item.getPaymentName().toLowerCase().contains("mở khóa sách") &&
-                                item.getPaymentName().toLowerCase().contains(bookTitle.toLowerCase())) {
-                            //purchased = true;
-                            isPurchase = true;
-                            break;
+                    List<BookChapter> chapters = response.body().getDataList();
+                    if (chapters != null && !chapters.isEmpty()) {
+                        isPurchase = true;
+                        for (BookChapter chapter : chapters) {
+                            if (!chapter.isPaidChapter()) {
+                                isPurchase = false;
+                                break;
+                            }
                         }
                     }
                 }
 
                 if (onFinished != null) {
-                    onFinished.run();
+                    onFinished.run(); // Sau khi kiểm tra xong thì load UI
                 }
-
             }
 
             @Override
-            public void onFailure(Call<ReponderModel<UserTranscationBookModel>> call, Throwable t) {
+            public void onFailure(Call<ReponderModel<BookChapter>> call, Throwable t) {
                 Log.e("CHECK_PURCHASE", "Lỗi khi kiểm tra mua sách: " + t.getMessage());
                 if (onFinished != null) onFinished.run();
-                setupTabs();
             }
         });
     }
+
 
 }

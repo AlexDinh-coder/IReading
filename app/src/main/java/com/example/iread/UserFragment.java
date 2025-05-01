@@ -38,6 +38,7 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -193,9 +194,10 @@ public class UserFragment extends Fragment {
             readEntries.add(new BarEntry(i, model.getReadMinute()));
             listenEntries.add(new BarEntry(i, model.getListenMinute()));
 
-            // Gộp thứ + ngày: "Th2 (28)"
-            String day = model.getDay().substring(8, 10);
-            labels.add(model.getDayOfWeekStr() + " (" + day + ")");
+            String dayRaw = model.getDay(); // "2025-05-01T00:00:00Z"
+            // Cắt thành dd/MM
+            String formattedDate = dayRaw.substring(8, 10) + "/" + dayRaw.substring(5, 7);
+            labels.add(model.getDayOfWeekStr() + " (" + formattedDate + ")");
 
             if (model.isToday()) {
                 readColors.add(Color.parseColor("#007BFF"));     // hôm nay - xanh đậm
@@ -258,9 +260,9 @@ public class UserFragment extends Fragment {
         barChart.getXAxis().setGranularityEnabled(true);
         barChart.getXAxis().setDrawGridLines(false);
         barChart.getXAxis().setTextColor(Color.WHITE);
-        barChart.getXAxis().setTextSize(10f);//nhỏ lại
+        barChart.getXAxis().setTextSize(10f);//phông
         barChart.getXAxis().setLabelRotationAngle(30f);// nghiêng nhãn
-        barChart.setExtraBottomOffset(10f);//thêm khoảng cách
+        barChart.setExtraBottomOffset(50f);//thêm khoảng cách
         barChart.getXAxis().setLabelCount(labels.size());
 
 
@@ -305,19 +307,16 @@ public class UserFragment extends Fragment {
                     UserProfile userProfile = response.body().getData();
                     if (userProfile != null) {
                         long coin = userProfile.getClamPoint();
-                        txtCoin.setText(coin + " xu");
-
+                        DecimalFormat formatter = new DecimalFormat("#,###");
+                        txtCoin.setText(formatter.format(coin) + " xu");
+                       // txtCoin.setText(coin + " xu");
                         txtUpgradeAccount.setText(userProfile.getPaymentName());
-
                         username.setText(userProfile.getFullName());
-
-
                         Glide.with(requireContext())
                                 .load(userProfile.getAvatar())
                                 .placeholder(R.drawable.icon_avatar)
                                 .into(avatar);
                     }
-
                 }
             }
 

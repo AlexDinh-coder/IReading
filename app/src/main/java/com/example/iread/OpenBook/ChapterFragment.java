@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -124,18 +125,37 @@ public class ChapterFragment extends Fragment {
         if (!isAdded()) return;
 
         chapterList.clear();
-        if (bookTypeStatus ==1){
-            for(BookChapter chapter: allChapters){
-                if(chapter.getAudioUrl() != null && chapter.getAudioUrl().equals("Audio")) {
+
+        if (bookPrice > 0 && !isBookPurchased) {
+            // Nếu chưa mua trọn sách, chỉ hiển thị các chương FREE
+            for (BookChapter chapter : allChapters) {
+                if (chapter.getBookType() == 0) { // FREE chapter
                     chapterList.add(chapter);
                 }
             }
+
+            sortChapterList();
+            totalChapters.setText(chapterList.size() + " chương");
+            setupRecyclerView();
+            return;
         }
-        else chapterList = allChapters;
+
+
+        if (bookTypeStatus == 1) {
+            for (BookChapter chapter : allChapters) {
+                if (chapter.getAudioUrl() != null && chapter.getAudioUrl().equals("Audio")) {
+                    chapterList.add(chapter);
+                }
+            }
+        } else {
+            chapterList = allChapters;
+        }
+
         sortChapterList();
         totalChapters.setText(chapterList.size() + " chương");
         setupRecyclerView();
     }
+
 
     private void sortChapterList() {
         if (isAscending) {
@@ -155,31 +175,36 @@ public class ChapterFragment extends Fragment {
 
     private void setupRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        chapterAdapter = new ChapterAdapter(position -> {
-            BookChapter selectedChapter = chapterList.get(position);
+        Log.d("CHECK_ADAPTER", "bookPrice: " + bookPrice + ", isBookPurchased: " + isBookPurchased);
 
-            Intent intent;
-            if (bookTypeStatus == 1) {
-                // Sách nói → mở AudioActivity
-                intent = new Intent(getContext(), AudioActivity.class);
-                intent.putExtra("chapterId", selectedChapter.getId());
-                intent.putExtra("chapterList", new ArrayList<>(chapterList));
-                intent.putExtra("bookId", bookId);
-            } else {
-                // Sách đọc → mở ActivityBook
-                ChapterDataHolder.getInstance().setChapterList(chapterList);
-                intent = new Intent(getContext(), ActivityBook.class);
-                intent.putExtra("selectedIndex", position);
-               // intent.putExtra("chapterList", new ArrayList<>(chapterList));
-                intent.putExtra("bookTypeStatus", bookTypeStatus);
-                intent.putExtra("bookId", bookId);
-                startActivity(intent);
-            }
-            SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-            prefs.edit().putBoolean("hasAccess_" + bookId, true).apply();
-
-            startActivity(intent);
-        }, requireContext(), chapterList, bookTypeStatus, bookId, bookTypeStatus,unlockedChapterIds,userCoin, isBookPurchased,bookPrice);
+        chapterAdapter = new ChapterAdapter(
+                position -> {
+                    BookChapter chapter = chapterList.get(position);
+                    if (bookTypeStatus == 0) {
+                        ChapterDataHolder.getInstance().setChapterList(chapterList);
+                        Intent intent = new Intent(getContext(), ActivityBook.class);
+                        intent.putExtra("selectedIndex", position);
+                        intent.putExtra("bookTypeStatus", bookTypeStatus);
+                        intent.putExtra("bookId", bookId);
+                        startActivity(intent);
+                    } else if (bookTypeStatus == 1) {
+                        Intent intent = new Intent(getContext(), AudioActivity.class);
+                        intent.putExtra("chapterId", chapter.getId());
+                        intent.putExtra("chapterList", new ArrayList<>(chapterList));
+                        intent.putExtra("bookId", bookId);
+                        startActivity(intent);
+                    }
+                },
+                requireContext(),
+                chapterList,
+                0,
+                bookId,
+                bookTypeStatus,
+                unlockedChapterIds,
+                userCoin,
+                isBookPurchased,
+                bookPrice
+        );
 
         recyclerView.setAdapter(chapterAdapter);
     }
@@ -193,7 +218,15 @@ public class ChapterFragment extends Fragment {
             @Override
             public void onResponse(Call<ReponderModel<BookChapter>> call, Response<ReponderModel<BookChapter>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    unlockedChapterIds.clear();
+                    List<BookChapter> chapters = response.body().getDataList();
+                    // nếu tất cả chương đều là paidChapter = true => đã mua trọn bộ
+                    isBookPurchased = !chapters.isEmpty();
+                    for (BookChapter chapter : chapters) {
+                        if (!chapter.isPaidChapter()) {
+                            isBookPurchased = false;
+                            break;
+                        }
+                    }
                 }
 
                 iAppApiCaller.getHistoryPaymentItem(username).enqueue(new Callback<ReponderModel<UserTranscationBookModel>>() {

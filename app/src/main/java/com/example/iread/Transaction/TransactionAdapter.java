@@ -19,6 +19,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     private List<UserTranscationBookModel> transactionList;
 
+    private String formatXu(int value) {
+        return String.format("%,d xu", value).replace(',', '.');
+    }
+
+
     public TransactionAdapter(List<UserTranscationBookModel> transactionList) {
         this.transactionList = transactionList;
     }
@@ -44,11 +49,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         UserTranscationBookModel.PaymentNameEnum type = transaction.getPaymentNameEnum();
         if (type == UserTranscationBookModel.PaymentNameEnum.Deposit) {
             // Nạp tiền
-            holder.tvAmount.setText("+" + amount + " xu");
+            holder.tvAmount.setText("+" + formatXu(amount));
             holder.tvAmount.setTextColor(0xFF00C853); // Màu xanh
         } else if (type == UserTranscationBookModel.PaymentNameEnum.Pay) {
             // Mặc định là Pay (trừ tiền)
-            holder.tvAmount.setText("-" + amount + " xu");
+            holder.tvAmount.setText("-" + formatXu(amount));
             holder.tvAmount.setTextColor(0xFFFF5555); // Màu đỏ
         }
     }
