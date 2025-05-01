@@ -153,7 +153,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
     }
 
     private void openChapter(int position, BookChapter bookChapter) {
-        sendViewStatus(bookChapter, 0, viewId);
+       // sendViewStatus(bookChapter, 0, viewId);
 
         Intent intent;
         if (bookTypeStatus == 1) {

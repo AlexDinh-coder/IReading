@@ -81,7 +81,7 @@ public class AudioActivity extends AppCompatActivity {
 
     private int bookId;
 
-    ImageView imgPoster, btnHome, btnDown, btnPlay, btnHomePage;
+    ImageView imgPoster, btnHome, btnDown, btnHomePage;
 
     private FrameLayout miniAudioContainer;
 
@@ -89,10 +89,8 @@ public class AudioActivity extends AppCompatActivity {
 
     private Map<String, Integer> viewIdMap = new HashMap<>();
     private String currentChapterId = null;
-    private boolean isFirstLoad = true;
 
-
-
+    private int returnedId = 0;
 
     @SuppressLint("MissingInflatedId")
     @OptIn(markerClass = UnstableApi.class)
@@ -128,7 +126,6 @@ public class AudioActivity extends AppCompatActivity {
         exoPlayer = new ExoPlayer.Builder(this)
                 .setMediaSourceFactory(new DefaultMediaSourceFactory(dataSourceFactory))
                 .build();
-
         String chapterId = getIntent().getStringExtra("chapterId");
         fetchChapterAudio(chapterId);
 
@@ -158,17 +155,13 @@ public class AudioActivity extends AppCompatActivity {
         btnDown.setOnClickListener(v -> {
             showMiniAudio();
         });
-
         txtContentDisplay = findViewById(R.id.txtAudioTitle);
-
         bookId = getIntent().getIntExtra("bookId", -1);
         imgPoster = findViewById(R.id.image_characters_in_detail);
 
         if (bookId != -1) {
             getBookPoster(bookId);
         }
-
-
         // SeekBar setup
         exoPlayer.addListener(new Player.Listener() {
             @Override
@@ -220,53 +213,35 @@ public class AudioActivity extends AppCompatActivity {
 
         btnPrevious.setOnClickListener(v -> {
             if (currentChapterIndex > 0) {
-                // Đóng chương hiện tại (nếu có viewId đã lưu)
                 BookChapter currentChapter = chapterList.get(currentChapterIndex);
-                sendViewStatus(currentChapter, 1); // status = 1: Đóng
-
-                // Cập nhật index và ID
+                sendViewStatusAudio(currentChapter, 1);
                 currentChapterIndex--;
                 BookChapter previousChapter = chapterList.get(currentChapterIndex);
                 currentChapterId = previousChapter.getId();
-
                 txtContentDisplay.setText(previousChapter.getChapterName());
                 fetchChapterAudio(previousChapter.getId());
-
-                // Chờ fetch xong rồi mở chương (tránh bị viewId = 0)
-                new Handler().postDelayed(() -> sendViewStatus(previousChapter, 0), 500);
-
+                new Handler().postDelayed(() -> sendViewStatusAudio(previousChapter, 0), 500);
                 Toast.makeText(this, "Đang ở: " + previousChapter.getChapterName(), Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Đây là chương đầu tiên", Toast.LENGTH_SHORT).show();
             }
         });
 
-
-
-
         btnNext.setOnClickListener(v -> {
             if (currentChapterIndex < chapterList.size() - 1) {
-                // Đóng chương hiện tại
                 BookChapter currentChapter = chapterList.get(currentChapterIndex);
-                sendViewStatus(currentChapter, 1); // status = 1: Đóng
-
-                // Cập nhật index và ID mới
+                sendViewStatusAudio(currentChapter, 1);
                 currentChapterIndex++;
                 BookChapter nextChapter = chapterList.get(currentChapterIndex);
                 currentChapterId = nextChapter.getId();
-
                 txtContentDisplay.setText(nextChapter.getChapterName());
                 fetchChapterAudio(nextChapter.getId());
-
-                // Sau khi tải xong audio, mở chương (status = 0)
-                new Handler().postDelayed(() -> sendViewStatus(nextChapter, 0), 500);
-
+                new Handler().postDelayed(() -> sendViewStatusAudio(nextChapter, 0), 500);
                 Toast.makeText(this, "Đang ở: " + nextChapter.getChapterName(), Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Đây là chương cuối cùng", Toast.LENGTH_SHORT).show();
             }
         });
-
 
         // Khi kéo SeekBar
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -296,12 +271,11 @@ public class AudioActivity extends AppCompatActivity {
             if (chapterList != null && chapterList.size() > currentChapterIndex) {
                 title.setText(chapterList.get(currentChapterIndex).getChapterName());
                 title.setSelected(true);
-                title.requestFocus(); // thêm dòng này sau setSelected
+                title.requestFocus();
 
             } else {
                 title.setText("Đang phát chương");
             }
-
             // Lấy ảnh poster đang hiển thị
             poster.setImageDrawable(imgPoster.getDrawable());
 
@@ -318,10 +292,8 @@ public class AudioActivity extends AppCompatActivity {
 
             miniAudioContainer.addView(miniAudioView);
         }
-
         miniAudioContainer.setVisibility(View.VISIBLE);
     }
-
 
     private void getBookPoster(int bookId) {
         iAppApiCaller.getBookById(bookId).enqueue(new Callback<ReponderModel<Book>>() {
@@ -336,13 +308,10 @@ public class AudioActivity extends AppCompatActivity {
                                 .error(R.drawable.error_image)
                                 .into(imgPoster);
                     }
-
                 }
             }
-
             @Override
             public void onFailure(Call<ReponderModel<Book>> call, Throwable t) {
-
             }
         });
     }
@@ -360,7 +329,7 @@ public class AudioActivity extends AppCompatActivity {
                     BookChapter bookChapter = response.body().getData();
                     currentChapterId = bookChapter.getId();
 
-                    Log.d("🎧 AudioTracking", " Đã tải chương: " + bookChapter.getChapterName() + " (ID: " + bookChapter.getId() + ")");
+                    Log.d("AudioTracking", " Đã tải chương: " + bookChapter.getChapterName() + " (ID: " + bookChapter.getId() + ")");
 
                     if (bookChapter.getContentWithTime() != null) {
                         summaryTimes.clear();
@@ -388,17 +357,14 @@ public class AudioActivity extends AppCompatActivity {
                         Toast.makeText(AudioActivity.this, "Audio URL is empty", Toast.LENGTH_SHORT).show();
                     }
 
-                    // ✅ Chỉ mở chương khi load lần đầu
-                    if (isFirstLoad) {
-                        isFirstLoad = false;
-                        if (!viewIdMap.containsKey(bookChapter.getId())) {
-                            sendViewStatus(bookChapter, 0);
-                            Log.d(" AudioTracking", " Mở chương lần đầu: " + bookChapter.getChapterName());
-                        } else {
-                            Log.d("📥AudioTracking", " Chương đã từng được mở - bỏ qua mở lại");
-                        }
+                    // Chỉ mở chương khi load lần đầu
+                    // Gọi mở chương nếu chưa có viewId
+                    if (!viewIdMap.containsKey(bookChapter.getId())) {
+                        sendViewStatusAudio(bookChapter, 0);
+                        Log.d("AudioTracking", "Mở chương mới: " + bookChapter.getChapterName());
+                    } else {
+                        Log.d("AudioTracking", "Chương đã được mở trước đó, bỏ qua");
                     }
-
 
                 } else {
                     Toast.makeText(AudioActivity.this, "Failed to fetch audio URL", Toast.LENGTH_SHORT).show();
@@ -412,7 +378,7 @@ public class AudioActivity extends AppCompatActivity {
         });
     }
 
-    private void sendViewStatus(BookChapter chapter, int status) {
+    private void sendViewStatusAudio(BookChapter chapter, int status) {
         if (chapter == null) return;
 
         String userId = getSharedPreferences("MyPrefs", MODE_PRIVATE).getString("userId", "");
@@ -421,12 +387,14 @@ public class AudioActivity extends AppCompatActivity {
         BookViewModel model = new BookViewModel();
 
         if (status == 1) {
-            int existingId = viewIdMap.getOrDefault(chapter.getId(), 0);
-            model.setId(existingId);
-            Log.d("AudioTracking", " Đóng chương [" + chapter.getChapterName() + "] -> ID = " + existingId);
+            if (returnedId == 0) {
+                Log.w("AudioTracking", "Không gửi đóng chương vì chưa có viewId!");
+                return;
+            }
+            model.setId(returnedId);
+            returnedId = 0;
         } else {
             model.setId(0);
-            Log.d("AudioTracking", " Mở chương [" + chapter.getChapterName() + "]");
         }
 
         model.setBookId(chapter.getBookId());
@@ -439,19 +407,17 @@ public class AudioActivity extends AppCompatActivity {
         if (status == 0) {
             // Kiểm tra nếu viewId đã tồn tại → bỏ qua mở lại
             if (viewIdMap.containsKey(chapter.getId())) {
-                Log.d("AudioTracking", "🔁 Bỏ qua mở chương đã từng mở: " + chapter.getChapterName());
+                Log.d("AudioTracking", "Bỏ qua mở chương đã từng mở: " + chapter.getChapterName());
                 return;
             }
         }
-
 
         iAppApiCaller.createBookView(model).enqueue(new Callback<ReponderModel<Integer>>() {
             @Override
             public void onResponse(Call<ReponderModel<Integer>> call, Response<ReponderModel<Integer>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     if (status == 0) {
-                        int returnedId = response.body().getData();
-                        viewIdMap.put(chapter.getId(), returnedId);
+                        returnedId = response.body().getData();
                         Log.d("AudioTracking", " Mở chương - viewId được lưu: " + returnedId);
                     } else {
                         Log.d("AudioTracking", " Đóng chương đã gửi với viewId: " + model.getId());
@@ -488,20 +454,7 @@ public class AudioActivity extends AppCompatActivity {
 
 
     private void updateDisplayContent(long currentPosition) {
-        //long delayTime = currentPosition + 500;
-//        for (SummaryTime summaryTime : summaryTimes) {
-//          try {
-//              long startTime = Long.parseLong(summaryTime.getStartTime());
-//              long endTime = Long.parseLong(summaryTime.getEndTime());
-//
-//              if(currentPosition >= startTime && currentPosition <= endTime) {
-//                  txtContentDisplay.setText(summaryTime.getText());
-//                  return;
-//              }
-//          } catch (NumberFormatException e) {
-//                Log.e("AudioActivity", "Error parsing time: " + e.getMessage());
-//          }
-//        }
+
         for (SummaryTime summaryTime : summaryTimes) {
             try {
                 long startTime = (long) (Double.parseDouble(summaryTime.getStartTime()) * 1000);
@@ -541,7 +494,7 @@ public class AudioActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (currentChapterId != null && chapterList != null && !chapterList.isEmpty()) {
             BookChapter currentChapter = chapterList.get(currentChapterIndex);
-            sendViewStatus(currentChapter, 1); // Đóng chương
+            sendViewStatusAudio(currentChapter, 1); // Đóng chương
         }
         super.onBackPressed();
     }

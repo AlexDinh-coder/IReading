@@ -622,8 +622,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             }
         }
 
-
-
         //Xử lí phần hiển thị tên sách
         TextView tvName = findViewById(R.id.book_title_in_detail);
         if (tvName != null) {
@@ -632,7 +630,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             tvName.setTextColor(Color.WHITE);
             tvName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         }
-
 
         TextView authorName = findViewById(R.id.author_name);
         if (authorName != null) {

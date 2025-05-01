@@ -64,7 +64,7 @@ public class ActivityBook extends AppCompatActivity {
 
     private Map<String, Integer> viewIdMap = new HashMap<>();
 
-
+    private  int returnedId = 0;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -92,18 +92,18 @@ public class ActivityBook extends AppCompatActivity {
         if (currentChapterId != null) {
             BookChapter current = findChapterById(currentChapterId);
             if (current != null) {
-                Integer savedViewId = viewIdMap.getOrDefault(current.getId(), 0);
-                Log.d("BookTracking", "📤 Back: Đóng chương [" + current.getChapterName() + "] với viewId = " + savedViewId);
+               // Integer savedViewId = viewIdMap.getOrDefault(current.getId(), 0);
+               // Log.d("BookTracking", " Back: Đóng chương [" + current.getChapterName() + "] với viewId = " + savedViewId);
 
                 BookViewModel model = new BookViewModel();
-                model.setId(savedViewId);
+                model.setId(returnedId);
                 model.setBookId(current.getBookId());
                 model.setChapterId(current.getId());
                 model.setBookTypeStatus(0); // đọc
                 model.setCreateBy(username);
                 model.setStatus(1); // đóng
                 model.setUserId(userId);
-
+                returnedId = 0;
                 apiCaller.createBookView(model).enqueue(new Callback<ReponderModel<Integer>>() {
                     @Override
                     public void onResponse(Call<ReponderModel<Integer>> call, Response<ReponderModel<Integer>> response) {
@@ -122,6 +122,7 @@ public class ActivityBook extends AppCompatActivity {
         }
         // fallback nếu không có chương hiện tại
         backToOpenBookActivity();
+        super.onBackPressed();
     }
 
 
@@ -265,26 +266,28 @@ public class ActivityBook extends AppCompatActivity {
     }
 
     // Gửi trạng thái đọc chương (mở hoặc đóng)
+    // Dang su dung
     private void sendViewStatus(BookChapter chapter, int status) {
         if (chapter == null) return;
 
         int bookId = chapter.getBookId();
 
-        if (status == 0 && viewIdMap.containsKey(chapter.getId())) {
-            Log.d("BookTracking", "Đã từng mở chương [" + chapter.getChapterName() + "] → không mở lại");
-            return;
-        }
-
+//        if (status == 0 && viewIdMap.containsKey(chapter.getId())) {
+//            Log.d("BookTracking", "Đã từng mở chương [" + chapter.getChapterName() + "] → không mở lại");
+//            return;
+//        }
+        if (status == 0 && returnedId != 0) return;
         BookViewModel model = new BookViewModel();
 
         // Nếu status là 1 (close), gán id đã lưu
         if (status == 1) {
-            int existingId = viewIdMap.getOrDefault(chapter.getId(), 0);
+            int existingId = returnedId;
             if (existingId == 0) {
                 Log.w("BookTracking", "Không gửi đóng chương vì chưa có viewId!");
                 return; // bỏ qua nếu chưa có viewId
             }
             model.setId(existingId);
+            returnedId = 0;
         }
 
 
@@ -295,22 +298,15 @@ public class ActivityBook extends AppCompatActivity {
         model.setStatus(status);
         model.setUserId(userId);
 
-        if (status == 1) {
-            int existingId = viewIdMap.getOrDefault(chapter.getId(), 0);
-            model.setId(existingId);
-            Log.d("BookTracking", "Đóng chương [" + chapter.getChapterName() + "] -> ID = " + existingId);
-        } else {
-            model.setId(0); // tạo mới
-            Log.d("BookTracking", "Mở chương [" + chapter.getChapterName() + "]");
-        }
+
 
         apiCaller.createBookView(model).enqueue(new Callback<ReponderModel<Integer>>() {
             @Override
             public void onResponse(Call<ReponderModel<Integer>> call, Response<ReponderModel<Integer>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     if (status == 0) {
-                        int returnedId = response.body().getData();
-                        viewIdMap.put(chapter.getId(), returnedId); // lưu lại để dùng khi đóng chương
+                        returnedId = response.body().getData();
+                        //viewIdMap.put(chapter.getId(), returnedId); // lưu lại để dùng khi đóng chương
                         Log.d("BookTracking", "✔ Mở chương - viewId được lưu: " + returnedId);
                     } else {
                         Log.d("BookTracking", "✔ Đóng chương đã gửi với viewId: " + model.getId());
