@@ -67,7 +67,6 @@ public class ChapterFragment extends Fragment {
         });
 
 
-
         return view;
     }
 

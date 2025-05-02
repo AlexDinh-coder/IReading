@@ -110,11 +110,11 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
 
         // Lấy bookTypeStatus từ Intent
         currentBookTypeStatus = getIntent().getIntExtra("bookTypeStatus", 0);
-        if (currentBookTypeStatus == 1) {
-            applyBookListenMode();
-        } else {
-            applyBookReadMode();
-        }
+//        if (currentBookTypeStatus == 1) {
+//            applyBookListenMode();
+//        } else {
+//            applyBookReadMode();
+//        }
 
         //Cấu hình giao diện
         setupUI();
@@ -173,6 +173,11 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         ratingStarBottom[4] = findViewById(R.id.star5);
 
         btnActionBook.setOnClickListener(v -> {
+            if (!isUserLoggedIn()) {
+                Toast.makeText(this, "Bạn cần đăng nhập để thực hiện", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             if (bookPrice > 0 && !isPurchase) {
                 showPaymentDialog(bookTitle, bookPrice);
                 return;
@@ -262,9 +267,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             }
         });
     }
-
-
-
 
     private void openNewPublishedChapter(String chapterId) {
         if (!isUserLoggedIn()) {
@@ -437,6 +439,11 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         btnActionBook.setText("NGHE THỬ");
         btnUpgrade.setVisibility(View.VISIBLE);
         btnUpgrade.setOnClickListener(v -> {
+            if (!isUserLoggedIn()) {
+                Toast.makeText(this, "Bạn cần đăng nhập để nâng cấp tài khoản", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Intent intent = new Intent(OpenBookActivity.this, SubscriptionActivity.class);
             intent.putExtra("bookId", bookId);
             startActivity(intent);
@@ -454,11 +461,25 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
 
         if (bookPrice > 0 && !isPurchase) {
             btnActionBook.setText("MUA SÁCH");
-            btnActionBook.setOnClickListener(v -> showPaymentDialog(bookTitle, bookPrice));
+            btnActionBook.setOnClickListener(v -> {
+                if (!isUserLoggedIn()) {
+                    Toast.makeText(this, "Bạn cần đăng nhập để mua sách", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                showPaymentDialog(bookTitle, bookPrice);
+            });
+            //btnActionBook.setOnClickListener(v -> showPaymentDialog(bookTitle, bookPrice));
             btnRead.setVisibility(View.GONE);
         } else {
             btnActionBook.setText("ĐỌC SÁCH");
-            btnActionBook.setOnClickListener(v -> openFirstChapter());
+            btnActionBook.setOnClickListener(v -> {
+                if (!isUserLoggedIn()) {
+                    Toast.makeText(this, "Bạn cần đăng nhập để đọc sách!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                openFirstChapter();
+            });
+            //btnActionBook.setOnClickListener(v -> openFirstChapter());
             btnRead.setVisibility(View.VISIBLE);
         }
 
@@ -678,6 +699,10 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             String chapterId = book.getNewPublishedChapter().getId(); // ID chương mới nhất
 
             btnRead.setOnClickListener(v -> {
+                if (!isUserLoggedIn()) {
+                    Toast.makeText(this, "Bạn cần đăng nhập để đọc chương mơới nhất", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 openNewPublishedChapter(chapterId);
             });
         } else {
@@ -689,7 +714,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         setupBookSummary(book);
         setupBookCategories(book);
     }
-
 
     private void showPaymentDialog(String bookTitle, int price) {
         if (!isUserLoggedIn()) {
@@ -905,11 +929,20 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                         if (book != null) {
                             checkBookPurchasedFromServer(bookId, username, book.getName(), () -> {
                                 // cập nhập purchased book
-                                bookTitle = book.getName();
-                                bookPrice = book.getPrice();
+//                                bookTitle = book.getName();
+//                                bookPrice = book.getPrice();
+
                                 runOnUiThread(() -> {
-                                    showBookDetailUI(book);
+                                    bookTitle = book.getName();
+                                    bookPrice = book.getPrice();
                                     checkReadingEnoughToEnableRating();
+                                    if (currentBookTypeStatus == 1) {
+                                        applyBookListenMode();
+                                    } else {
+                                        applyBookReadMode();
+                                    }
+
+                                    showBookDetailUI(book);
                                     loadFragmentWithBookId(new ChapterFragment(), currentBookTypeStatus);
                                 });
                             });

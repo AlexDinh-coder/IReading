@@ -281,11 +281,10 @@ public class UserFragment extends Fragment {
         legend.setTextSize(12f);
         legend.setForm(Legend.LegendForm.SQUARE);
 
-
         barChart.setDrawGridBackground(false);
         barChart.setDrawBarShadow(false);
         barChart.getDescription().setEnabled(false);
-        barChart.setExtraBottomOffset(30f); // giúp có thêm không gian hiển thị label
+        barChart.setExtraBottomOffset(30f); // có thêm không gian hiển thị label
 
         barChart.invalidate();
     }
@@ -309,7 +308,6 @@ public class UserFragment extends Fragment {
                         long coin = userProfile.getClamPoint();
                         DecimalFormat formatter = new DecimalFormat("#,###");
                         txtCoin.setText(formatter.format(coin) + " xu");
-                       // txtCoin.setText(coin + " xu");
                         txtUpgradeAccount.setText(userProfile.getPaymentName());
                         username.setText(userProfile.getFullName());
                         Glide.with(requireContext())

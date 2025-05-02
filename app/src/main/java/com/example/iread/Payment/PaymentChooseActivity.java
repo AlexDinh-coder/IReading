@@ -136,7 +136,6 @@ public class PaymentChooseActivity extends AppCompatActivity {
                     Log.e("API", "Lỗi gọi API thanh toán: " + response.message());
                 }
             }
-
             @Override
             public void onFailure(Call<ReponderModel<String>> call, Throwable t) {
 

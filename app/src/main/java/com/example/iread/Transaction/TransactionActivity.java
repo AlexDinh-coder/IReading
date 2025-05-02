@@ -18,7 +18,11 @@ import com.example.iread.apicaller.RetrofitClient;
 import com.example.iread.basemodel.ReponderModel;
 import com.example.iread.helper.Utils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -54,16 +58,33 @@ public class TransactionActivity extends AppCompatActivity {
             public void onResponse(Call<ReponderModel<UserTranscationBookModel>> call, Response<ReponderModel<UserTranscationBookModel>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<UserTranscationBookModel> transactionBook = response.body().getDataList();
+
+                    // Sắp xếp theo ngày giảm dần
+                    Collections.sort(transactionBook, new Comparator<UserTranscationBookModel>() {
+                        @Override
+                        public int compare(UserTranscationBookModel o1, UserTranscationBookModel o2) {
+                            try {
+                                // Giả định format ngày là: "HH:mm dd-MM-yyyy"
+                                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd-MM-yyyy");
+                                Date d1 = sdf.parse(o1.getCreateDate());
+                                Date d2 = sdf.parse(o2.getCreateDate());
+                                return d2.compareTo(d1); // giảm dần
+                            } catch (Exception e) {
+                                return 0;
+                            }
+                        }
+                    });
+
                     transactionAdapter = new TransactionAdapter(transactionBook);
                     rcvTransactions.setAdapter(transactionAdapter);
-                } else{
+                } else {
                     Toast.makeText(TransactionActivity.this, "Không có dữ liệu", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ReponderModel<UserTranscationBookModel>> call, Throwable t) {
-
+                Toast.makeText(TransactionActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

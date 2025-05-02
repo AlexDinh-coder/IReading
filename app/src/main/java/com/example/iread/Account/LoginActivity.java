@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -18,6 +19,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import com.example.iread.JWT.JwtUtils;
 import com.example.iread.MainActivity;
 import com.example.iread.Model.Account;
+import com.example.iread.Model.UserProfile;
 import com.example.iread.R;
 import com.example.iread.apicaller.IAppApiCaller;
 import com.example.iread.apicaller.RetrofitClient;
@@ -25,6 +27,7 @@ import com.example.iread.basemodel.ReponderModel;
 import com.example.iread.helper.Utils;
 import com.google.android.gms.auth.api.signin.*;
 import com.google.android.gms.tasks.Task;
+import com.google.gson.Gson;
 
 import io.paperdb.Paper;
 import retrofit2.Call;
@@ -165,20 +168,39 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null && response.body().isSussess()) {
                     String token = response.body().getData();
                     String userId = JwtUtils.getUserIdFromToken(token);
+                    Log.d("LOGIN_GOOGLE", "Email để gọi profile: " + email);
 
-                    if (userId != null) {
-                        sharedPreferences.edit()
-                                .putString("username", name)
-                                .putString("email", email)
-                                .putString("avatar", avatarUrl)
-                                .putString("userId", userId)
-                                .putString("token", token)
-                                .apply();
-                    }
 
-                    Toast.makeText(LoginActivity.this, "Đăng nhập Google thành công", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                    finish();
+                    // Sau khi login thành công → gọi API để lấy thông tin đầy đủ (username)
+                    iAppApiCaller.getUserProfile(email).enqueue(new Callback<ReponderModel<UserProfile>>() {
+                        @Override
+                        public void onResponse(Call<ReponderModel<UserProfile>> call, Response<ReponderModel<UserProfile>> profileRes) {
+                            if (profileRes.isSuccessful() && profileRes.body() != null && profileRes.body().getData() != null) {
+                                Log.d("LOGIN_GOOGLE", "Response getUserProfile: " + new Gson().toJson(profileRes.body()));
+
+                                String actualUsername = profileRes.body().getData().getUserName();
+
+                                sharedPreferences.edit()
+                                        .putString("username", actualUsername)
+                                        .putString("email", email)
+                                        .putString("avatar", avatarUrl)
+                                        .putString("userId", userId)
+                                        .putString("token", token)
+                                        .apply();
+
+                                Toast.makeText(LoginActivity.this, "Đăng nhập Google thành công", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                finish();
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Không lấy được username", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ReponderModel<UserProfile>> call, Throwable t) {
+                            Toast.makeText(LoginActivity.this, "Lỗi lấy username: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 } else {
                     Toast.makeText(LoginActivity.this, "Đăng nhập Google thất bại", Toast.LENGTH_SHORT).show();
                 }
@@ -189,9 +211,48 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
+
+
+//    private void loginWithGoogle(String email, String name, String avatarUrl) {
+//        Account account = new Account();
+//        account.setEmail(email);
+//        account.setFullName(name);
+//        account.setAvatar(avatarUrl);
+//
+//        iAppApiCaller.loginWithGoogle(account).enqueue(new Callback<ReponderModel<String>>() {
+//            @Override
+//            public void onResponse(Call<ReponderModel<String>> call, Response<ReponderModel<String>> response) {
+//                if (response.isSuccessful() && response.body() != null && response.body().isSussess()) {
+//                    String token = response.body().getData();
+//                    String userId = JwtUtils.getUserIdFromToken(token);
+//
+//                    if (userId != null) {
+//                        sharedPreferences.edit()
+//                                .putString("username", email)
+//                                .putString("email", email)
+//                                .putString("avatar", avatarUrl)
+//                                .putString("userId", userId)
+//                                .putString("token", token)
+//                                .apply();
+//                    }
+//
+//                    Toast.makeText(LoginActivity.this, "Đăng nhập Google thành công", Toast.LENGTH_SHORT).show();
+//                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+//                    finish();
+//                } else {
+//                    Toast.makeText(LoginActivity.this, "Đăng nhập Google thất bại", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ReponderModel<String>> call, Throwable t) {
+//                Toast.makeText(LoginActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//
+//    }
 
     private void signOutGoogle() {
         googleSignInClient.signOut().addOnCompleteListener(this, task -> {
