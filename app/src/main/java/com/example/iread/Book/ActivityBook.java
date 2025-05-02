@@ -117,7 +117,7 @@ public class ActivityBook extends AppCompatActivity {
                         backToOpenBookActivity();
                     }
                 });
-                return; // tránh gọi `backToOpenBookActivity()` hai lần
+                return;
             }
         }
         // fallback nếu không có chương hiện tại
@@ -266,16 +266,11 @@ public class ActivityBook extends AppCompatActivity {
     }
 
     // Gửi trạng thái đọc chương (mở hoặc đóng)
-    // Dang su dung
     private void sendViewStatus(BookChapter chapter, int status) {
         if (chapter == null) return;
 
         int bookId = chapter.getBookId();
 
-//        if (status == 0 && viewIdMap.containsKey(chapter.getId())) {
-//            Log.d("BookTracking", "Đã từng mở chương [" + chapter.getChapterName() + "] → không mở lại");
-//            return;
-//        }
         if (status == 0 && returnedId != 0) return;
         BookViewModel model = new BookViewModel();
 
@@ -290,15 +285,12 @@ public class ActivityBook extends AppCompatActivity {
             returnedId = 0;
         }
 
-
         model.setBookId(bookId);
         model.setChapterId(chapter.getId());
         model.setBookTypeStatus(0); // 0: đọc
         model.setCreateBy(username);
         model.setStatus(status);
         model.setUserId(userId);
-
-
 
         apiCaller.createBookView(model).enqueue(new Callback<ReponderModel<Integer>>() {
             @Override

@@ -86,10 +86,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        // Set up the initial fragment
-//        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pay.payos.vn/web/6496f0e2c62d4c258cf81e928423f70d"));
-//        startActivity(browserIntent);
-        //https://pay.payos.vn/web/6496f0e2c62d4c258cf81e928423f70d
     }
 
     private void loadFragment(Fragment fragment) {

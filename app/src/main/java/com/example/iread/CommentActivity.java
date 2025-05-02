@@ -59,6 +59,24 @@ public class CommentActivity extends AppCompatActivity {
         String title = getIntent().getStringExtra("bookTitle");
         String author = getIntent().getStringExtra("bookAuthor");
         String image = getIntent().getStringExtra("bookImage");
+
+        Log.d("DEBUG", "Book title: " + title);
+        Log.d("DEBUG", "Book author: " + author);
+        Log.d("DEBUG", "Book image: " + image);
+
+        if (bookTitle != null) bookTitle.setText(title != null ? title : "Không rõ tên");
+        if (bookAuthor != null) bookAuthor.setText(author != null ? author : "Không rõ tác giả");
+
+        if (image != null && !image.isEmpty()) {
+            Glide.with(this)
+                    .load(image)
+                    .placeholder(R.drawable.loading_placeholder)
+                    .error(R.drawable.error_image)
+                    .into(imageView);
+        } else {
+            imageView.setImageResource(R.drawable.error_image);
+        }
+
         bookTitle.setText(title);
         bookAuthor.setText(author);
         Glide.with(this)
@@ -107,15 +125,6 @@ public class CommentActivity extends AppCompatActivity {
                 return;
             }
 
-            SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-            boolean hasAccess = prefs.getBoolean("hasAccess_" + bookId, false);
-
-            if (!hasAccess) {
-                Toast.makeText(this, "Bạn cần đọc hoặc nghe sách trước khi đánh giá!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // Nếu đã đọc/nghe => cho phép gửi đánh giá
             CommentModel commentModel = new CommentModel();
             commentModel.setBookId(bookId);
             commentModel.setContent(content);
@@ -123,11 +132,26 @@ public class CommentActivity extends AppCompatActivity {
             commentModel.setCreateBy(username);
             commentModel.setUserId(userId);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            String currentDate = sdf.format(new Date());
-            commentModel.setCreateDate(currentDate);
+            commentModel.setCreateDate(sdf.format(new Date()));
 
-            postComment(commentModel);
+            // Gọi API để kiểm tra quyền gửi đánh giá
+            iAppApiCaller.checkReadingEnough(username, bookId).enqueue(new Callback<ReponderModel<String>>() {
+                @Override
+                public void onResponse(Call<ReponderModel<String>> call, Response<ReponderModel<String>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSussess()) {
+                        postComment(commentModel); // → Gửi đánh giá nếu hợp lệ
+                    } else {
+                        Toast.makeText(CommentActivity.this, "Bạn cần đọc hoặc nghe sách trước khi đánh giá!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ReponderModel<String>> call, Throwable t) {
+                    Toast.makeText(CommentActivity.this, "Không thể xác minh quyền đánh giá!", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
+
 
     }
 

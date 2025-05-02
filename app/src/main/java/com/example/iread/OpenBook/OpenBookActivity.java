@@ -91,6 +91,8 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     private String username;
 
     private String bookTitle;
+    private String currentAuthorName;
+    private String currentPosterUrl;
 
     private boolean isPurchase;
 
@@ -119,6 +121,8 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         setupRecyclerView();
         setupTabs();
         setupCommentLauncher();
+
+        loadBookDetails();
 
 
     }
@@ -315,8 +319,8 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                 if (response.isSuccessful() && response.body() != null) {
                     Book book = response.body().getData();
                     if (book != null) {
-                        bookTitle = book.getName();
-                        bookPrice = book.getPrice();
+                        currentAuthorName = book.getCreateBy();
+                        currentPosterUrl = book.getPoster();
                         iconLove.setImageResource(isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_love); //cập nhật icon
 
                         showBookDetailUI(book);
@@ -365,6 +369,17 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                     btnTextReview.setVisibility(canRate ? View.VISIBLE : View.GONE);
                     iconLove.setVisibility(canRate ? View.VISIBLE : View.GONE);
                     Log.d("CheckAccess", "Người dùng đã đọc? " + canRate);
+                    if (canRate) {
+                        btnTextReview.setOnClickListener(v -> {
+                            Intent intent = new Intent(OpenBookActivity.this, CommentActivity.class);
+                            intent.putExtra("bookId", bookId);
+                            intent.putExtra("bookTitle", bookTitle);
+                            intent.putExtra("bookAuthor",  currentAuthorName);
+                            intent.putExtra("bookImage", currentPosterUrl);
+                            commentLauncher.launch(intent);
+                        });
+                    }
+
                 } else {
                     btnTextReview.setVisibility(View.GONE);
                     iconLove.setVisibility(View.GONE);
@@ -882,7 +897,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
             username = preferences.getString("username", "");
 
-            // KHÔNG gọi loadBookDetails ở đây nữa
             apiCaller.getBookById(bookId).enqueue(new Callback<ReponderModel<Book>>() {
                 @Override
                 public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
@@ -890,7 +904,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                         Book book = response.body().getData();
                         if (book != null) {
                             checkBookPurchasedFromServer(bookId, username, book.getName(), () -> {
-                                // GỌI Ở ĐÂY SAU KHI isPurchase ĐÃ ĐƯỢC CẬP NHẬT
+                                // cập nhập purchased book
                                 bookTitle = book.getName();
                                 bookPrice = book.getPrice();
                                 runOnUiThread(() -> {
