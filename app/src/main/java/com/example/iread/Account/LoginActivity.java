@@ -168,11 +168,11 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null && response.body().isSussess()) {
                     String token = response.body().getData();
                     String userId = JwtUtils.getUserIdFromToken(token);
+                    String username = JwtUtils.getUsernameFromToken(token);
                     Log.d("LOGIN_GOOGLE", "Email để gọi profile: " + email);
 
-
                     // Sau khi login thành công → gọi API để lấy thông tin đầy đủ (username)
-                    iAppApiCaller.getUserProfile(email).enqueue(new Callback<ReponderModel<UserProfile>>() {
+                    iAppApiCaller.getUserProfile(username).enqueue(new Callback<ReponderModel<UserProfile>>() {
                         @Override
                         public void onResponse(Call<ReponderModel<UserProfile>> call, Response<ReponderModel<UserProfile>> profileRes) {
                             if (profileRes.isSuccessful() && profileRes.body() != null && profileRes.body().getData() != null) {

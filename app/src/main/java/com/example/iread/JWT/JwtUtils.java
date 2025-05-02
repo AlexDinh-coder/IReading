@@ -32,28 +32,28 @@ public class JwtUtils {
         return null;
     }
 
-//    public static String getUsernameFromToken(String token) {
-//        try {
-//            String[] parts = token.split("\\.");
-//            if (parts.length == 3) {
-//                String payload = parts[1];
-//                byte[] decodedBytes = Base64.decode(payload, Base64.URL_SAFE | Base64.NO_PADDING | Base64.NO_WRAP);
-//                String decodedPayload = new String(decodedBytes, StandardCharsets.UTF_8);
-//
-//                JSONObject jsonObject = new JSONObject(decodedPayload);
-//
-//                // Tìm khóa nào chứa "nameidentifier" (username)
-//                Iterator<String> keys = jsonObject.keys();
-//                while (keys.hasNext()) {
-//                    String key = keys.next();
-//                    if (key.toLowerCase().contains("nameidentifier")) {
-//                        return jsonObject.getString(key);
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
+    public static String getUsernameFromToken(String token) {
+        try {
+            String[] parts = token.split("\\.");
+            if (parts.length == 3) {
+                String payload = parts[1];
+                byte[] decodedBytes = Base64.decode(payload, Base64.URL_SAFE | Base64.NO_PADDING | Base64.NO_WRAP);
+                String decodedPayload = new String(decodedBytes, StandardCharsets.UTF_8);
+
+                JSONObject jsonObject = new JSONObject(decodedPayload);
+
+                // Tìm khóa nào chứa "nameidentifier" (username)
+                Iterator<String> keys = jsonObject.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    if (key.toLowerCase().contains("nameidentifier")) {
+                        return jsonObject.getString(key);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
