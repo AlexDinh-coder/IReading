@@ -24,6 +24,7 @@ import com.example.iread.Model.DataBook;
 import com.example.iread.Model.DataPageInBook;
 import com.example.iread.OpenBook.ChapterAdapter;
 import com.example.iread.OpenBook.ChapterDataHolder;
+import com.example.iread.OpenBook.NoteActivity;
 import com.example.iread.OpenBook.OpenBookActivity;
 import com.example.iread.R;
 import com.example.iread.apicaller.IAppApiCaller;
@@ -59,6 +60,8 @@ public class ActivityBook extends AppCompatActivity {
 
     private int bookPrice;
 
+    private ImageView btnNote;
+
     private String currentChapterId = null;
 
 
@@ -66,8 +69,10 @@ public class ActivityBook extends AppCompatActivity {
 
     private  int returnedId = 0;
 
+    int bookid;
 
-    @SuppressLint("ClickableViewAccessibility")
+
+    @SuppressLint({"ClickableViewAccessibility", "MissingInflatedId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +81,14 @@ public class ActivityBook extends AppCompatActivity {
         username = sharedPreferences.getString("username", "");
         userId = sharedPreferences.getString("userId", "");
         clickView = getIntent().getBooleanExtra("isView", false);
+        bookid = getIntent().getIntExtra("bookId",0);
+        btnNote = findViewById(R.id.btnNote);
+        btnNote.setOnClickListener(v -> {
+            Intent intent = new Intent(this, NoteActivity.class);
+            intent.putExtra("bookId", bookid);
+            startActivity(intent);
+            //finish();
+        });
 
         setupUI();
         setupApiCaller();
@@ -174,6 +187,7 @@ public class ActivityBook extends AppCompatActivity {
                     Log.d("BOOK_CONTENT", "Extracted IMG URL: " + imgUrl);
                     if(imgUrl != null && !imgUrl.isEmpty()) {
                         DataBook imgItem = new DataBook(imgUrl, false);
+                        imgItem.setChapterId(chapter.getId());
                         imgItem.setType(false);
                         dataBookList.add(imgItem);
                     }
@@ -183,6 +197,7 @@ public class ActivityBook extends AppCompatActivity {
                     Log.d("BOOK_CONTENT", "Extracted TEXT: " + textContent);
                     if (!textContent.isEmpty()) {
                         DataBook textItem = new DataBook(textContent, true);
+                        textItem.setChapterId(chapter.getId());
                         textItem.setType(true); // is text
                         dataBookList.add(textItem);
                     }

@@ -16,6 +16,9 @@
         android:theme="@style/Theme.IRead"
         tools:targetApi="31">
         <activity
+            android:name=".OpenBook.NoteActivity"
+            android:exported="true" />
+        <activity
             android:name=".Audio.BaseActivity"
             android:exported="false" />
 
@@ -29,22 +32,22 @@
 
         <activity
             android:name=".Book.ActivityBook"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".WaitingConfirmEmailActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".ChangePasswordActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".UpgradeActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".SubscriptionActivity"
             android:exported="false" />
         <activity
             android:name=".MenuBarInHome.SearchActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".Payment.PaymentChooseActivity"
             android:exported="false" />
@@ -62,32 +65,31 @@
             android:exported="false" />
         <activity
             android:name=".Home.SplashActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".Transaction.TransactionActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".Audio.AudioActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".Account.LoginOpenActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".Account.InfoUserActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".Account.LoginActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name=".Account.ForgotPasswordActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".Account.RegisterActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".DetailActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -99,13 +101,14 @@
         </activity>
         <activity
             android:name=".OpenBook.OpenBookActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".CommentActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
+
         <activity
             android:name=".Comment.ReviewActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
     </application>
 
 </manifest>

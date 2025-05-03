@@ -415,6 +415,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                         Collections.sort(chapters, Comparator.comparing(BookChapter::getChapterNumber));
                         ChapterDataHolder.getInstance().setChapterList(chapters);
                         Intent intent = new Intent(OpenBookActivity.this, ActivityBook.class);
+                        intent.putExtra("bookId", bookId);
                         intent.putExtra("selectedIndex", 0);
                         startActivity(intent);
                     }

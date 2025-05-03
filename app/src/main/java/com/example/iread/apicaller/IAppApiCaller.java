@@ -161,7 +161,7 @@ public interface IAppApiCaller {
     @GET("Book/GetListNote")
     Call<ReponderModel<NoteUser>> GetListNote(
             @Query("username") String username,
-            @Query("chapterId") String chapterId
+            @Query("bookId") int bookId
     );
     @GET("Payment/PaymentItem")
     Call<ReponderModel<UserTranscationBookModel>> getHistoryPaymentItem(
@@ -196,5 +196,16 @@ public interface IAppApiCaller {
     Call<ReponderModel<BookChapter>> getListBookChapterByUsername(
             @Query("userName") String username,
             @Query("bookId") int bookId
+    );
+
+    @GET("Book/DeleteNoteUser")
+    Call<ReponderModel<String>> DeleteNoteUser(
+            @Query("id") int id
+    );
+
+    @GET("Book/GetAnalysis")
+    Call<ReponderModel<String>> GetAnalysis(
+            @Query("input") String input
+
     );
 }
