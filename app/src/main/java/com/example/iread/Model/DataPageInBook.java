@@ -11,10 +11,13 @@ public class DataPageInBook {
 
 
 
-    public DataPageInBook(int idPage, List<DataBook> data,BookChapter bookChapter) {
+
+
+    public DataPageInBook(int idPage, List<DataBook> data,BookChapter bookChapter ) {
         IdPage = idPage;
         Data = data;
         BookChapter = bookChapter;
+
     }
     public BookChapter getBookChapter() {
         return BookChapter;

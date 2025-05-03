@@ -24,6 +24,7 @@ public class PageAdapter extends RecyclerView.Adapter<PageAdapter.PageViewHolder
 
    private List<DataPageInBook> dataPage;
    private BookChapter bookChapter;
+   private List<BookChapter> chapterList;
    private Context context;
    private String username;
 

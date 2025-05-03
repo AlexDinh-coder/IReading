@@ -188,6 +188,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                                 intent.putExtra("selectedIndex", i);
                                 intent.putExtra("chapterList", new ArrayList<>(chapters));
                                 intent.putExtra("isView", true);
+                                intent.putExtra("bookId", bookId);
                                 startActivity(intent);
                                 return;
                             }
@@ -264,6 +265,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                         Intent intent = new Intent(OpenBookActivity.this, ActivityBook.class);
                         intent.putExtra("selectedIndex", 0);
                         intent.putExtra("chapterList", new ArrayList<>(chapters));
+                        intent.putExtra("bookId", bookId);
                         startActivity(intent);
                     }
                 }

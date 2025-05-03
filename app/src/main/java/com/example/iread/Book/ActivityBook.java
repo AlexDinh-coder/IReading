@@ -47,7 +47,9 @@ public class ActivityBook extends AppCompatActivity {
     private Integer viewId = 0;
 
     private String username, userId;
-    private int bookid;
+     int bookid;
+
+    int currentPage;
 
     private boolean clickView = false;
 
@@ -60,7 +62,7 @@ public class ActivityBook extends AppCompatActivity {
         username = sharedPreferences.getString("username", "");
         userId = sharedPreferences.getString("userId", "");
         clickView = getIntent().getBooleanExtra("isView", false);
-        bookid = getIntent().getIntExtra("bookid",0);
+        bookid = getIntent().getIntExtra("bookId",0);
 
 
         setupUI();
@@ -90,6 +92,11 @@ public class ActivityBook extends AppCompatActivity {
         makeStatusBarTransparent();
         applyTopPadding();
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadChapterData();
+    }
 
     // Lấy dữ liệu chương từ intent và gán vào ViewPager
     private void loadChapterData() {
@@ -109,32 +116,39 @@ public class ActivityBook extends AppCompatActivity {
                 segment = segment.trim();
                 if (segment.contains("<img")) {
                     String imgUrl = extractImgSrc(segment);
-                    Log.d("BOOK_CONTENT", "Extracted IMG URL: " + imgUrl);
+                    //Log.d("BOOK_CONTENT", "Extracted IMG URL: " + imgUrl);
                     if(imgUrl != null && !imgUrl.isEmpty()) {
                         DataBook imgItem = new DataBook(imgUrl, false);
+                        imgItem.setChapterId(chapter.getId());
                         imgItem.setType(false);
                         dataBookList.add(imgItem);
+
                     }
                 } else {
                     //Xu li noi dung
                     String textContent = Html.fromHtml(segment, Html.FROM_HTML_MODE_LEGACY).toString().trim();
-                    Log.d("BOOK_CONTENT", "Extracted TEXT: " + textContent);
+                    //Log.d("BOOK_CONTENT", "Extracted TEXT: " + textContent);
                     if (!textContent.isEmpty()) {
                         DataBook textItem = new DataBook(textContent, true);
+                        textItem.setChapterId(chapter.getId());
                         textItem.setType(true); // is text
                         dataBookList.add(textItem);
                     }
                 }
             }
+
             DataPageInBook dataPageInBook = new DataPageInBook(i, dataBookList,chapterList.get(i));
             pageDataList.add(dataPageInBook);
         }
+
 
         pageAdapter = new PageAdapter(pageDataList, this,username);
         viewPagerBook = findViewById(R.id.viewPagerBook);
         viewPagerBook.setAdapter(pageAdapter);
         viewPagerBook.setCurrentItem(selectedIndex);
+
     }
+
     private String extractImgSrc(String segment) {
         int srcIndex = segment.indexOf("src=");
         if (srcIndex == -1) return null;
@@ -232,7 +246,7 @@ public class ActivityBook extends AppCompatActivity {
 //        dialog.show();
         Intent intent = new Intent(ActivityBook.this, ChapterActivity.class);
         intent.putExtra("chapterList", new ArrayList<>(chapterList));
-        intent.putExtra("bookid", bookid);
+        intent.putExtra("bookId", bookid);
 
 
 

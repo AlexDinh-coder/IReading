@@ -1,20 +1,38 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="12dp">
 
-    <!-- Tiêu đề chính -->
-    <TextView
-        android:id="@+id/selectedText"
+    <!-- Hàng chứa text + nút xóa -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Item 1"
-        android:textSize="16sp"
-        android:textColor="#000000" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:weightSum="1">
 
-    <!-- Mô tả phụ -->
+        <TextView
+            android:id="@+id/selectedText"
+            android:layout_width="0dp"
+            android:layout_weight="0.9"
+            android:layout_height="wrap_content"
+            android:text="Item 1"
+            android:textSize="16sp"
+            android:textColor="#000000" />
+
+        <ImageView
+            android:id="@+id/btnDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_delete"
+            android:contentDescription="Xóa ghi chú"
+            android:padding="8dp"
+            app:tint="#F44336" />
+    </LinearLayout>
+
+    <!-- Nội dung ghi chú -->
     <TextView
         android:id="@+id/noteContent"
         android:layout_width="match_parent"
@@ -22,4 +40,5 @@
         android:text="Sub Item 1"
         android:textColor="#666666"
         android:textSize="14sp" />
+
 </LinearLayout>

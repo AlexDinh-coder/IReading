@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -57,13 +58,15 @@ public class NoteFragment extends Fragment {
 
     }
 
+
+
     private void getlistnote() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyPrefs", MODE_PRIVATE);
         String username = sharedPreferences.getString("username", "");
         Bundle bundle = getArguments();
         Context context = requireContext();
         if (bundle != null) {
-                 bookid = bundle.getInt("bookid",0);
+                 bookid = bundle.getInt("bookId",0);
 
 
                 apiCaller = RetrofitClient.getInstance(Utils.BASE_URL, context).create(IAppApiCaller.class);
@@ -73,25 +76,22 @@ public class NoteFragment extends Fragment {
                     public void onResponse(Call<ReponderModel<NoteUser>> call, Response<ReponderModel<NoteUser>> response) {
 
                         if (response.isSuccessful() && response.body() != null) {
-                            Log.d("NOTE_JSON", new Gson().toJson(response.body()));
+
                             //listnoteuser = response.body().getDataList();
                             List<NoteUser> listnoteuser = response.body().getDataList();
                             NoteListAdapter adapter = new NoteListAdapter(getContext(), listnoteuser);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                             recyclerView.setAdapter(adapter);
                             // TODO: cập nhật adapter nếu có
-                            Log.d("NOTE_API", "Số ghi chú: " + listnoteuser.size());
+
                         } else {
-                            Log.e("NOTE_API", "Phản hồi không thành công: " + response.code());
+                            Toast.makeText(getContext(), "Lỗi khi tải danh sách ghi chú.", Toast.LENGTH_SHORT).show();
                         }
                     }
 
-
-
-
                     @Override
                     public void onFailure(Call<ReponderModel<NoteUser>> call, Throwable t) {
-                        Log.e("NOTE_API", "Lỗi gọi API: " + t.getMessage());
+
                         Toast.makeText(requireContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();   }
                 });
 

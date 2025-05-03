@@ -162,6 +162,14 @@ public interface IAppApiCaller {
             @Query("username") String username,
             @Query("bookId") int bookId
     );
+    @GET("Book/GetAnalysis")
+    Call<ReponderModel<String>> GetAnalysis(
+            @Query("input") String input
 
+    );
+    @GET("Book/DeleteNoteUser")
+    Call<ReponderModel<String>> DeleteNoteUser(
+            @Query("id") int id
+    );
 
 }

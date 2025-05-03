@@ -20,7 +20,7 @@ import java.util.List;
 
 public class ChapterActivity extends AppCompatActivity {
     TabLayout tabLayout;
-    private int bookid;
+     int bookid;
 
     private List<BookChapter> chapterList = new ArrayList<>();
 
@@ -30,7 +30,7 @@ public class ChapterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chapter);
-        bookid = getIntent().getIntExtra("bookid",0);
+        bookid = getIntent().getIntExtra("bookId",0);
 
         makeStatusBarTransparent();
         applyTopPadding();
@@ -46,6 +46,11 @@ public class ChapterActivity extends AppCompatActivity {
 //        recyclerView.setAdapter(adapter);
     }
 
+    @Override
+    public void onBackPressed() {
+
+        super.onBackPressed();
+    }
     private void showTabLayout() {
         String[] tabTitles = {"Mục lục", "Dấu trang", "Ghi chú", "Bình luận"};
         tabLayout = findViewById(R.id.tabLayout);
@@ -66,7 +71,7 @@ public class ChapterActivity extends AppCompatActivity {
                     case 2:
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("chapterList", new ArrayList<>(chapterList));
-                        bundle.putInt("bookid",bookid);
+                        bundle.putInt("bookId",bookid);
 
                         NoteFragment fragment = new NoteFragment();
                         fragment.setArguments(bundle);
