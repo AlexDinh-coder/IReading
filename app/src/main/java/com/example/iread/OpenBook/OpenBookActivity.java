@@ -313,14 +313,14 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     //Hàm để xử lí load các thông tin sách
     private void loadBookDetails() {
         if (bookId == -1) return;
-
-
         apiCaller.getBookById(bookId).enqueue(new Callback<ReponderModel<Book>>() {
             @Override
             public void onResponse(Call<ReponderModel<Book>> call, Response<ReponderModel<Book>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Book book = response.body().getData();
                     if (book != null) {
+                        bookTitle = book.getName();
+                        bookPrice = book.getPrice();
                         currentAuthorName = book.getCreateBy();
                         currentPosterUrl = book.getPoster();
                         iconLove.setImageResource(isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_love); //cập nhật icon
@@ -339,7 +339,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                             commentLauncher.launch(intent);
                         });
                     }
-                 
+
                 }
 
             }
@@ -437,17 +437,35 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         btnBookListen.setBackgroundTintList(getColorStateList(android.R.color.transparent));
         btnBookRead.setBackgroundTintList(getColorStateList(R.color.dark_gray));
         btnActionBook.setText("NGHE THỬ");
+        if (bookPrice > 0 && !isPurchase) {
+            btnActionBook.setOnClickListener(v -> {
+                Toast.makeText(this, "Bạn cần mua sách mới có thể nghe audio", Toast.LENGTH_SHORT).show();
+
+            });
+        } else {
+            btnActionBook.setOnClickListener(v -> {
+                if (!isUserLoggedIn()) {
+                    Toast.makeText(this, "Bạn cần đăng nhập để nghe sách", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                openFirstAudioChapter();
+            });
+        }
+
         btnUpgrade.setVisibility(View.VISIBLE);
         btnUpgrade.setOnClickListener(v -> {
             if (!isUserLoggedIn()) {
                 Toast.makeText(this, "Bạn cần đăng nhập để nâng cấp tài khoản", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             Intent intent = new Intent(OpenBookActivity.this, SubscriptionActivity.class);
             intent.putExtra("bookId", bookId);
             startActivity(intent);
         });
+
+        // Ẩn phần chương mới nhất nếu đang ở chế độ sách nói
+        LinearLayout layoutNewChapter = findViewById(R.id.layoutNewChapter);
+        layoutNewChapter.setVisibility(View.GONE);
     }
 
     ////Xử lí phần sách nghe
@@ -484,6 +502,8 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         }
 
         btnUpgrade.setVisibility(View.GONE);
+        LinearLayout layoutNewChapter = findViewById(R.id.layoutNewChapter);
+        layoutNewChapter.setVisibility(View.VISIBLE);
     }
 
 
@@ -640,7 +660,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                 .placeholder(R.drawable.loading_placeholder)
                 .error(R.drawable.error_image)
                 .into(imagePoster);
-        //Phẩn hiển thị price
+
         TextView txtPriceOnPoster = findViewById(R.id.txtPriceOnPoster);
         if (book.getPrice() > 0) {
             txtPriceOnPoster.setText(String.valueOf(book.getPrice()));
@@ -650,13 +670,11 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         }
 
         if (currentBookTypeStatus == 1) {
-            // Đang ở chế độ sách nói, show nút NGHE THỬ
             applyBookListenMode();
         } else {
             if (book.getPrice() > 0) {
-                if (isPurchase) { // lấy từ API checkBookPurchasedFromServer trả về
+                if (isPurchase) {
                     btnActionBook.setText("ĐỌC SÁCH");
-                   // btnActionBook.setOnClickListener(v -> openFirstChapter());
                     btnRead.setVisibility(View.VISIBLE);
                 } else {
                     btnActionBook.setText("MUA SÁCH");
@@ -664,11 +682,11 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                     btnRead.setVisibility(View.GONE);
                 }
             } else {
-              applyBookReadMode();
+                applyBookReadMode();
             }
+            btnUpgrade.setVisibility(currentBookTypeStatus == 1 ? View.VISIBLE : View.GONE);
         }
 
-        //Xử lí phần hiển thị tên sách
         TextView tvName = findViewById(R.id.book_title_in_detail);
         if (tvName != null) {
             tvName.setText(book.getName());
@@ -682,38 +700,34 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             authorName.setText(book.getCreateBy());
         }
 
-        //Hiển thị thông tin chương mới nhất
-        if (book.isNewPublishedChapter() && book.getNewPublishedChapter() != null) {
+        LinearLayout layoutNewChapter = findViewById(R.id.layoutNewChapter);
+       TextView txtNewChapter = findViewById(R.id.newChapter);
+        TextView txtChapterName = findViewById(R.id.chapterName);
+        AppCompatButton btnRead = findViewById(R.id.btnRead);
+
+        if (currentBookTypeStatus == 0 && book.isNewPublishedChapter() && book.getNewPublishedChapter() != null) {
             String chapterName = book.getNewPublishedChapter().getName();
             String publishTime = book.getNewPublishedChapter().getNewPublishedDateTime();
-            txtNewChapter.setVisibility(View.VISIBLE);
-            txtChapterName.setVisibility(View.VISIBLE);
+            String chapterId = book.getNewPublishedChapter().getId();
 
+            layoutNewChapter.setVisibility(View.VISIBLE);
             txtChapterName.setText(chapterName + " | " + publishTime);
-        }else {
-            txtNewChapter.setVisibility(View.GONE);
-            txtChapterName.setVisibility(View.GONE);
-        }
-        //Xử lí phần click đọc chương mới nhất
-        if (book.isNewPublishedChapter() && book.getNewPublishedChapter() != null) {
-            String chapterId = book.getNewPublishedChapter().getId(); // ID chương mới nhất
 
             btnRead.setOnClickListener(v -> {
                 if (!isUserLoggedIn()) {
-                    Toast.makeText(this, "Bạn cần đăng nhập để đọc chương mơới nhất", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Bạn cần đăng nhập để đọc chương mới nhất", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 openNewPublishedChapter(chapterId);
             });
         } else {
-            btnRead.setOnClickListener(v -> {
-                Toast.makeText(OpenBookActivity.this, "Chưa có chương mới được xuất bản!", Toast.LENGTH_SHORT).show();
-            });
+            layoutNewChapter.setVisibility(View.GONE);
         }
 
         setupBookSummary(book);
         setupBookCategories(book);
     }
+
 
     private void showPaymentDialog(String bookTitle, int price) {
         if (!isUserLoggedIn()) {
@@ -776,11 +790,17 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                             public void onResponse(Call<ReponderModel<String>> call, Response<ReponderModel<String>> response) {
                                 if (response.isSuccessful() && response.body() != null && response.body().isSussess()) {
                                     Toast.makeText(OpenBookActivity.this, "Thanh toán thành công!", Toast.LENGTH_SHORT).show();
-                                    isPurchase = true;
-                                    btnActionBook.setText("ĐỌC SÁCH");
-                                    btnActionBook.setOnClickListener(vv -> openFirstChapter());
-                                    btnRead.setVisibility(View.VISIBLE);
 
+                                    // Cập nhật trạng thái mua sách
+                                    isPurchase = true;
+
+                                    // Gọi lại kiểm tra mua từ server để đồng bộ chính xác
+                                    checkBookPurchasedFromServer(bookId, username, bookTitle, () -> {
+                                        applyBookReadMode(); // Cập nhật lại UI đọc sách
+                                        loadFragmentWithBookId(new ChapterFragment(), 0); // load lại fragment chương
+                                    });
+
+                                    // Ẩn dialog
                                     dialog.dismiss();
                                 } else {
                                     Toast.makeText(OpenBookActivity.this, "Thanh toán thất bại!", Toast.LENGTH_SHORT).show();
@@ -793,6 +813,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                             }
                         });
                     });
+
                 } else {
                     Toast.makeText(OpenBookActivity.this, "Lỗi lấy thông tin xu!", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
@@ -927,21 +948,13 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                     if (response.isSuccessful() && response.body() != null) {
                         Book book = response.body().getData();
                         if (book != null) {
-                            checkBookPurchasedFromServer(bookId, username, book.getName(), () -> {
-                                // cập nhập purchased book
-//                                bookTitle = book.getName();
-//                                bookPrice = book.getPrice();
+                            bookTitle = book.getName();
+                            bookPrice = book.getPrice();
+                            checkReadingEnoughToEnableRating();
 
+                            // Gọi lại UI theo loại sách hiện tại
+                            checkBookPurchasedFromServer(bookId, username, bookTitle, () -> {
                                 runOnUiThread(() -> {
-                                    bookTitle = book.getName();
-                                    bookPrice = book.getPrice();
-                                    checkReadingEnoughToEnableRating();
-                                    if (currentBookTypeStatus == 1) {
-                                        applyBookListenMode();
-                                    } else {
-                                        applyBookReadMode();
-                                    }
-
                                     showBookDetailUI(book);
                                     loadFragmentWithBookId(new ChapterFragment(), currentBookTypeStatus);
                                 });
@@ -959,6 +972,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             getBookTotalReview(bookId);
         }
     }
+
 
 
 
@@ -998,6 +1012,5 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             }
         });
     }
-
 
 }

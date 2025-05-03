@@ -408,7 +408,7 @@
                         android:textSize="14sp" />
                 </com.google.android.flexbox.FlexboxLayout>
                 <LinearLayout
-                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/layoutNewChapter"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -418,7 +418,20 @@
                     android:layout_margin="8dp"
                     android:clipToPadding="false"
                     android:elevation="2dp"
-                    android:backgroundTint="#1C1C1E">
+                    android:backgroundTint="#1C1C1E"
+                    android:visibility="gone">
+<!--                <LinearLayout-->
+<!--                    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:padding="16dp"-->
+<!--                    android:background="#1C1C1E"-->
+<!--                    android:gravity="center_vertical"-->
+<!--                    android:layout_margin="8dp"-->
+<!--                    android:clipToPadding="false"-->
+<!--                    android:elevation="2dp"-->
+<!--                    android:backgroundTint="#1C1C1E">-->
 
                     <!-- Khối văn bản -->
                     <LinearLayout

@@ -64,6 +64,7 @@ public class ChapterFragment extends Fragment {
         checkBookPurchasedFromServer(() -> {
             Log.d("CheckPurchased", "Đã kiểm tra xong, giá trị isBookPurchased = " + isBookPurchased);
             fetchChapters();
+            setupRecyclerView();
         });
 
 
@@ -77,7 +78,7 @@ public class ChapterFragment extends Fragment {
             bookTypeStatus = args.getInt("bookTypeStatus", 0);
             bookTitle = args.getString("bookTitle", "");
             bookPrice = args.getInt("bookPrice",0);
-            isBookPurchased = args.getBoolean("isPurchase", false);
+           // isBookPurchased = args.getBoolean("isPurchase", false);
         }
     }
 
@@ -196,8 +197,10 @@ public class ChapterFragment extends Fragment {
                 bookTypeStatus,
                 unlockedChapterIds,
                 userCoin,
-                isBookPurchased,
-                bookPrice
+                this.isBookPurchased,
+                this.bookPrice
+//                isBookPurchased,
+//                bookPrice
         );
 
         recyclerView.setAdapter(chapterAdapter);
