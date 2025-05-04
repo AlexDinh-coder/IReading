@@ -308,125 +308,60 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/bg_card_dark"
-                android:backgroundTintMode="src_in">
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_dark">
 
-                <!-- Mỗi item bắt đầu từ đây -->
+                <!-- Mục: Lịch sử giao dịch -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingHorizontal="12dp">
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <TextView
                         android:id="@+id/HistoryTransaction"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="16dp"
                         android:text="Lịch sử giao dịch"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp" />
-
                 </LinearLayout>
 
-                <View android:layout_width="match_parent"
+                <View
+                    android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="#222222" />
+
+                <!-- Mục: Nạp xu -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="12dp">
-
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:text="Thông báo"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-                <View android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#222222" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="12dp">
-
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:text="Trở thành tác giả"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-                <View android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#222222" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="12dp">
-
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <TextView
                         android:id="@+id/btnPayment"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
                         android:layout_weight="1"
                         android:text="Nạp xu"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp" />
-
                 </LinearLayout>
-
-                <View android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#222222" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="12dp">
-
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:text="Trợ giúp và góp ý"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-                <View android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#222222" />
-
             </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"

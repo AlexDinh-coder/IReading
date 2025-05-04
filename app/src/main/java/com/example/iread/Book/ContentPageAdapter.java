@@ -136,6 +136,7 @@ public class ContentPageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                 public void updateDrawState(@NonNull TextPaint ds) {
                                     super.updateDrawState(ds);
                                     ds.setUnderlineText(false); // Bỏ gạch chân
+                                    ds.setColor(holderText.txtContent.getCurrentTextColor());
                                 }
                             };
                             spannable.setSpan(clickableSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

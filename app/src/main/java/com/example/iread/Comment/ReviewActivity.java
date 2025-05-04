@@ -83,8 +83,8 @@ public class ReviewActivity extends AppCompatActivity {
                     for (CommentModel comment : commentModel) {
                         totalStar += comment.getRating();
                     }
-                    float averageRating = commentModel.size() > 0 ? totalStar / commentModel.size() : 0f;
-                    ratingSummary.setText(String.format("%.1f", averageRating));
+                    float averageRating = commentModel.size() > 0 ? totalStar / commentModel.size() : 0f;// tổng số sao chia cho số lượng đánh giá
+                    ratingSummary.setText(String.format("%.1f", averageRating));// làm tròn tới số thập phân
 
                     updateStarIcon(averageRating);
 

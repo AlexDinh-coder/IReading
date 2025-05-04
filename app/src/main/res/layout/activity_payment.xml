@@ -54,7 +54,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🦊 Chỉ có thể dùng để nâng cấp tài khoản, mở khoá chương, tặng quà cho tác giả"
+            android:text="🦊 Chỉ có thể dùng để nâng cấp tài khoản, mở khoá chương. mua sách"
             android:textColor="#FFFFFF" />
         <TextView
             android:layout_width="wrap_content"
@@ -69,7 +69,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🦊 Có thể mua thông qua một trong các hình thức thanh toán bên dưới"
+            android:text="🦊 Có thể mua thông qua hình thức thanh toán bên dưới"
             android:textColor="#FFFFFF" />
     </LinearLayout>
     <LinearLayout
@@ -87,7 +87,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Thanh toán qua QR code"
+            android:text="Thanh toán bằng PayOS qua QR code"
             android:textColor="#000000"
             android:textStyle="bold" />
     </LinearLayout>
@@ -107,7 +107,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🍬 Lưu ý không đổi ngược lại thành Kẹo được"
+            android:text="🦊 Lưu ý không đổi ngược lại thành Tiền được"
             android:textColor="#FFFFFF"
             android:textStyle="bold" />
     </LinearLayout>

@@ -14,14 +14,33 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="1dp"
+            android:layout_height="56dp"
             android:background="#00C081"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:title="Mục lục"
-            android:gravity="center"
-            android:layout_gravity="center"
-            app:titleTextColor="#FFFFFF" />
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_back"
+                android:layout_gravity="center_vertical"
+                android:contentDescription="Back" />
+
+            <TextView
+                android:id="@+id/title_center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mục lục"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_marginStart="-24dp" />
+        </androidx.appcompat.widget.Toolbar>
+
 
         <!-- TabLayout -->
         <com.google.android.material.tabs.TabLayout

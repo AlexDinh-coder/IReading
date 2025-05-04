@@ -320,11 +320,11 @@ public class HomeFragment extends Fragment {
         RecyclerView rcvBooks = sectionView.findViewById(R.id.rcv_books_by_category);
 
         tvCategoryTitle.setText(category.getCategoryName());
-        tvCategoryTitle.setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), DetailActivity.class);
-            intent.putExtra("selectedCategory", category.getCategoryName());
-            startActivity(intent);
-        });
+//        tvCategoryTitle.setOnClickListener(v -> {
+//            Intent intent = new Intent(requireContext(), DetailActivity.class);
+//            intent.putExtra("selectedCategory", category.getCategoryName());
+//            startActivity(intent);
+//        });
 
         rcvBooks.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         //Lấy danh mục top 10

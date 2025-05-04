@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -27,6 +28,8 @@ public class NoteActivity extends AppCompatActivity {
     TabLayout tabLayout;
     int bookid;
 
+    private ImageView btnBack;
+
     private List<BookChapter> chapterList = new ArrayList<>();
 
     @SuppressLint("MissingInflatedId")
@@ -36,6 +39,8 @@ public class NoteActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_note);
         bookid = getIntent().getIntExtra("bookId",0);
+        btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
 
         makeStatusBarTransparent();
         applyTopPadding();

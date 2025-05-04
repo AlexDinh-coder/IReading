@@ -53,7 +53,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_back" />
 
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ScrollView
@@ -159,22 +158,8 @@
                         app:cardElevation="4dp">
                         >
 
-                        <TextView
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:gravity="center"
-                            android:text="#5"
-                            android:textColor="@color/white" />
                     </androidx.cardview.widget.CardView>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="10dp"
-                        android:text="trong Top xu hướng Sách nói >"
-                        android:textColor="#95123E"
-                        android:textSize="15sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -300,20 +285,21 @@
                             android:focusable="true"/>
 
                         <ImageView
+                            android:id="@+id/btnNote"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:layout_gravity="center"
                             android:layout_marginLeft="10dp"
                             android:src="@drawable/ic_bookmark" />
 
-                        <ImageView
-                            android:id="@+id/imageView6"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:layout_gravity="center"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"
-                            android:src="@drawable/ic_menu_in_open_book" />
+<!--                        <ImageView-->
+<!--                            android:id="@+id/imageView6"-->
+<!--                            android:layout_width="30dp"-->
+<!--                            android:layout_height="30dp"-->
+<!--                            android:layout_gravity="center"-->
+<!--                            android:layout_marginLeft="10dp"-->
+<!--                            android:layout_marginRight="10dp"-->
+<!--                            android:src="@drawable/ic_menu_in_open_book" />-->
                     </LinearLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
                 <LinearLayout

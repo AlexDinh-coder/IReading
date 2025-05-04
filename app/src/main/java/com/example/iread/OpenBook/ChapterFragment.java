@@ -66,8 +66,6 @@ public class ChapterFragment extends Fragment {
             fetchChapters();
             setupRecyclerView();
         });
-
-
         return view;
     }
 

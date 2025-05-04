@@ -1,6 +1,7 @@
 package com.example.iread;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -52,7 +53,7 @@ public class LibraryFragment extends Fragment {
 
     private IAppApiCaller iAppApiCaller;
 
-    private ImageView btnDelete, imgAvatar;
+    private ImageView  imgAvatar;
 
     TextView tvUserName, tvFavorite, tvContinue, tvPurchased;
 
@@ -103,19 +104,10 @@ public class LibraryFragment extends Fragment {
             }
         });
 
-
-
         tvFavorite = view.findViewById(R.id.tvFavorite);
         tvContinue = view.findViewById(R.id.tvContinue);
         tvPurchased = view.findViewById(R.id.tvBuy);
         viewAccount = view.findViewById(R.id.viewAccount);
-        btnDelete = view.findViewById(R.id.btnDelete);
-        btnDelete.setOnClickListener(v -> {
-            if (bookAdapter == null) return;
-            Log.d("DELETE", "Đã nhấn vào nút delete");
-            bookAdapter.setSelectMode(true);
-            recyclerBookView.setAdapter(bookAdapter);
-        });
         deleteActionLayout = new LinearLayout(requireContext());
         deleteActionLayout.setOrientation(LinearLayout.HORIZONTAL);
         deleteActionLayout.setVisibility(View.GONE);
@@ -188,7 +180,7 @@ public class LibraryFragment extends Fragment {
     }
 
     public void showDeleteUI() {
-        btnDelete.setVisibility(View.GONE);// ẩn nút delete
+       // btnDelete.setVisibility(View.GONE);// ẩn nút delete
         if (bookAdapter != null) {
             bookAdapter.setSelectMode(true);
             deleteActionLayout.setVisibility(View.VISIBLE); // show nút xoá/huỷ
@@ -272,9 +264,12 @@ public class LibraryFragment extends Fragment {
                     bookAdapter = new BookDetailAdapter(getContext(), bookList);
                     // Gắn listener để hiển thị UI Xoá/Huỷ khi có tick chọn
                     bookAdapter.setOnSelectionChangedListener(() -> {
-                        if (getActivity() != null) {
+                        if (isAdded() && getActivity() != null) {
                             getActivity().runOnUiThread(() -> showDeleteUI());
                         }
+//                        if (getActivity() != null) {
+//                            getActivity().runOnUiThread(() -> showDeleteUI());
+//                        }
                     });
                     recyclerBookView.setAdapter(bookAdapter);
                 }
@@ -287,16 +282,16 @@ public class LibraryFragment extends Fragment {
         });
 
 
-
-
-
     }
     // Gọi lại load danh sách mỗi lần quay lại màn
     @Override
     public void onResume() {
         super.onResume();
+        Context context = getContext();
+        if (context == null) return;
+        SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        //SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String username = sharedPreferences.getString("username", "User");
         switch (currentTab) {
             case FAVORITE:
@@ -317,13 +312,23 @@ public class LibraryFragment extends Fragment {
         tvPurchased.setTextColor(currentTab == LibraryTab.PURCHASED ? Color.WHITE : Color.parseColor("#8C8A8A"));
     }
     private void makeStatusBarTransparent() {
-        Window window = requireActivity().getWindow();
+       // Window window = requireActivity().getWindow();
+        Activity activity = getActivity();
+        if (activity != null) {
+            Window window = activity.getWindow();
+            // các xử lý tiếp theo...
+            window.getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            );
 
-        window.getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        );
+            window.setStatusBarColor(Color.TRANSPARENT);
+        }
 
-        window.setStatusBarColor(Color.TRANSPARENT);
+//        window.getDecorView().setSystemUiVisibility(
+//                View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//        );
+//
+//        window.setStatusBarColor(Color.TRANSPARENT);
     }
 
 

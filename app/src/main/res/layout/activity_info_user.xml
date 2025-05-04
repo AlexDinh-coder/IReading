@@ -113,12 +113,12 @@
                 android:textSize="14sp"
                 android:textColor="#AAAAAA" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ID: 9654508"
-                android:textSize="12sp"
-                android:textColor="#888888" />
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="ID: 9654508"-->
+<!--                android:textSize="12sp"-->
+<!--                android:textColor="#888888" />-->
         </LinearLayout>
 
         <!-- Thông tin liên hệ -->
@@ -146,12 +146,12 @@
                 android:textColor="#FFFFFF"
                 android:padding="4dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Google: dttrung2******ail.com"
-                android:textColor="#FFFFFF"
-                android:padding="4dp" />
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Google: dttrung2******ail.com"-->
+<!--                android:textColor="#FFFFFF"-->
+<!--                android:padding="4dp" />-->
         </LinearLayout>
 
         <!-- Nút chức năng -->
@@ -178,15 +178,15 @@
                 android:layout_height="1dp"
                 android:background="#444444" />
 
-            <TextView
-                android:id="@+id/txtDeleteAccount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Xóa tài khoản"
-                android:textColor="#FF4444"
-                android:textSize="16sp"
-                android:padding="12dp"
-                android:background="?attr/selectableItemBackground" />
+<!--            <TextView-->
+<!--                android:id="@+id/txtDeleteAccount"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Xóa tài khoản"-->
+<!--                android:textColor="#FF4444"-->
+<!--                android:textSize="16sp"-->
+<!--                android:padding="12dp"-->
+<!--                android:background="?attr/selectableItemBackground" />-->
             <Button
                 android:id="@+id/btnSaveInfo"
                 android:layout_width="match_parent"

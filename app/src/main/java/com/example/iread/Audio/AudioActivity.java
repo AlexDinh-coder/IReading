@@ -108,10 +108,10 @@ public class AudioActivity extends AppCompatActivity {
         bottomSheetBehavior.setHideable(true);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-        ImageView btnReview = findViewById(R.id.btn_review_in_audio);
-        btnReview.setOnClickListener(v -> {
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        });
+      //  ImageView btnReview = findViewById(R.id.btn_review_in_audio);
+//        btnReview.setOnClickListener(v -> {
+//            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//        });
         bottomSheetBehavior.setHideable(true);
 
         recyclerView = findViewById(R.id.recyclerReviews);
@@ -151,10 +151,10 @@ public class AudioActivity extends AppCompatActivity {
             startActivity(intent);
         });
         miniAudioContainer = findViewById(R.id.miniAudioContainer);
-        btnDown = findViewById(R.id.btnDown);
-        btnDown.setOnClickListener(v -> {
-            showMiniAudio();
-        });
+//        btnDown = findViewById(R.id.btnDown);
+//        btnDown.setOnClickListener(v -> {
+//            showMiniAudio();
+//        });
         txtContentDisplay = findViewById(R.id.txtAudioTitle);
         bookId = getIntent().getIntExtra("bookId", -1);
         imgPoster = findViewById(R.id.image_characters_in_detail);
@@ -251,8 +251,6 @@ public class AudioActivity extends AppCompatActivity {
                     time.setText(formatTime(progress) + " / " + formatTime(duration));
                 }
             }
-
-
             @Override public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}
         });

@@ -102,20 +102,20 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
         BookChapter bookChapter = chapterList.get(position);
         holder.chapterTitle.setText(bookChapter.getChapterName());
 
-        int bookType = bookChapter.getBookType();
-        boolean isPaid = (bookTypeStatus == 0) ? bookChapter.isPaidChapter() : bookChapter.isPaidVoice();
+        int priceToDisplay = (bookTypeStatus == 0)
+                ? bookChapter.getPrice()
+                : bookChapter.getPriceVoice();
 
-        if (isPaid) {
-            setLabel(holder, "Đã mua", R.drawable.bg_label_paid);
-        } else if (bookType == 0) {
+        boolean isPaid = (bookTypeStatus == 0)
+                ? bookChapter.isPaidChapter()
+                : bookChapter.isPaidVoice();
+
+        if (priceToDisplay == 0) {
             setLabel(holder, "FREE", R.drawable.bg_label_free);
-        } else if (bookType == 1) {
-            int priceToDisplay = (bookTypeStatus == 0)
-                    ? bookChapter.getPrice()
-                    : bookChapter.getPriceVoice();
-            setLabel(holder, priceToDisplay + "", R.drawable.bg_label_paid);
+        } else if (isPaid) {
+            setLabel(holder, "Đã mua", R.drawable.bg_label_paid);
         } else {
-            holder.chapterLabel.setVisibility(View.GONE);
+            setLabel(holder, formatXu(priceToDisplay), R.drawable.bg_label_paid);
         }
 
         holder.itemView.setOnClickListener(v -> {
@@ -126,31 +126,84 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
                 return;
             }
 
-            //  Nếu sách có giá toàn bộ
+            // Nếu sách có giá toàn bộ
             if (bookPrice > 0 && !isBookPurchased) {
                 Toast.makeText(context, "Bạn cần mua sách để truy cập các chương!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            //  Nếu đã mua hoặc sách không có giá → xử lý từng chương
-            if (bookTypeStatus == 0) { // Sách đọc
-                if (bookChapter.getBookType() == 0 || bookChapter.isPaidChapter()) {
-                    openChapter(position, bookChapter);
-                } else {
-                    showUnlockDialog(bookChapter); // Mua chương đọc lẻ
-                }
-            } else if (bookTypeStatus == 1) { // Sách nghe
-                if (bookChapter.getBookType() == 0 || bookChapter.isPaidVoice()) {
-                    openChapter(position, bookChapter);
-                } else {
-                    showUnlockDialog(bookChapter); // Mua chương nghe lẻ
-                }
+            // Kiểm tra điều kiện mở chương
+            boolean isChapterPaid = (bookTypeStatus == 0)
+                    ? bookChapter.isPaidChapter()
+                    : bookChapter.isPaidVoice();
+
+            int chapterPrice = (bookTypeStatus == 0)
+                    ? bookChapter.getPrice()
+                    : bookChapter.getPriceVoice();
+
+            if (chapterPrice == 0 || isChapterPaid) {
+                openChapter(position, bookChapter);
+            } else {
+                showUnlockDialog(bookChapter);
             }
         });
-
-
-
     }
+
+
+    // @Override
+//    public void onBindViewHolder(@NonNull ChapterViewHolder holder, int position) {
+//        BookChapter bookChapter = chapterList.get(position);
+//        holder.chapterTitle.setText(bookChapter.getChapterName());
+//
+//        int bookType = bookChapter.getBookType();
+//        boolean isPaid = (bookTypeStatus == 0) ? bookChapter.isPaidChapter() : bookChapter.isPaidVoice();
+//
+//        if (isPaid) {
+//            setLabel(holder, "Đã mua", R.drawable.bg_label_paid);
+//        } else if (bookType == 0) {
+//            setLabel(holder, "FREE", R.drawable.bg_label_free);
+//        } else if (bookType == 1) {
+//            int priceToDisplay = (bookTypeStatus == 0)
+//                    ? bookChapter.getPrice()
+//                    : bookChapter.getPriceVoice();
+//            setLabel(holder, priceToDisplay + "", R.drawable.bg_label_paid);
+//        } else {
+//            holder.chapterLabel.setVisibility(View.GONE);
+//        }
+//
+//        holder.itemView.setOnClickListener(v -> {
+//            if (bookChapter == null) return;
+//
+//            if (username == null || username.isEmpty() || userId == null || userId.isEmpty()) {
+//                Toast.makeText(context, "Bạn cần đăng nhập để đọc hoặc nghe sách!", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//
+//            //  Nếu sách có giá toàn bộ
+//            if (bookPrice > 0 && !isBookPurchased) {
+//                Toast.makeText(context, "Bạn cần mua sách để truy cập các chương!", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//
+//            //  Nếu đã mua hoặc sách không có giá → xử lý từng chương
+//            if (bookTypeStatus == 0) { // Sách đọc
+//                if (bookChapter.getBookType() == 0 || bookChapter.isPaidChapter()) {
+//                    openChapter(position, bookChapter);
+//                } else {
+//                    showUnlockDialog(bookChapter); // Mua chương đọc lẻ
+//                }
+//            } else if (bookTypeStatus == 1) { // Sách nghe
+//                if (bookChapter.getBookType() == 0 || bookChapter.isPaidVoice()) {
+//                    openChapter(position, bookChapter);
+//                } else {
+//                    showUnlockDialog(bookChapter); // Mua chương nghe lẻ
+//                }
+//            }
+//        });
+//
+//
+//
+//    }
 
     private void openChapter(int position, BookChapter bookChapter) {
        // sendViewStatus(bookChapter, 0, viewId);
