@@ -140,6 +140,9 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
         txtChapterName = findViewById(R.id.chapterName);
         btnRead = findViewById(R.id.btnRead);
         btnNote = findViewById(R.id.btnNote);
+        btnTextReview.setVisibility(View.GONE);
+        iconLove.setVisibility(View.GONE);
+
         bookId = getIntent().getIntExtra("bookId",0);
         btnNote.setOnClickListener(v -> {
             Intent intent = new Intent(OpenBookActivity.this, NoteActivity.class);
@@ -309,6 +312,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                         currentPosterUrl = book.getPoster();
                         iconLove.setImageResource(isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_love); //cập nhật icon
                         showBookDetailUI(book);
+                        checkReadingEnoughToEnableRating();
                         btnTextReview.setOnClickListener(v -> {
                             if (!isUserLoggedIn()) {
                                 Toast.makeText(OpenBookActivity.this, "Vui lòng đăng nhập để đánh giá sách!", Toast.LENGTH_SHORT).show();
