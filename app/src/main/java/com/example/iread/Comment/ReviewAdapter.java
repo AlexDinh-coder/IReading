@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.iread.Model.CommentModel;
 import com.example.iread.Model.Review;
 import com.example.iread.R;
@@ -26,12 +27,15 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     public static class ReviewViewHolder extends RecyclerView.ViewHolder {
         TextView txtUsername, txtReview, txtTime;
+
+        ImageView imgAvatar;
         ImageView[] stars = new ImageView[5];
 
         public ReviewViewHolder(@NonNull View itemView) {
             super(itemView);
             txtUsername = itemView.findViewById(R.id.txtName);
             txtReview = itemView.findViewById(R.id.txtComment);
+            imgAvatar = itemView.findViewById(R.id.imgAvatar);
             txtTime = itemView.findViewById(R.id.txtTime);
             stars[0] = itemView.findViewById(R.id.star111);
             stars[1] = itemView.findViewById(R.id.star112);
@@ -58,6 +62,12 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         holder.txtUsername.setText(listComment.getFullName());
         holder.txtReview.setText(listComment.getContent());
         holder.txtTime.setText(listComment.getCreateDate());
+
+        Glide.with(holder.itemView.getContext())
+                .load(listComment.getAvatar())
+                .placeholder(R.drawable.loading_placeholder)
+                .error(R.drawable.error_image)
+                .into(holder.imgAvatar);
         // Hiển thị số sao tương ứng với rating
         for (int i = 0; i < 5; i++) {
             if (i < listComment.getRating()) {

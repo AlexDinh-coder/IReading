@@ -67,9 +67,6 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
 
 
 
-    //private List<BookChapter> chapterList;
-
-
     public ChapterAdapter(OnChapterClickListener onChapterClickListener, Context context, List<BookChapter> chapterList, int viewId, int bookId, int bookTypeStatus,List<String> unlockedChapterIds, long userCoin, boolean isBookPurchased, int bookPrice) {
         this.onChapterClickListener = onChapterClickListener;
         this.context = context;
@@ -117,7 +114,6 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
         } else {
             setLabel(holder, formatXu(priceToDisplay), R.drawable.bg_label_paid);
         }
-
         holder.itemView.setOnClickListener(v -> {
             if (bookChapter == null) return;
 

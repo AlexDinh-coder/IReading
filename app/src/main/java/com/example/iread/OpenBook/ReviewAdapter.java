@@ -8,6 +8,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 import com.example.iread.Model.CommentModel;
 import com.example.iread.R;
 
@@ -15,6 +17,8 @@ import java.util.List;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ItemHolder> {
     private List<CommentModel> commentList;
+
+
 
     public ReviewAdapter(List<CommentModel> commentList) {
         this.commentList = commentList;
@@ -33,12 +37,16 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ItemHolder
         CommentModel comment = commentList.get(position);
         if (comment == null) return;
         Log.d("ReviewAdapter", "Đang bind comment: " + comment.getFullName());
-
         holder.txtUsername.setText(comment.getFullName());
         holder.txtReview.setText(comment.getContent());
         Log.d("ReviewAdapter", "Nội dung comment: " + comment.getContent());
-
         holder.txtTime.setText(comment.getCreateDate());
+        Glide.with(holder.itemView.getContext())
+                .load(comment.getAvatar())
+                .placeholder(R.drawable.ic_user)
+                .error(R.drawable.error_image)
+                .into(holder.imgAvatarReview);
+
         // Hiển thị số sao tương ứng với rating
         for (int i = 0; i < 5; i++) {
             if (i < comment.getRating()) {
@@ -56,6 +64,8 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ItemHolder
 
     public class ItemHolder extends RecyclerView.ViewHolder {
         private TextView txtUsername;
+
+        ImageView imgAvatarReview;
         private TextView txtReview, txtTime;
 
         ImageView[] stars = new ImageView[5];
@@ -64,6 +74,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ItemHolder
             super(itemView);
             txtUsername = itemView.findViewById(R.id.username_in_open_book);
             txtReview = itemView.findViewById(R.id.review_in_open_book);
+            imgAvatarReview = itemView.findViewById(R.id.Avatar);
             txtTime = itemView.findViewById(R.id.time_text);
             stars[0] = itemView.findViewById(R.id.star1);
             stars[1] = itemView.findViewById(R.id.star2);

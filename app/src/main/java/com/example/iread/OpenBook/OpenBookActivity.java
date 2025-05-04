@@ -1,7 +1,5 @@
 package com.example.iread.OpenBook;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -30,7 +28,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.iread.Audio.AudioActivity;
-import com.example.iread.Audio.BaseActivity;
 import com.example.iread.Book.ActivityBook;
 import com.example.iread.Comment.ReviewActivity;
 import com.example.iread.CommentActivity;
@@ -41,7 +38,6 @@ import com.example.iread.Model.BookChapter;
 import com.example.iread.Model.Category;
 import com.example.iread.Model.CommentModel;
 import com.example.iread.Model.UserTranscationBook;
-import com.example.iread.Model.UserTranscationBookModel;
 import com.example.iread.R;
 import com.example.iread.SubscriptionActivity;
 import com.example.iread.apicaller.IAppApiCaller;
@@ -63,28 +59,22 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class OpenBookActivity extends AppCompatActivity implements ParameterInterface<Integer> {
-
     private RecyclerView rcv;
     private IAppApiCaller apiCaller;
     private ReviewAdapter reviewAdapter;
     private TabLayout tabLayout;
     private TextView totalRating, btnTotalReview, btnTextReview, totalReadView,totalListenView;
-
     private TextView ratingTextStarTop, ratingTextStarBottom, txtNewChapter,txtChapterName;
-
     MaterialButton btnBookRead, btnBookListen;
 
     ImageView iconShow, iconLove, imagePoster;
-
     AppCompatButton btnActionBook, btnUpgrade;
-
     ImageView[] ratingStarBottom = new ImageView[5];
     private ActivityResultLauncher<Intent> commentLauncher;
     private ImageView btnBack, btnNote;
     private FrameLayout contentFrame;
 
     private AppCompatButton btnRead;
-
     private boolean isFavorite = false;
     private int bookId;
 
@@ -97,7 +87,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     private boolean isPurchase;
 
     private int currentBookTypeStatus = 0;
-
     private int bookPrice = 0;
 
     @Override
@@ -214,7 +203,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
 
                     if (!audioChapters.isEmpty()) {
                         BookChapter firstAudio = audioChapters.get(0);
-
                         Intent intent = new Intent(OpenBookActivity.this, AudioActivity.class);
                         intent.putExtra("chapterId", firstAudio.getId());
                         intent.putExtra("bookId", bookId);
@@ -277,7 +265,6 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
                                 intent.putExtra("selectedIndex", i);
                                 intent.putExtra("bookId", bookId);
                                 startActivity(intent);
-
                                 return;
                             }
                         }
@@ -582,6 +569,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
 
                     float totalStar = 0f;
                     for (CommentModel comment : comments) {
+                        Log.d("DEBUG_AVATAR", "Tên: " + comment.getFullName() + ", Avatar: " + comment.getAvatar());
                         totalStar += comment.getRating();
                     }
                     float averageRating = comments.size() > 0 ? totalStar / comments.size() : 0f;

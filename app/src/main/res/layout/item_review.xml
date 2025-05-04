@@ -22,12 +22,11 @@
             >
 
             <!-- Avatar -->
-            <TextView
-                android:id="@+id/avatar_text"
+            <ImageView
+                android:id="@+id/Avatar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:gravity="center"
-                android:text="TE"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:backgroundTint="#7E57C2"
