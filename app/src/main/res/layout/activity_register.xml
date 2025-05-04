@@ -65,7 +65,7 @@
                 android:id="@+id/welcome_text_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Waka"
+                android:text="IReading"
                 android:textColor="#FFFFFF"
                 android:textSize="19sp"
                 android:layout_centerHorizontal="true"
