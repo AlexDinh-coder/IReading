@@ -511,7 +511,8 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
     private void loadFragmentWithBookId(Fragment fragment, int bookTypeStatus) {
         Bundle bundle = new Bundle();
         bundle.putInt("bookId", bookId);
-        bundle.putInt("bookTypeStatus", bookTypeStatus); // 0: đọc, 1: nghe
+       // bundle.putInt("bookTypeStatus", bookTypeStatus); // 0: đọc, 1: nghe
+        bundle.putInt("bookTypeStatus", currentBookTypeStatus);
         bundle.putString("bookTitle", bookTitle);
         bundle.putInt("bookPrice", bookPrice);
         bundle.putBoolean("isPurchase", isPurchase);
@@ -533,7 +534,7 @@ public class OpenBookActivity extends AppCompatActivity implements ParameterInte
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition() == 0){
-                    loadFragmentWithBookId(new ChapterFragment());
+                    loadFragmentWithBookId(new ChapterFragment(), currentBookTypeStatus);
                 } else if (tab.getPosition() == 1) {
                     loadFragmentWithBookId(new MinghtLikeFragment());
                 }

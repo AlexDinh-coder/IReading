@@ -71,18 +71,13 @@
                 android:maxLines="1"
                 android:paddingVertical="0dp" />
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@android:drawable/ic_btn_speak_now"
-                android:layout_marginStart="8dp"/>
         </LinearLayout>
 
     </LinearLayout>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Sách được tìm kiếm nhiều"
+        android:text="Sách được tìm kiếm"
         android:textColor="@color/white"
         android:textStyle="bold"
         android:textSize="15sp"
